@@ -3,6 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const requestLoger = require("./middlewares/logger");
+
+// Custom middlewares
+const errorHandler = require("./middlewares/errorHandler");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
 const { verifyToken, refreshToken } = require("./middlewares/auth");
@@ -35,6 +38,9 @@ app.use("/refresh", refreshToken, verifyToken, userRoutes);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);
+
+// Error handling middleware
+app.use(errorHandler);
 
 const startApp = async () => {
   try {

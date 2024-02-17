@@ -1,6 +1,6 @@
 const { signUpUser, loginUser } = require("../services/authService");
 
-const signUpController = async (req, res) => {
+const signUpController = async (req, res, next) => {
   try {
     const { id, username, createdAt } = await signUpUser(req.body);
 
@@ -9,31 +9,26 @@ const signUpController = async (req, res) => {
       result: { username, userId: id, createdAt },
       message: `User ${id} signed up successfully`,
     });
-  } catch (error) {
-    if (error.name === "ValidationError") {
+  } catch (e) {
+    if (e.name === "ValidationError") {
       res.status(422).json({
         success: false,
-        error: error.name,
-        message: error.message,
+        error: e.name,
+        message: e.message,
       });
-    } else if (error.name === "MongoServerError") {
+    } else if (e.name === "MongoServerError") {
       res.status(400).json({
         success: false,
-        error: error.name,
-        message: error.message,
+        error: e.name,
+        message: e.message,
       });
     } else {
-      // console.log(error);
-      res.status(500).json({
-        success: false,
-        error: "Internal Server Error",
-        message: error.message || "An unknown error occurred while signing up",
-      });
+      next(e);
     }
   }
 };
 
-const loginController = async (req, res) => {
+const loginController = async (req, res, next) => {
   // console.log("Inside login controller");
   try {
     res.clearCookie("jwt");
@@ -67,11 +62,7 @@ const loginController = async (req, res) => {
         message: "Invalid password, please try again",
       });
     } else {
-      return res.status(500).json({
-        success: false,
-        error: "Internal Server Error",
-        message: e.message || "An unknown error occurred while logging in",
-      });
+      next(e);
     }
   }
 };
