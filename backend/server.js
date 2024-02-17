@@ -7,6 +7,7 @@ const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
 // custom routes
 const userRoutes = require("./routes/userRoute");
+const authRoutes = require("./routes/authRoute");
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.use(requestLoger);
 
 // User Routes
 app.use("/user", userRoutes);
+
+// Protected Routes
+app.use("/api", authRoutes);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);

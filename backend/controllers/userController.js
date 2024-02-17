@@ -2,12 +2,12 @@ const signUpUser = require("../services/userService");
 
 const signUpController = async (req, res) => {
   try {
-    const { userId, username, createdAt } = await signUpUser(req.body);
+    const { id, username, createdAt } = await signUpUser(req.body);
 
     res.status(201).json({
       success: true,
-      result: { userId, username, createdAt },
-      message: `User ${userId} signed up successfully`,
+      result: { username, userId: id, createdAt },
+      message: `User ${id} signed up successfully`,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
