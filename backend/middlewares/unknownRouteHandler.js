@@ -4,8 +4,7 @@ const unknownRouteHandler = (req, res, err) => {
     success: false,
     message: "Looks like, the page you are looking for doesn't exist",
     error: {
-      errorCode: err.code || 404,
-      errorMessage: err.message || "Not Found",
+      message: err.message || "Not Found",
     },
   });
 };

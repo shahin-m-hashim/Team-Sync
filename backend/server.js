@@ -5,6 +5,9 @@ const cookieParser = require("cookie-parser");
 const requestLoger = require("./middlewares/logger");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
+// custom routes
+const userRoutes = require("./routes/userRoute");
+
 const app = express();
 
 // Body parser middlewares
@@ -20,21 +23,27 @@ app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 // Custom middleware for logging request paths
 app.use(requestLoger);
 
-// Route for root path
-app.get("/", (req, res) => res.send("Hello World"));
+// User Routes
+app.use("/user", userRoutes);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);
 
 const startApp = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(
+      process.env.MONGODB_URI + "?retryWrites=true&w=majority"
+    );
     console.log("Database connected successfully");
     app.listen(process.env.PORT, () => {
       console.log("Server is running on port:", process.env.PORT);
     });
   } catch (error) {
-    console.error("Database connection error:", error);
+    console.error("Database connection error:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 };
