@@ -5,9 +5,11 @@ const cookieParser = require("cookie-parser");
 const requestLoger = require("./middlewares/logger");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
+const { verifyToken, refreshToken } = require("./middlewares/auth");
+
 // custom routes
-const userRoutes = require("./routes/userRoute");
 const authRoutes = require("./routes/authRoute");
+const userRoutes = require("./routes/userRoute");
 
 const app = express();
 
@@ -24,11 +26,12 @@ app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 // Custom middleware for logging request paths
 app.use(requestLoger);
 
-// User Routes
-app.use("/user", userRoutes);
+// Authentication Routes
+app.use("/auth", authRoutes);
 
 // Protected Routes
-app.use("/api", authRoutes);
+app.use("/api", verifyToken, userRoutes);
+app.use("/refresh", refreshToken, verifyToken, userRoutes);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);

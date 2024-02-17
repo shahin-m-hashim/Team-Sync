@@ -2,7 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const users = require("../models/userModel");
 
-const verifyCredentials = async (email, password) => {
+const signUpUser = async (user) => await users.create(user);
+
+const loginUser = async (email, password) => {
   const user = await users.findOne({ email });
 
   if (!user) {
@@ -24,4 +26,4 @@ const verifyCredentials = async (email, password) => {
   return token;
 };
 
-module.exports = verifyCredentials;
+module.exports = { signUpUser, loginUser };
