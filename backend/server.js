@@ -8,7 +8,11 @@ const requestLoger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
-const { verifyToken, refreshToken } = require("./middlewares/auth");
+const {
+  verifyAccessToken,
+  verifyRefreshToken,
+  refreshToken,
+} = require("./middlewares/token");
 
 // custom routes
 const authRoutes = require("./routes/authRoute");
@@ -33,8 +37,10 @@ app.use(requestLoger);
 app.use("/auth", authRoutes);
 
 // Protected Routes
-app.use("/api", verifyToken, userRoutes);
-app.use("/refresh", refreshToken, verifyToken, userRoutes);
+app.use("/api", verifyAccessToken, userRoutes);
+
+// Request a new access token
+app.use("/refresh", verifyRefreshToken, refreshToken);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);

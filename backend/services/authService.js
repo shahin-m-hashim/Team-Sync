@@ -19,11 +19,19 @@ const loginUser = async (email, password) => {
 
   const { id, username } = user;
 
-  const token = jwt.sign({ userId: id, username }, process.env.JWT_SECRET_KEY, {
-    expiresIn: "1m",
-  });
+  const accessToken = jwt.sign(
+    { userId: id, username },
+    process.env.JWT_ACCESS_KEY,
+    { expiresIn: "15m" }
+  );
 
-  return token;
+  const refreshToken = jwt.sign(
+    { userId: id, username },
+    process.env.JWT_REFRESH_KEY,
+    { expiresIn: "1d" }
+  );
+
+  return { accessToken, refreshToken };
 };
 
 module.exports = { signUpUser, loginUser };

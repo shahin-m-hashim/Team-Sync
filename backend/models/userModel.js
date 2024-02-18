@@ -6,7 +6,6 @@ const { isEmail, isStrongPassword } = require("validator");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Name is required"],
     minLength: [3, "Minimum length is 3 characters"],
     maxLength: [20, "Maximum length is 20 characters"],
   },
