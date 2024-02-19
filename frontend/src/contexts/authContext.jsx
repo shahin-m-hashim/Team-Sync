@@ -8,44 +8,70 @@ export const authContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [status, setStatus] = useState("LOADING");
+  const [authState, setAuthState] = useState("LOADING");
+
+  const signup = async (credentials) => {
+    const response = await axios.post(base_url + "auth/signup", credentials, {
+      withCredentials: true,
+    });
+    return response;
+  };
+
+  const login = async (credentials) => {
+    const response = await axios.post(base_url + "auth/login", credentials, {
+      withCredentials: true,
+    });
+    localStorage.setItem("authState", "LOGGED_IN");
+    setAuthState("LOGGED_IN");
+    return response;
+  };
 
   const authorize = async () => {
-    console.log("Authorizing User...");
+    console.log("authorizing");
     try {
-      const { data } = await axios.get(`${base_url}api/primaryUser`, {
+      const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
       });
       setUser(data.user);
-      setStatus("AUTHENTICATED");
+      setAuthState("AUTHORIZED");
     } catch (error) {
-      reAuthorize(); // Call reAuthorize instead of undefined function
+      reAuthorize();
     }
   };
 
   const reAuthorize = async () => {
-    console.log("Reauthorizing User...");
+    console.log("reauthorizing");
     try {
       await axios.get(`${base_url}refresh`, { withCredentials: true });
-      authorize(); // Reauthorize after refreshing the token
+      authorize();
     } catch (error) {
       setUser(null);
-      setStatus("UNAUTHENTICATED");
+      setAuthState("UNAUTHORIZED");
     }
   };
 
   const logout = async () => {
     try {
-      await axios.get(`${base_url}auth/logout`, { withCredentials: true });
+      await axios.get(base_url + "auth/logout", { withCredentials: true });
+      localStorage.setItem("authState", "LOGGED_OUT");
+      setAuthState("LOGGED_OUT");
       setUser(null);
-      setStatus("LOGGED_OUT");
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <authContext.Provider value={{ user, status, authorize, logout }}>
+    <authContext.Provider
+      value={{
+        user,
+        authState,
+        signup,
+        login,
+        authorize,
+        logout,
+      }}
+    >
       {children}
     </authContext.Provider>
   );
