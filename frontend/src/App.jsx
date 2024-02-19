@@ -5,7 +5,8 @@ import ErrorPage from "./pages/ErrorPage";
 import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
 import ReLoginPage from "./pages/ReLoginPage";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import AuthWrapper from "./components/AuthWrapper";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,11 @@ const router = createBrowserRouter([
   },
   {
     path: "user",
+    element: (
+      <AuthWrapper>
+        <Outlet />
+      </AuthWrapper>
+    ),
     children: [
       {
         index: true,
@@ -30,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <DashboardPage />,
+      },
+      {
+        path: "dashboard1",
+        element: <LoginPage />,
       },
     ],
   },

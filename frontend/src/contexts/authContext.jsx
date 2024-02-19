@@ -8,44 +8,72 @@ export const authContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [status, setStatus] = useState("LOADING");
+  const [authState, setAuthState] = useState("LOADING");
+
+  const signup = async (credentials) =>
+    await axios.post(base_url + "auth/signup", credentials, {
+      withCredentials: true,
+    });
+
+  const login = async (credentials) => {
+    console.log("Logging In");
+    const response = await axios.post(base_url + "auth/login", credentials, {
+      withCredentials: true,
+    });
+    localStorage.setItem("authState", "LOGGED_IN");
+    setAuthState("LOGGED_IN");
+    return response;
+  };
 
   const authorize = async () => {
-    console.log("Authorizing User...");
+    console.log("Authorizing");
     try {
-      const { data } = await axios.get(`${base_url}api/primaryUser`, {
+      const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
       });
       setUser(data.user);
-      setStatus("AUTHENTICATED");
+      localStorage.setItem("authState", "AUTHORIZED");
+      setAuthState("AUTHORIZED");
     } catch (error) {
-      reAuthorize(); // Call reAuthorize instead of undefined function
+      reAuthorize();
     }
   };
 
   const reAuthorize = async () => {
-    console.log("Reauthorizing User...");
+    console.log("Reauthorizing");
     try {
-      await axios.get(`${base_url}refresh`, { withCredentials: true });
-      authorize(); // Reauthorize after refreshing the token
+      await axios.get(base_url + "refresh", { withCredentials: true });
+      authorize();
     } catch (error) {
       setUser(null);
-      setStatus("UNAUTHENTICATED");
+      setAuthState("UNAUTHORIZED");
+      localStorage.setItem("authState", "UNAUTHORIZED");
     }
   };
 
   const logout = async () => {
+    console.log("Logging out");
     try {
-      await axios.get(`${base_url}auth/logout`, { withCredentials: true });
+      await axios.get(base_url + "auth/logout", { withCredentials: true });
       setUser(null);
-      setStatus("LOGGED_OUT");
+      setAuthState("LOGGED_OUT");
+      localStorage.setItem("authState", "LOGGED_OUT");
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <authContext.Provider value={{ user, status, authorize, logout }}>
+    <authContext.Provider
+      value={{
+        user,
+        authState,
+        signup,
+        login,
+        authorize,
+        logout,
+      }}
+    >
       {children}
     </authContext.Provider>
   );
