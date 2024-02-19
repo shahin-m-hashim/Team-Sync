@@ -29,7 +29,7 @@ const BreakPoint = () => {
   }, []);
 
   return (
-    <div className="absolute bottom-0 right-0 p-1 text-sm text-white bg-slate-900">
+    <div className="absolute bottom-0 left-0 p-1 text-sm text-white bg-slate-900">
       BP = {breakpoint}
     </div>
   );
