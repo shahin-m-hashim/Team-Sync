@@ -6,6 +6,7 @@ import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
 import ReLoginPage from "./pages/ReLoginPage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Auth from "./components/Auth";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <DashboardPage />,
+        element: <Auth><DashboardPage /></Auth>
       },
     ],
   },
