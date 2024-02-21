@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
-import rocket from "../assets/images/rocket.png";
+import rocket from "../../assets/images/rocket.png";
 import { Link, useNavigate } from "react-router-dom";
-import { validationSchema } from "../validations/signupValidation";
+import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useContext, useEffect, useRef, useState } from "react";
 import { authContext } from "@/contexts/authContext";
 
@@ -48,7 +48,8 @@ export default function SignupPage() {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
         document.body.addEventListener("click", handleGlobalError);
-      } else console.log(e);
+      } else navigate("/serverError", { replace: true });
+      console.log(e);
     }
   };
 
@@ -83,9 +84,9 @@ export default function SignupPage() {
               </h1>
             </div>
             <form
-              onSubmit={handleSubmit}
               method="post"
               action="/api/signup"
+              onSubmit={handleSubmit}
               className="w-full max-w-sm p-5 mx-auto bg-white rounded-md shadow-md"
             >
               <div className="mb-4">

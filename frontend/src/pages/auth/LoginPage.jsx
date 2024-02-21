@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
-import { validationSchema } from "../validations/loginValidation";
+import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
 import { Link, useNavigate } from "react-router-dom";
-import rocket from "../assets/images/rocket.png";
+import rocket from "../../assets/images/rocket.png";
 import { useContext, useEffect, useRef, useState } from "react";
 import { authContext } from "@/contexts/authContext";
 
@@ -39,7 +39,8 @@ export default function LoginPage() {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
         document.body.addEventListener("click", handleGlobalError);
-      } else console.log(e);
+      } else navigate("/serverError", { replace: true });
+      console.log(e);
     }
   };
 
@@ -107,12 +108,7 @@ export default function LoginPage() {
                       Password
                     </label>
                     <div className="text-sm">
-                      <a
-                        href="#"
-                        className="font-semibold text-indigo-600 hover:text-indigo-500"
-                      >
-                        Forgot password?
-                      </a>
+                      <Link to="/resetPass">Forgot password?</Link>
                     </div>
                   </div>
                   <div className="mt-2">

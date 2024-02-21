@@ -3,7 +3,7 @@ import LoadingComponent from "../components/Loading";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { authContext } from "@/contexts/authContext";
-import ReLoginPage from "@/pages/ReLoginPage";
+import ReLoginPage from "@/pages/auth/ReLoginPage";
 import HomePage from "@/pages/HomePage";
 
 const AuthWrapper = ({ children }) => {
