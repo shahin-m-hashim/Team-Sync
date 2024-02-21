@@ -15,7 +15,7 @@ export default function LoginPage() {
   useEffect(() => {
     authState === "LOGGED_IN" && navigate("/user/dashboard");
     setRender(true);
-  }, []);
+  }, [authState]);
 
   const { login } = useContext(authContext);
 
@@ -24,17 +24,22 @@ export default function LoginPage() {
     password: "John@12345",
   };
 
+  const handleGlobalError = (event) => {
+    if (errorRef.current && !errorRef.current.contains(event.target)) {
+      errorRef.current.innerText = "";
+      document.body.removeEventListener("click", handleGlobalError);
+    }
+  };
+
   const onSubmit = async (values) => {
     try {
-      const res = await login(values);
-      res && navigate("/user/dashboard", { replace: true });
+      await login(values);
+      navigate("/user/dashboard", { replace: true });
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
-        setTimeout(() => {
-          errorRef.current.innerText = "";
-        }, 3000);
-      }
+        document.body.addEventListener("click", handleGlobalError);
+      } else console.log(e);
     }
   };
 

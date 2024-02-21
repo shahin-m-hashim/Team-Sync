@@ -26,6 +26,13 @@ export default function SignupPage() {
 
   const { signup } = useContext(authContext);
 
+  const handleGlobalError = (event) => {
+    if (errorRef.current && !errorRef.current.contains(event.target)) {
+      errorRef.current.innerText = "";
+      document.body.removeEventListener("click", handleGlobalError);
+    }
+  };
+
   const onSubmit = async (values) => {
     const { username, email, password } = values;
 
@@ -40,18 +47,13 @@ export default function SignupPage() {
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
-        setTimeout(() => {
-          errorRef.current.innerText = "";
-        }, 3000);
-      }
+        document.body.addEventListener("click", handleGlobalError);
+      } else console.log(e);
     }
   };
 
   const {
-    values,
     errors,
-    handleBlur,
-    handleChange,
     handleSubmit,
     touched,
     getFieldProps,
@@ -163,9 +165,7 @@ export default function SignupPage() {
                   id="cPassword"
                   name="cPassword"
                   placeholder="Confirm Your Password"
-                  value={values.cPassword}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
+                  {...getFieldProps("cPassword")}
                 />
                 {errors.cPassword && touched.cPassword ? (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">

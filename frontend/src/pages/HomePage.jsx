@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import rocket from "../assets/images/rocket.png";
-import NavbarComponent from "@/components/NavbarComponent";
+import NavbarComponent from "@/components/Navbar";
 import { useEffect, useState } from "react";
 export default function HomePage() {
   const navigate = useNavigate();

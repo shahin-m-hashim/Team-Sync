@@ -10,14 +10,13 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authState, setAuthState] = useState("LOADING");
 
-  const signup = async (credentials) => {
-    const response = await axios.post(base_url + "auth/signup", credentials, {
+  const signup = async (credentials) =>
+    await axios.post(base_url + "auth/signup", credentials, {
       withCredentials: true,
     });
-    return response;
-  };
 
   const login = async (credentials) => {
+    console.log("Logging In");
     const response = await axios.post(base_url + "auth/login", credentials, {
       withCredentials: true,
     });
@@ -27,12 +26,13 @@ const AuthProvider = ({ children }) => {
   };
 
   const authorize = async () => {
-    console.log("authorizing");
+    console.log("Authorizing");
     try {
       const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
       });
       setUser(data.user);
+      localStorage.setItem("authState", "AUTHORIZED");
       setAuthState("AUTHORIZED");
     } catch (error) {
       reAuthorize();
@@ -40,22 +40,24 @@ const AuthProvider = ({ children }) => {
   };
 
   const reAuthorize = async () => {
-    console.log("reauthorizing");
+    console.log("Reauthorizing");
     try {
-      await axios.get(`${base_url}refresh`, { withCredentials: true });
+      await axios.get(base_url + "refresh", { withCredentials: true });
       authorize();
     } catch (error) {
       setUser(null);
       setAuthState("UNAUTHORIZED");
+      localStorage.setItem("authState", "UNAUTHORIZED");
     }
   };
 
   const logout = async () => {
+    console.log("Logging out");
     try {
       await axios.get(base_url + "auth/logout", { withCredentials: true });
-      localStorage.setItem("authState", "LOGGED_OUT");
-      setAuthState("LOGGED_OUT");
       setUser(null);
+      setAuthState("LOGGED_OUT");
+      localStorage.setItem("authState", "LOGGED_OUT");
     } catch (error) {
       console.error(error);
     }
