@@ -40,7 +40,13 @@ const loginController = async (req, res, next) => {
       res.cookie("accJwt", accessToken, {
         httpOnly: true,
         withCredentials: true,
-        expires: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+        expires: new Date(Date.now() + 15 * 60 * 1000), // 15 min
+      });
+
+      res.cookie("refJwt", refreshToken, {
+        httpOnly: true,
+        withCredentials: true,
+        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
       });
 
       res.cookie("refJwt", refreshToken, {

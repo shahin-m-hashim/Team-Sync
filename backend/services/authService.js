@@ -22,7 +22,7 @@ const loginUser = async (email, password) => {
   const accessToken = jwt.sign(
     { userId: id, username },
     process.env.JWT_ACCESS_KEY,
-    { expiresIn: "1m" }
+    { expiresIn: "15m" }
   );
 
   const refreshToken = jwt.sign(
