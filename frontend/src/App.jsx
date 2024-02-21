@@ -1,12 +1,14 @@
 import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignUpPage";
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignUpPage";
 import ErrorPage from "./pages/ErrorPage";
 import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
-import ReLoginPage from "./pages/ReLoginPage";
+import ReLoginPage from "./pages/auth/ReLoginPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AuthWrapper from "./components/AuthWrapper";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ServerErrorPage from "./pages/ServerErrorPage";
 
 const router = createBrowserRouter([
   {
@@ -37,15 +39,19 @@ const router = createBrowserRouter([
         path: "dashboard",
         element: <DashboardPage />,
       },
-      {
-        path: "dashboard1",
-        element: <LoginPage />,
-      },
     ],
+  },
+  {
+    path: "resetPass",
+    element: <ResetPasswordPage />,
   },
   {
     path: "reLogin",
     element: <ReLoginPage />,
+  },
+  {
+    path: "serverError",
+    element: <ServerErrorPage />,
   },
   {
     path: "*",
