@@ -1,6 +1,6 @@
 export default function ServerErrorPage() {
   return (
-    <div className="grid grid-col-1 pt-10 w-screen lg:grid-cols-[2fr,1fr]">
+    <div className="grid grid-col-1 pt-10 w-screen lg:grid-cols-[2fr,1fr] p-10">
       <div className="flex flex-col items-center justify-center w-full text-center">
         <div className="text-center">
           <p className="font-bold tracking-wider text-red-500 text-7xl md:text-8xl lg:text-9xl">
@@ -27,7 +27,7 @@ export default function ServerErrorPage() {
           </p>
         </div>
       </div>
-      <div className="flex flex-col justify-center w-full pr-10 lg:h-full lg:items-end">
+      <div className="flex flex-col justify-center w-full lg:h-full lg:items-end">
         <svg
           className="w-full text-blue-600"
           xmlns="http://www.w3.org/2000/svg"

@@ -35,11 +35,15 @@ const router = createBrowserRouter([
         index: true,
         element: <ErrorPage />,
       },
-      {
-        path: "dashboard",
-        element: <DashboardPage />,
-      },
+      // {
+      //   path: "dashboard",
+      //   element: <DashboardPage />,
+      // },
     ],
+  },
+  {
+    path: "dashboard",
+    element: <DashboardPage />,
   },
   {
     path: "resetPass",
