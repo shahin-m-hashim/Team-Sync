@@ -1,9 +1,22 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { authContext } from "@/contexts/authContext";
+import { useNavigate } from "react-router-dom";
 
-const OtpInput = ({ setShowInput }) => {
-  const [otp, setOtp] = useState(new Array(6).fill(""));
+const VerifyOTP = ({ setShowInput }) => {
+  const errorRef = useRef();
   const otpInputRefs = [];
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState(new Array(6).fill(""));
+
+  const { verifyOTP } = useContext(authContext);
+
+  const handleOtpError = (event) => {
+    if (errorRef.current && !errorRef.current.contains(event.target)) {
+      errorRef.current.innerText = "";
+      document.body.removeEventListener("click", handleOtpError);
+    }
+  };
 
   const handleInputChange = (index, event) => {
     const newOtp = [...otp];
@@ -22,16 +35,27 @@ const OtpInput = ({ setShowInput }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const otpValue = otp.join("");
-    console.log(otpValue);
-    setShowInput("passwordForm");
+    try {
+      const otpValue = otp.join("");
+      await verifyOTP({ otp: otpValue });
+      setShowInput("passwordForm");
+    } catch (e) {
+      const status = e.response ? e.response.status : 500;
+      if (status === 401) {
+        errorRef.current.innerText = e.response.data.error;
+        document.body.addEventListener("click", handleOtpError);
+      } else {
+        console.log(e);
+        navigate("/serverError", { replace: true });
+      }
+    }
   };
 
   return (
     <form
-      className="w-full max-w-sm p-8 mx-auto space-y-6 bg-white rounded-md shadow-md"
+      className="flex flex-col items-center w-full max-w-sm p-8 pt-0 mx-auto space-y-2 bg-white rounded-md shadow-md"
       onSubmit={handleSubmit}
     >
       <div>
@@ -57,6 +81,10 @@ const OtpInput = ({ setShowInput }) => {
           />
         ))}
       </div>
+      <p
+        ref={errorRef}
+        className="text-sm text-center text-red-600 dark:text-red-400"
+      ></p>
       <button
         type="submit"
         className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -81,4 +109,4 @@ const OtpInput = ({ setShowInput }) => {
   );
 };
 
-export default OtpInput;
+export default VerifyOTP;

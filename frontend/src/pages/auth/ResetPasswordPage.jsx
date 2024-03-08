@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import rocket from "../../assets/images/rocket.png";
-import ForgotPassword from "@/components/auth/ForgotPassword";
-import OtpInput from "@/components/auth/OtpInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import RequestPassResetOTP from "@/components/auth/RequestPassResetOtp";
 import ResetPassword from "@/components/auth/ResetPassword";
 
 const ResetPasswordPage = () => {
-  const [showInput, setShowInput] = useState("emailForm");
+  const navigate = useNavigate();
+  const [showInput, setShowInput] = useState("requestOtp");
+
+  useEffect(() => {
+    if (showInput === "success") {
+      const timeoutId = setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 1500);
+
+      // Cleanup function to clear the timeout in case the component unmounts before the timeout finishes
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showInput]);
 
   return (
     <div className="h-screen lg:grid lg:grid-cols-2">
@@ -25,10 +36,9 @@ const ResetPasswordPage = () => {
           )}
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {showInput === "emailForm" && (
-            <ForgotPassword setShowInput={setShowInput} />
+          {showInput === "requestOtp" && (
+            <RequestPassResetOTP setShowInput={setShowInput} />
           )}
-          {showInput === "otpForm" && <OtpInput setShowInput={setShowInput} />}
           {showInput === "passwordForm" && (
             <ResetPassword setShowInput={setShowInput} />
           )}

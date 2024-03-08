@@ -51,6 +51,42 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const reqPassResetOTP = async (credentials) => {
+    const response = await axios.post(
+      base_url + "auth/reqPassResetOtp",
+      credentials,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log("Password Request OTP Send");
+    return response;
+  };
+
+  const verifyOTP = async (credentials) => {
+    const response = await axios.post(
+      base_url + "auth/verifyOTP",
+      credentials,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log("OTP verified successfully");
+    return response;
+  };
+
+  const resetPassword = async (credentials) => {
+    const response = await axios.post(
+      base_url + "auth/resetPass",
+      credentials,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log("Password Reset Successfully");
+    return response;
+  };
+
   const logout = async () => {
     console.log("Logging out");
     try {
@@ -72,6 +108,9 @@ const AuthProvider = ({ children }) => {
         login,
         authorize,
         logout,
+        reqPassResetOTP,
+        verifyOTP,
+        resetPassword,
       }}
     >
       {children}

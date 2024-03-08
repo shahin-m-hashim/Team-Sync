@@ -8,7 +8,8 @@ export default function HomePage() {
   const authState = localStorage.getItem("authState");
 
   useEffect(() => {
-    authState === "LOGGED_IN" && navigate("/user/dashboard");
+    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
+      navigate("/user/dashboard");
     setRender(true);
   }, []);
 
