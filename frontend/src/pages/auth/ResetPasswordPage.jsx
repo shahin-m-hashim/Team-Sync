@@ -1,9 +1,9 @@
 import { useState } from "react";
 import rocket from "../../assets/images/rocket.png";
-import ForgotPassword from "@/components/ForgotPassword";
-import OtpInput from "@/components/OtpInput";
+import ForgotPassword from "@/components/auth/ForgotPassword";
+import OtpInput from "@/components/auth/OtpInput";
 import { Link } from "react-router-dom";
-import ResetPassword from "@/components/ResetPassword";
+import ResetPassword from "@/components/auth/ResetPassword";
 
 const ResetPasswordPage = () => {
   const [showInput, setShowInput] = useState("emailForm");

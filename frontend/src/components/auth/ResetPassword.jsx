@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-import { resetPasswordValidationSchema as validationSchema } from "../validations/authValidations";
+import { resetPasswordValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useEffect, useRef } from "react";
 
 const ResetPassword = ({ setShowInput }) => {

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-import { forgotPasswordEmailValidationSchema as validationSchema } from "../validations/authValidations";
+import { forgotPasswordEmailValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useEffect, useRef, useState } from "react";
 
 const ForgotPassword = ({ setShowInput }) => {
