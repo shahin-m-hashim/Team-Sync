@@ -6,7 +6,7 @@ import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
 import ReLoginPage from "./pages/auth/ReLoginPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import AuthWrapper from "./components/AuthWrapper";
+import AuthWrapper from "./components/auth/AuthWrapper";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
 
@@ -35,15 +35,11 @@ const router = createBrowserRouter([
         index: true,
         element: <ErrorPage />,
       },
-      // {
-      //   path: "dashboard",
-      //   element: <DashboardPage />,
-      // },
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+      },
     ],
-  },
-  {
-    path: "dashboard",
-    element: <DashboardPage />,
   },
   {
     path: "resetPass",

@@ -13,7 +13,8 @@ export default function SignupPage() {
   const authState = localStorage.getItem("authState");
 
   useEffect(() => {
-    authState === "LOGGED_IN" && navigate("/user/dashboard");
+    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
+      navigate("/user/dashboard");
     setRender(true);
   }, []);
 
@@ -48,8 +49,10 @@ export default function SignupPage() {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
         document.body.addEventListener("click", handleGlobalError);
-      } else navigate("/serverError", { replace: true });
-      console.log(e);
+      } else {
+        console.log(e);
+        navigate("/serverError", { replace: true });
+      }
     }
   };
 

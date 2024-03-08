@@ -3,12 +3,12 @@
 
 import SideBar from "@/components/dashboard/SideBar";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import ActivityCard from "@/components/dashboard/ActivityCard";
-import MessageCard from "@/components/dashboard/MessageCard";
+import ActivityCard from "@/components/cards/ActivityCard";
+import MessageCard from "@/components/cards/MessageCard";
 import BodyHeader from "@/components/dashboard/BodyHeader";
 import ProjectHeader from "@/components/dashboard/ProjectHeader";
 import ProjectBody from "@/components/dashboard/ProjectBody";
-import StatusCard from "@/components/dashboard/StatusCard";
+import StatusCard from "@/components/cards/StatusCard";
 
 export default function DashboardPage() {
   // const { user, logout } = useContext(authContext);

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import LoadingComponent from "../components/Loading";
+import LoadingComponent from "../Loading";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { authContext } from "@/contexts/authContext";
