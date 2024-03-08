@@ -2,21 +2,23 @@
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { resetPasswordValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
+import { authContext } from "@/contexts/authContext";
 
 const ResetPassword = ({ setShowInput }) => {
   const navigate = useNavigate();
   const errorRef = useRef();
 
   const authState = localStorage.getItem("authState");
+  const { resetPassword } = useContext(authContext);
 
   useEffect(() => {
     authState === "LOGGED_IN" && navigate("/user/dashboard");
   }, []);
 
   const initialValues = {
-    password: "",
-    cPassword: "",
+    password: "Ajmal@12345",
+    cPassword: "Ajmal@12345",
   };
 
   //   const { signup } = useContext(authContext);
@@ -29,17 +31,8 @@ const ResetPassword = ({ setShowInput }) => {
   };
 
   const onSubmit = async (values) => {
-    // const { username, email, password } = values;
-
     try {
-      //   const res = await signup({
-      //     username,
-      //     email,
-      //     password,
-      //   });
-      //   console.log(res);
-      //   res && navigate("/login", { replace: true });
-      console.log(values);
+      await resetPassword(values);
       setShowInput("success");
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
