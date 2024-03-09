@@ -17,16 +17,14 @@ const ResetPassword = ({ setShowInput }) => {
   }, []);
 
   const initialValues = {
-    password: "Ajmal@12345",
-    cPassword: "Ajmal@12345",
+    password: "",
+    cPassword: "",
   };
 
-  //   const { signup } = useContext(authContext);
-
-  const handleGlobalError = (event) => {
+  const handlePasswordResetError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {
       errorRef.current.innerText = "";
-      document.body.removeEventListener("click", handleGlobalError);
+      document.body.removeEventListener("click", handlePasswordResetError);
     }
   };
 
@@ -37,7 +35,7 @@ const ResetPassword = ({ setShowInput }) => {
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
-        document.body.addEventListener("click", handleGlobalError);
+        document.body.addEventListener("click", handlePasswordResetError);
       } else console.log(e);
     }
   };

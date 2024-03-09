@@ -5,7 +5,11 @@ export default function ReLoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => navigate("/login", { replace: true }), 3000);
+    const timeoutId = setTimeout(
+      () => navigate("/login", { replace: true }),
+      3000
+    );
+    return () => clearTimeout(timeoutId);
   }, [navigate]);
 
   return (

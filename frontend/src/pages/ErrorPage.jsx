@@ -5,7 +5,8 @@ export default function ErrorPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => navigate(-1, { replace: true }), 3000);
+    const timeoutId = setTimeout(() => navigate(-1, { replace: true }), 3000);
+    return () => clearTimeout(timeoutId);
   }, [navigate]);
 
   return (

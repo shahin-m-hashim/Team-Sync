@@ -21,14 +21,14 @@ export default function LoginPage() {
   const { login } = useContext(authContext);
 
   const initialValues = {
-    email: "john@yahoo.com",
-    password: "John@12345",
+    email: "",
+    password: "",
   };
 
-  const handleGlobalError = (event) => {
+  const handleLoginError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {
       errorRef.current.innerText = "";
-      document.body.removeEventListener("click", handleGlobalError);
+      document.body.removeEventListener("click", handleLoginError);
     }
   };
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
-        document.body.addEventListener("click", handleGlobalError);
+        document.body.addEventListener("click", handleLoginError);
       } else {
         console.log(e);
         navigate("/serverError", { replace: true });
