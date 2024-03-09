@@ -1,4 +1,12 @@
-const { signUpUser, loginUser } = require("../services/authService");
+const jwt = require("jsonwebtoken");
+
+const {
+  signUpUser,
+  loginUser,
+  sendPassResetOtp,
+  verifyOTP,
+  resetUserPassword,
+} = require("../services/authService");
 
 const signUpController = async (req, res, next) => {
   try {
@@ -85,4 +93,92 @@ const logoutController = async (req, res, next) => {
   }
 };
 
-module.exports = { signUpController, loginController, logoutController };
+const reqPassResetOtpController = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const mail = await sendPassResetOtp(email);
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully, Please check your email for the OTP",
+      mail,
+    });
+  } catch (e) {
+    if (e.message === "UnknownUser") {
+      return res.status(404).json({
+        success: false,
+        error: "User not found, Please sign up first",
+      });
+    }
+    next(e);
+  }
+};
+
+const verifyOtpController = async (req, res, next) => {
+  const { otp } = req.body;
+  try {
+    const otpToken = await verifyOTP(otp);
+
+    res.cookie("otpJwt", otpToken, {
+      httpOnly: true,
+      withCredentials: true,
+      expires: new Date(Date.now() + 3 * 60 * 1000), // 3 min
+    });
+
+    res.status(200).json({ success: true });
+  } catch (e) {
+    if (e.message === "InvalidOTP") {
+      return res.status(401).json({
+        success: false,
+        error:
+          "Oops, looks like the OTP has expired,\nkindly request a new one",
+      });
+    }
+    next(e);
+  }
+};
+
+const resetPassController = async (req, res) => {
+  try {
+    const otpToken = req.cookies.otpJwt;
+
+    if (!otpToken) {
+      return res
+        .status(401)
+        .json({ status: false, error: "Access Denied. No token provided." });
+    }
+
+    const { password } = req.body;
+    const { userId } = jwt.verify(otpToken, process.env.JWT_OTP_KEY);
+
+    const username = await resetUserPassword({ userId, password });
+
+    res.clearCookie("otpJwt");
+    res.status(201).json({
+      success: true,
+      message: `User ${username} password updated successfully`,
+    });
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      res.clearCookie("otpJwt");
+      res.status(422).json({
+        success: false,
+        error: "Validations failed, please check your input and try again",
+      });
+    } else {
+      console.log("Invalid token:", err.message);
+      res.clearCookie("otpJwt");
+      return res
+        .status(401)
+        .json({ status: false, error: "Access Denied. Invalid token." });
+    }
+  }
+};
+
+module.exports = {
+  signUpController,
+  loginController,
+  logoutController,
+  reqPassResetOtpController,
+  verifyOtpController,
+  resetPassController,
+};

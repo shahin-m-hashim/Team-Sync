@@ -33,15 +33,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: () => moment().format("DD-MM-YYYY hh:mm:ss A"),
   },
+  used_otps: [
+    {
+      otp: {
+        type: String,
+        required: true,
+        minlength: 6,
+        maxlength: 6,
+      },
+      createdAt: {
+        type: String,
+        default: () => moment().format("DD-MM-YYYY hh:mm:ss A"),
+      },
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 12);
+  this.wasNew = this.isNew;
   next();
 });
 
-userSchema.post("save", (userDoc, next) => {
-  console.log(`New user with id ${userDoc.id} is registered`);
+userSchema.post("save", async function (userDoc, next) {
+  if (this.wasNew) console.log(`User ${userDoc.id} is registered`);
   next();
 });
 
