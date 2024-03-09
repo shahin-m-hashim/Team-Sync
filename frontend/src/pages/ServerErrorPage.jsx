@@ -1,4 +1,14 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function ServerErrorPage() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => navigate("/", { replace: true }), 10000);
+    return () => clearTimeout(timeoutId);
+  }, [navigate]);
+
   return (
     <div className="grid grid-col-1 pt-10 w-screen lg:grid-cols-[2fr,1fr] p-10">
       <div className="flex flex-col items-center justify-center w-full text-center">
