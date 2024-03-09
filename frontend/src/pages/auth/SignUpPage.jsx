@@ -19,18 +19,18 @@ export default function SignupPage() {
   }, []);
 
   const initialValues = {
-    username: "johndoe",
-    email: "john@yahoo.com",
-    password: "John@12345",
-    cPassword: "John@12345",
+    username: "",
+    email: "",
+    password: "",
+    cPassword: "",
   };
 
   const { signup } = useContext(authContext);
 
-  const handleGlobalError = (event) => {
+  const handleSignUpError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {
       errorRef.current.innerText = "";
-      document.body.removeEventListener("click", handleGlobalError);
+      document.body.removeEventListener("click", handleSignUpError);
     }
   };
 
@@ -48,7 +48,7 @@ export default function SignupPage() {
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
-        document.body.addEventListener("click", handleGlobalError);
+        document.body.addEventListener("click", handleSignUpError);
       } else {
         console.log(e);
         navigate("/serverError", { replace: true });

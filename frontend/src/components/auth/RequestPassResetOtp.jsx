@@ -22,7 +22,7 @@ const RequestPassResetOTP = ({ setShowInput }) => {
     authState === "LOGGED_IN" && navigate("/user/dashboard");
   }, []);
 
-  const initialValues = { email: "ajmal123@yahoo.com" };
+  const initialValues = { email: "" };
 
   const handleGlobalError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {
