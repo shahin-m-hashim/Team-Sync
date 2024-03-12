@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import add from "../../assets/images/Add.png";
 import filter from "../../assets/images/Filter.png";
 import search from "../../assets/images/Search.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 
-export default function BodyHeader() {
+export default function BodyHeader({ setShowAddPopUp }) {
   return (
     <div
       id="bodyHeader"
@@ -31,7 +32,12 @@ export default function BodyHeader() {
         <span>Tasks</span>
       </div>
       <button>
-        <img src={add} className="size-10" alt="addProject" />
+        <img
+          src={add}
+          onClick={() => setShowAddPopUp(true)}
+          className="size-10"
+          alt="addProject"
+        />
       </button>
     </div>
   );
