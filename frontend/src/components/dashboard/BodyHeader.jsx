@@ -2,13 +2,14 @@
 import add from "../../assets/images/Add.png";
 import filter from "../../assets/images/Filter.png";
 import search from "../../assets/images/Search.png";
+import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 
 export default function BodyHeader({ setShowAddPopUp }) {
   return (
     <div
       id="bodyHeader"
-      className="flex items-center justify-between px-5 py-3 text-sm"
+      className="flex items-center justify-between py-3 text-sm px-7"
     >
       <div className="flex flex-col gap-1">
         <span className="font-medium">Projects</span>
@@ -31,14 +32,19 @@ export default function BodyHeader({ setShowAddPopUp }) {
         <span>Sub Teams</span>
         <span>Tasks</span>
       </div>
-      <button>
-        <img
-          src={add}
-          onClick={() => setShowAddPopUp(true)}
-          className="size-10"
-          alt="addProject"
-        />
-      </button>
+      <div className="inline-flex gap-5">
+        <button>
+          <img src={switchIcon} className="size-10" alt="switchProjectView" />
+        </button>
+        <button>
+          <img
+            src={add}
+            onClick={() => setShowAddPopUp(true)}
+            className="size-10"
+            alt="addProject"
+          />
+        </button>
+      </div>
     </div>
   );
 }
