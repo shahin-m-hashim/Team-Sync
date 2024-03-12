@@ -1,6 +1,3 @@
-// import { useContext } from "react";
-// import { authContext } from "@/contexts/authContext";
-
 import SideBar from "@/components/dashboard/SideBar";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ActivityCard from "@/components/cards/ActivityCard";
@@ -9,15 +6,14 @@ import BodyHeader from "@/components/dashboard/BodyHeader";
 import ProjectHeader from "@/components/dashboard/ProjectHeader";
 import ProjectBody from "@/components/dashboard/ProjectBody";
 import StatusCard from "@/components/cards/StatusCard";
+import AddComponent from "@/components/AddComponent";
+import { useState } from "react";
 
 export default function DashboardPage() {
-  // const { user, logout } = useContext(authContext);
-  // const username = user ? user.username : "unknown";
-  //       <h1>Welcome to Your Dashboard {username}</h1>
-  //     <button onClick={logout}>LogOut</button>
+  const [showAddPopUp, setShowAddPopUp] = useState(false);
+  console.log(showAddPopUp);
   return (
-    // grid-cols-[250px,1fr]
-    <div className="grid h-screen grid-cols-[250px,1fr] ">
+    <div className="grid h-screen grid-cols-[250px,1fr] relative ">
       <SideBar />
       <div className="grid grid-rows-[50px,1fr,2fr]">
         <DashboardNav />
@@ -33,11 +29,14 @@ export default function DashboardPage() {
           id="dashBody"
           className="bg-[#141414] m-1 mt-0 rounded-lg text-white"
         >
-          <BodyHeader />
+          <BodyHeader setShowAddPopUp={setShowAddPopUp} />
           <ProjectHeader />
           <ProjectBody />
         </div>
       </div>
+      {showAddPopUp && (
+        <AddComponent name="Project" setShowAddPopUp={setShowAddPopUp} />
+      )}
     </div>
   );
 }
