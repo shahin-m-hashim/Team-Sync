@@ -5,7 +5,10 @@ import search from "../../assets/images/Search.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 
-export default function BodyHeader({ setShowAddPopUp }) {
+export default function BodyHeader({
+  setShowAddPopUp,
+  setListOnlyAdminProjects,
+}) {
   return (
     <div
       id="bodyHeader"
@@ -33,16 +36,13 @@ export default function BodyHeader({ setShowAddPopUp }) {
         <span>Tasks</span>
       </div>
       <div className="inline-flex gap-5">
-        <button>
+        <button
+          onClick={() => setListOnlyAdminProjects((prevState) => !prevState)}
+        >
           <img src={switchIcon} className="size-10" alt="switchProjectView" />
         </button>
-        <button>
-          <img
-            src={add}
-            onClick={() => setShowAddPopUp(true)}
-            className="size-10"
-            alt="addProject"
-          />
+        <button onClick={() => setShowAddPopUp(true)}>
+          <img src={add} className="size-10" alt="addProject" />
         </button>
       </div>
     </div>
