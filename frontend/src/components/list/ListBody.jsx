@@ -41,10 +41,16 @@ const allProjects = [
   },
 ];
 
-export default function ListBody({ listOnlyAdminProjects }) {
+export default function ListBody({ listOnlyAdminProjects, searchByName }) {
   const projects = listOnlyAdminProjects
     ? allProjects.filter((project) => project.role === "Leader")
     : allProjects;
+
+  if (searchByName) {
+    return projects
+      .filter((project) => project.name.toLowerCase().includes(searchByName))
+      .map((project, index) => <ListItem key={index} {...project} />);
+  }
 
   return projects.length > 0 ? (
     projects.map((project, index) => <ListItem key={index} {...project} />)

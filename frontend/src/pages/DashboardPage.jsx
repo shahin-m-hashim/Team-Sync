@@ -12,6 +12,10 @@ import ListSubHeader from "@/components/list/ListSubHeader";
 export default function DashboardPage() {
   const [showAddPopUp, setShowAddPopUp] = useState(false);
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
+  const [searchByName, setSearchByName] = useState(null);
+
+  console.log(searchByName);
+
   return (
     <div className="grid h-screen grid-cols-[250px,1fr] relative ">
       <SideBar />
@@ -32,9 +36,13 @@ export default function DashboardPage() {
           <ListHeader
             setShowAddPopUp={setShowAddPopUp}
             setListOnlyAdminProjects={setListOnlyAdminProjects}
+            setSearchByName={setSearchByName}
           />
           <ListSubHeader />
-          <ListBody listOnlyAdminProjects={listOnlyAdminProjects} />
+          <ListBody
+            listOnlyAdminProjects={listOnlyAdminProjects}
+            searchByName={searchByName}
+          />
         </div>
       </div>
       {showAddPopUp && (
