@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export default function DashboardPage() {
   const [showAddPopUp, setShowAddPopUp] = useState(false);
-  console.log(showAddPopUp);
+  const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
   return (
     <div className="grid h-screen grid-cols-[250px,1fr] relative ">
       <SideBar />
@@ -29,9 +29,12 @@ export default function DashboardPage() {
           id="dashBody"
           className="bg-[#141414] m-1 mt-0 rounded-lg text-white"
         >
-          <BodyHeader setShowAddPopUp={setShowAddPopUp} />
+          <BodyHeader
+            setShowAddPopUp={setShowAddPopUp}
+            setListOnlyAdminProjects={setListOnlyAdminProjects}
+          />
           <ProjectHeader />
-          <ProjectBody />
+          <ProjectBody listOnlyAdminProjects={listOnlyAdminProjects} />
         </div>
       </div>
       {showAddPopUp && (
