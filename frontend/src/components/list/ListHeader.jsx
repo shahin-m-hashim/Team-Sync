@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import add from "../../assets/images/Add.png";
 import filter from "../../assets/images/Filter.png";
-import search from "../../assets/images/Search.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 
 export default function ListHeader({
   setShowAddPopUp,
   setListOnlyAdminProjects,
+  setSearchByName,
 }) {
   return (
     <div
@@ -24,10 +24,12 @@ export default function ListHeader({
           <span>Filter</span>
           <img src={dropArrow} alt="dropArrow" className="size-5" />
         </button>
-        <button className="flex items-center gap-2 py-1 pl-2 pr-20 text-xs border-[1px] border-white rounded-xl">
-          <img src={search} alt="search" className="size-5" />
-          <span>Search</span>
-        </button>
+        <input
+          type="text"
+          placeholder="Search by name"
+          className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
+          onChange={(e) => setSearchByName(e.target.value.toLowerCase())}
+        />
       </div>
       <div className="flex gap-10 text-[#828282]">
         <span>Projects</span>
