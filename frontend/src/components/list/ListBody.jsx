@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import ListItem from "../ListItem";
+import ListItem from "./ListItem";
 import bye from "../../assets/images/bye brain.png";
 import google from "../../assets/images/project icons/Google.png";
 import facebook from "../../assets/images/project icons/Facebook.png";
@@ -41,7 +41,7 @@ const allProjects = [
   },
 ];
 
-const ProjectBody = ({ listOnlyAdminProjects }) => {
+export default function ListBody({ listOnlyAdminProjects }) {
   const projects = listOnlyAdminProjects
     ? allProjects.filter((project) => project.role === "Leader")
     : allProjects;
@@ -64,6 +64,4 @@ const ProjectBody = ({ listOnlyAdminProjects }) => {
       </div>
     </div>
   );
-};
-
-export default ProjectBody;
+}

@@ -1,5 +1,5 @@
 import ajmalDp from "../../assets/images/ajmalDp.png";
-export default function DashboardNav() {
+export default function Navbar() {
   return (
     <div
       id="dashNavbar"

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
-import settings from "../assets/images/Settings.png";
-import deleteIcon from "../assets/images/Delete.png";
+import settings from "../../assets/images/Settings.png";
+import deleteIcon from "../../assets/images/Delete.png";
 import { cn } from "@/lib/utils";
 
 export default function ListItem({
