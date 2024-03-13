@@ -5,7 +5,7 @@ import search from "../../assets/images/Search.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 
-export default function BodyHeader({
+export default function ListHeader({
   setShowAddPopUp,
   setListOnlyAdminProjects,
 }) {
