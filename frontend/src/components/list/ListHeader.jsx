@@ -4,12 +4,36 @@ import filter from "../../assets/images/Filter.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 import FilterDropDownMenu from "../FilterDropDownMenu";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { projectContext } from "@/contexts/projectContext";
 
-export default function ListHeader({ setShowAddPopUp, setSearchByName }) {
+export default function ListHeader({ setShowAddPopUp }) {
+  const filterBtnTextRef = useRef();
+  const filterDropDownRef = useRef();
   const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
-  const { setListOnlyAdminProjects } = useContext(projectContext);
+  const { setListOnlyAdminProjects, setSearchByName } =
+    useContext(projectContext);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        filterDropDownRef.current &&
+        !filterDropDownRef.current.contains(event.target)
+      ) {
+        setShowFilterDropDownMenu(false);
+      }
+    };
+
+    if (showFilterDropDownMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showFilterDropDownMenu]);
 
   return (
     <div
@@ -18,18 +42,26 @@ export default function ListHeader({ setShowAddPopUp, setSearchByName }) {
     >
       <div className="flex flex-col gap-1">
         <span className="font-medium">Projects</span>
-        <span className=" text-[#828282]">List of all projects</span>
+        <span className="text-[#828282]">List of all projects</span>
       </div>
       <div className="flex gap-5">
-        <div className="relative flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl">
+        <div
+          className="relative flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl"
+          ref={filterDropDownRef}
+        >
           <img src={filter} alt="filter" className="size-5" />
-          <span>Filter</span>
+          <span ref={filterBtnTextRef}>Filter</span>
           <button
             onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
           >
             <img src={dropArrow} alt="dropArrow" className="size-5" />
           </button>
-          {showFilterDropDownMenu && <FilterDropDownMenu />}
+          {showFilterDropDownMenu && (
+            <FilterDropDownMenu
+              filterBtnTextRef={filterBtnTextRef}
+              setShowFilterDropDownMenu={setShowFilterDropDownMenu}
+            />
+          )}
         </div>
         <input
           type="text"

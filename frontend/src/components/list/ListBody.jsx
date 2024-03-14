@@ -4,10 +4,10 @@ import { useContext } from "react";
 import EmptyListBody from "./EmptyListBody";
 import { projectContext } from "@/contexts/projectContext";
 
-export default function ListBody({ searchByName }) {
-  const { projects } = useContext(projectContext);
+export default function ListBody() {
+  const { projects, searchByName } = useContext(projectContext);
 
-  if (searchByName) {
+  if (searchByName && projects.length > 0) {
     return projects
       .filter((project) =>
         project.name.toLowerCase().includes(searchByName.toLowerCase())
