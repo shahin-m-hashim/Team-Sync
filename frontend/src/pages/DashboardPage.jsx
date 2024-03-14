@@ -12,7 +12,6 @@ import ProjectProvider from "@/contexts/projectContext";
 
 export default function DashboardPage() {
   const [showAddPopUp, setShowAddPopUp] = useState(false);
-  const [searchByName, setSearchByName] = useState(null);
 
   return (
     <div className="grid h-screen grid-cols-[250px,1fr] relative ">
@@ -32,12 +31,9 @@ export default function DashboardPage() {
             id="dashBody"
             className="bg-[#141414] m-1 mt-0 rounded-lg text-white"
           >
-            <ListHeader
-              setShowAddPopUp={setShowAddPopUp}
-              setSearchByName={setSearchByName}
-            />
+            <ListHeader setShowAddPopUp={setShowAddPopUp} />
             <ListSubHeader />
-            <ListBody searchByName={searchByName} />
+            <ListBody />
           </div>
         </ProjectProvider>
       </div>
