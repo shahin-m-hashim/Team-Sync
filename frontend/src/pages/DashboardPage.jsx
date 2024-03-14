@@ -14,8 +14,6 @@ export default function DashboardPage() {
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
   const [searchByName, setSearchByName] = useState(null);
 
-  console.log(searchByName);
-
   return (
     <div className="grid h-screen grid-cols-[250px,1fr] relative ">
       <SideBar />
