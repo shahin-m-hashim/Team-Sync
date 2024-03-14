@@ -3,12 +3,16 @@ import add from "../../assets/images/Add.png";
 import filter from "../../assets/images/Filter.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
+import FilterDropDownMenu from "../FilterDropDownMenu";
+import { useState } from "react";
 
 export default function ListHeader({
   setShowAddPopUp,
   setListOnlyAdminProjects,
   setSearchByName,
 }) {
+  const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
+
   return (
     <div
       id="bodyHeader"
@@ -19,11 +23,16 @@ export default function ListHeader({
         <span className=" text-[#828282]">List of all projects</span>
       </div>
       <div className="flex gap-5">
-        <button className="flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl">
+        <div className="relative flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl">
           <img src={filter} alt="filter" className="size-5" />
           <span>Filter</span>
-          <img src={dropArrow} alt="dropArrow" className="size-5" />
-        </button>
+          <button
+            onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
+          >
+            <img src={dropArrow} alt="dropArrow" className="size-5" />
+          </button>
+          {showFilterDropDownMenu && <FilterDropDownMenu />}
+        </div>
         <input
           type="text"
           placeholder="Search by name"
