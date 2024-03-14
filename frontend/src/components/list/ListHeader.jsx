@@ -4,14 +4,12 @@ import filter from "../../assets/images/Filter.png";
 import switchIcon from "../../assets/images/Switch.png";
 import dropArrow from "../../assets/images/Expand Arrow.png";
 import FilterDropDownMenu from "../FilterDropDownMenu";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { projectContext } from "@/contexts/projectContext";
 
-export default function ListHeader({
-  setShowAddPopUp,
-  setListOnlyAdminProjects,
-  setSearchByName,
-}) {
+export default function ListHeader({ setShowAddPopUp, setSearchByName }) {
   const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
+  const { setListOnlyAdminProjects } = useContext(projectContext);
 
   return (
     <div
@@ -37,7 +35,7 @@ export default function ListHeader({
           type="text"
           placeholder="Search by name"
           className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
-          onChange={(e) => setSearchByName(e.target.value.toLowerCase())}
+          onChange={(e) => setSearchByName(e.target.value)}
         />
       </div>
       <div className="flex gap-10 text-[#828282]">
