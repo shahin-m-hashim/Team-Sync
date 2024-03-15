@@ -5,11 +5,13 @@ import FilterDropDownMenu from "./FilterDropDownMenu";
 import { useContext, useEffect, useRef, useState } from "react";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 
 export default function FilterButton({ displayList }) {
   const filterDropDownRef = useRef();
   const { teamFilterBtnTxt } = useContext(teamContext);
   const { projectFilterBtnTxt } = useContext(projectContext);
+  const { subTeamFilterBtnTxt } = useContext(subTeamContext);
   const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function FilterButton({ displayList }) {
       <img src={filter} alt="filter" className="size-5" />
       {displayList === "Project" && <span>{projectFilterBtnTxt}</span>}
       {displayList === "Team" && <span>{teamFilterBtnTxt}</span>}
+      {displayList === "Sub Team" && <span>{subTeamFilterBtnTxt}</span>}
       <button
         onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
       >

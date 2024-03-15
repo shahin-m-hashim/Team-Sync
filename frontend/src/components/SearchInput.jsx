@@ -1,4 +1,5 @@
 import { projectContext } from "@/contexts/projectContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 import { teamContext } from "@/contexts/teamContext";
 import { useContext } from "react";
 
@@ -7,6 +8,8 @@ const SearchInput = ({ displayList }) => {
   const { projectNameSearchTxt, setProjectNameSearchTxt } =
     useContext(projectContext);
   const { teamNameSearchTxt, setTeamNameSearchTxt } = useContext(teamContext);
+  const { subTeamNameSearchTxt, setSubTeamNameSearchTxt } =
+    useContext(subTeamContext);
 
   if (displayList === "Project") {
     return (
@@ -28,6 +31,18 @@ const SearchInput = ({ displayList }) => {
         value={teamNameSearchTxt}
         className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
         onChange={(e) => setTeamNameSearchTxt(e.target.value)}
+      />
+    );
+  }
+
+  if (displayList === "Sub Team") {
+    return (
+      <input
+        type="text"
+        placeholder="Search by sub team name"
+        value={subTeamNameSearchTxt}
+        className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
+        onChange={(e) => setSubTeamNameSearchTxt(e.target.value)}
       />
     );
   }

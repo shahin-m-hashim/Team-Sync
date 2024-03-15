@@ -4,10 +4,12 @@ import { useContext } from "react";
 import EmptyListBody from "./EmptyListBody";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 
 export default function ListBody({ displayList }) {
-  const { projects, projectNameSearchTxt } = useContext(projectContext);
   const { teams, teamNameSearchTxt } = useContext(teamContext);
+  const { projects, projectNameSearchTxt } = useContext(projectContext);
+  const { subTeams, subTeamNameSearchTxt } = useContext(subTeamContext);
 
   if (displayList === "Project") {
     if (projectNameSearchTxt && projects.length > 0) {
@@ -30,14 +32,32 @@ export default function ListBody({ displayList }) {
   if (displayList === "Team") {
     if (teamNameSearchTxt && teams.length > 0) {
       return teams
-        .filter((project) =>
-          project.name.toLowerCase().includes(teamNameSearchTxt.toLowerCase())
+        .filter((team) =>
+          team.name.toLowerCase().includes(teamNameSearchTxt.toLowerCase())
         )
-        .map((project, index) => <ListItem key={index} {...project} />);
+        .map((team, index) => <ListItem key={index} {...team} />);
     }
 
     return teams.length > 0 ? (
-      teams.map((project, index) => <ListItem key={index} {...project} />)
+      teams.map((team, index) => <ListItem key={index} {...team} />)
+    ) : (
+      <EmptyListBody name={displayList} />
+    );
+  }
+
+  if (displayList === "Sub Team") {
+    if (subTeamNameSearchTxt && subTeams.length > 0) {
+      return subTeams
+        .filter((subTeam) =>
+          subTeam.name
+            .toLowerCase()
+            .includes(subTeamNameSearchTxt.toLowerCase())
+        )
+        .map((subTeam, index) => <ListItem key={index} {...subTeam} />);
+    }
+
+    return subTeams.length > 0 ? (
+      subTeams.map((subTeam, index) => <ListItem key={index} {...subTeam} />)
     ) : (
       <EmptyListBody name={displayList} />
     );

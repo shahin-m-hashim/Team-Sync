@@ -3,6 +3,7 @@ import { useContext } from "react";
 import reset from "../../assets/images/Reset.png";
 import { teamContext } from "@/contexts/teamContext";
 import { projectContext } from "@/contexts/projectContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 
 const ResetListBtn = ({ displayList }) => {
   const {
@@ -18,6 +19,13 @@ const ResetListBtn = ({ displayList }) => {
     setTeamFilterBtnTxt,
     setListOnlyAdminTeams,
   } = useContext(teamContext);
+
+  const {
+    resetSubTeamList,
+    setSubTeamNameSearchTxt,
+    setSubTeamFilterBtnTxt,
+    setListOnlyAdminSubTeams,
+  } = useContext(subTeamContext);
 
   if (displayList === "Project") {
     return (
@@ -45,6 +53,21 @@ const ResetListBtn = ({ displayList }) => {
         }}
       >
         <img src={reset} className="size-10" alt="resetTeams" />
+      </button>
+    );
+  }
+
+  if (displayList === "Sub Team") {
+    return (
+      <button
+        onClick={() => {
+          setSubTeamNameSearchTxt("");
+          setListOnlyAdminSubTeams(false);
+          setSubTeamFilterBtnTxt("Filter");
+          resetSubTeamList();
+        }}
+      >
+        <img src={reset} className="size-10" alt="resetSubTeams" />
       </button>
     );
   }
