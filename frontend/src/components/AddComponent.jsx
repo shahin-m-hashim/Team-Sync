@@ -8,7 +8,7 @@ export default function AddComponent({ name, setShowAddPopUp }) {
   };
 
   return (
-    <div className="fixed z-50 size-full backdrop-blur-sm">
+    <div className="absolute inset-0 z-50 size-full backdrop-blur-sm">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 flex-col w-[400px] h-[400px] bg-[#313338] text-white py-3 px-5">
         <div className="grid grid-cols-[1fr,25px] w-full">
           <span className="flex justify-center ml-2 text-xl">
