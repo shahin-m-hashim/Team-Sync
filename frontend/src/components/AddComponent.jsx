@@ -19,11 +19,11 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
           </button>
         </div>
         <div className="text-[#828282] text-center text-sm">
-          {displayList === "Projects" &&
+          {displayList === "Project" &&
             "Your project is where you can create your teams, add members and work with them effortlessly."}
-          {displayList === "Teams" &&
+          {displayList === "Team" &&
             "Your Team is where you can organize your sub teams, add members and work with them effortlessly."}
-          {displayList === "SubTeams" &&
+          {displayList === "SubTeam" &&
             "Your Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."}
         </div>
         <div className="bg-[#4D4D4D] size-[380px] mt-3">
@@ -44,14 +44,14 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
           <hr />
           <div className="p-3">
             <span>{displayList} Name</span>
-            {displayList === "Projects" && (
+            {displayList === "Project" && (
               <input
                 className="bg-[#5030E5] mt-3 px-3 py-2 rounded-lg w-full placeholder:text-[#BDBDBD]"
                 type="text"
                 placeholder="Enter Your Project Name"
               />
             )}
-            {displayList === "Teams" && (
+            {displayList === "Team" && (
               <input
                 className="bg-[#5030E5] mt-3 px-3 py-2 rounded-lg w-full placeholder:text-[#BDBDBD]"
                 type="text"

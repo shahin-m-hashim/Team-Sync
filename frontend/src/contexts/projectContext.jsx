@@ -52,14 +52,23 @@ let projects = [
   },
 ];
 
+const initialState = projects;
+
 const ProjectProvider = ({ children }) => {
-  const [searchByProjectName, setSearchByProjectName] = useState("");
-  const [projectFilterBtnText, setProjectFilterBtnText] = useState("Filter");
+  const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
+  const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
+
+  const resetList = () => {
+    filterProjects({
+      type: "RESET",
+      initialState,
+    });
+  };
 
   const [filteredProjects, dispatch] = useReducer(filterList, [...projects]);
 
-  const setFilterProjects = (action) => dispatch(action);
+  const filterProjects = (action) => dispatch(action);
 
   projects = listOnlyAdminProjects
     ? filteredProjects.filter((project) => project.role === "Leader")
@@ -70,12 +79,13 @@ const ProjectProvider = ({ children }) => {
       value={{
         projects,
         listOnlyAdminProjects,
-        searchByProjectName,
-        projectFilterBtnText,
-        setFilterProjects,
-        setProjectFilterBtnText,
-        setSearchByProjectName,
+        projectNameSearchTxt,
+        projectFilterBtnTxt,
+        filterProjects,
+        setProjectFilterBtnTxt,
+        setProjectNameSearchTxt,
         setListOnlyAdminProjects,
+        resetList,
       }}
     >
       {children}

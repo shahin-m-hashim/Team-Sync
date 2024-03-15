@@ -13,7 +13,7 @@ import TeamProvider from "@/contexts/teamContext";
 
 export default function DashboardPage() {
   const [showAddPopUp, setShowAddPopUp] = useState(false);
-  const [displayList, setDisplayList] = useState("Projects");
+  const [displayList, setDisplayList] = useState("Project");
 
   return (
     <>
