@@ -2,6 +2,7 @@
 import { useContext } from "react";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 
 export default function FilterDropDownMenu({
   displayList,
@@ -9,6 +10,7 @@ export default function FilterDropDownMenu({
 }) {
   const { filterTeams, setTeamFilterBtnTxt } = useContext(teamContext);
   const { filterProjects, setProjectFilterBtnTxt } = useContext(projectContext);
+  const { filterSubTeams, setSubTeamFilterBtnTxt } = useContext(subTeamContext);
 
   const handleFilterClick = (filterBy, order) => {
     setShowFilterDropDownMenu(false);
@@ -16,9 +18,23 @@ export default function FilterDropDownMenu({
     setFilter({ type: `${filterBy}_${order}`.toUpperCase() });
   };
 
-  const setFilter = displayList === "Project" ? filterProjects : filterTeams;
-  const setFilterBtnTxt =
-    displayList === "Project" ? setProjectFilterBtnTxt : setTeamFilterBtnTxt;
+  let setFilter, setFilterBtnTxt;
+
+  if (displayList === "Project") {
+    setFilter = filterProjects;
+  } else if (displayList === "Team") {
+    setFilter = filterTeams;
+  } else {
+    setFilter = filterSubTeams;
+  }
+
+  if (displayList === "Project") {
+    setFilterBtnTxt = setProjectFilterBtnTxt;
+  } else if (displayList === "Team") {
+    setFilterBtnTxt = setTeamFilterBtnTxt;
+  } else {
+    setFilterBtnTxt = setSubTeamFilterBtnTxt;
+  }
 
   const FilterButtons = ({ filterBy }) => (
     <>

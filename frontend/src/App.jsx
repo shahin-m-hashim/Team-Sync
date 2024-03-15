@@ -54,6 +54,10 @@ const router = createBrowserRouter([
     element: <DashboardPage tab="Team" />,
   },
   {
+    path: "subTeams",
+    element: <DashboardPage tab="Sub Team" />,
+  },
+  {
     path: "reLogin",
     element: <ReLoginPage />,
   },

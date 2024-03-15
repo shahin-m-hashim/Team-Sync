@@ -3,10 +3,12 @@ import { useContext } from "react";
 import { teamContext } from "@/contexts/teamContext";
 import switchIcon from "../../assets/images/Switch.png";
 import { projectContext } from "@/contexts/projectContext";
+import { subTeamContext } from "@/contexts/subTeamContext";
 
 const SwitchListBtn = ({ displayList }) => {
   const { setListOnlyAdminTeams } = useContext(teamContext);
   const { setListOnlyAdminProjects } = useContext(projectContext);
+  const { setListOnlyAdminSubTeams } = useContext(subTeamContext);
 
   if (displayList === "Project") {
     return (
@@ -21,6 +23,16 @@ const SwitchListBtn = ({ displayList }) => {
   if (displayList === "Team") {
     return (
       <button onClick={() => setListOnlyAdminTeams((prevState) => !prevState)}>
+        <img src={switchIcon} className="size-10" alt="switchTeamView" />
+      </button>
+    );
+  }
+
+  if (displayList === "Sub Team") {
+    return (
+      <button
+        onClick={() => setListOnlyAdminSubTeams((prevState) => !prevState)}
+      >
         <img src={switchIcon} className="size-10" alt="switchTeamView" />
       </button>
     );

@@ -7,6 +7,8 @@ import ProjectProvider from "@/contexts/projectContext";
 import TeamProvider from "@/contexts/teamContext";
 import TeamDash from "@/components/dashboard/TeamDash";
 import { useNavigate } from "react-router-dom";
+import SubTeamDash from "@/components/dashboard/SubTeamDash";
+import SubTeamProvider from "@/contexts/subTeamContext";
 
 // eslint-disable-next-line react/prop-types
 export default function DashboardPage({ tab = "Project" }) {
@@ -15,7 +17,10 @@ export default function DashboardPage({ tab = "Project" }) {
   const [displayList, setDisplayList] = useState(tab);
 
   useEffect(() => {
-    navigate(`/${displayList.toLowerCase()}s`);
+    const path =
+      displayList[0].toLowerCase() +
+      displayList.substring(1).replace(/\s/g, "");
+    navigate(`/${path}s`);
   }, [displayList, navigate]);
 
   return (
@@ -24,22 +29,32 @@ export default function DashboardPage({ tab = "Project" }) {
       <Navbar />
       <ProjectProvider>
         <TeamProvider>
-          {displayList === "Project" && (
-            <ProjectDash
-              displayList={displayList}
-              setDisplayList={setDisplayList}
-              showAddPopUp={showAddPopUp}
-              setShowAddPopUp={setShowAddPopUp}
-            />
-          )}
-          {displayList === "Team" && (
-            <TeamDash
-              displayList={displayList}
-              setDisplayList={setDisplayList}
-              showAddPopUp={showAddPopUp}
-              setShowAddPopUp={setShowAddPopUp}
-            />
-          )}
+          <SubTeamProvider>
+            {displayList === "Project" && (
+              <ProjectDash
+                displayList={displayList}
+                setDisplayList={setDisplayList}
+                showAddPopUp={showAddPopUp}
+                setShowAddPopUp={setShowAddPopUp}
+              />
+            )}
+            {displayList === "Team" && (
+              <TeamDash
+                displayList={displayList}
+                setDisplayList={setDisplayList}
+                showAddPopUp={showAddPopUp}
+                setShowAddPopUp={setShowAddPopUp}
+              />
+            )}
+            {displayList === "Sub Team" && (
+              <SubTeamDash
+                displayList={displayList}
+                setDisplayList={setDisplayList}
+                showAddPopUp={showAddPopUp}
+                setShowAddPopUp={setShowAddPopUp}
+              />
+            )}
+          </SubTeamProvider>
         </TeamProvider>
       </ProjectProvider>
       {showAddPopUp && (

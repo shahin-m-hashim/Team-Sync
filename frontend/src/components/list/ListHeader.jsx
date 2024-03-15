@@ -26,7 +26,7 @@ export default function ListHeader({
       <div className="flex gap-10 text-[#828282]">
         <button onClick={() => setDisplayList("Project")}>Projects</button>
         <button onClick={() => setDisplayList("Team")}>Teams</button>
-        <span>Sub Teams</span>
+        <button onClick={() => setDisplayList("Sub Team")}>Sub Teams</button>
         <span>Tasks</span>
       </div>
       <div className="inline-flex gap-5">
