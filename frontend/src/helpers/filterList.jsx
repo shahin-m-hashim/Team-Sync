@@ -1,6 +1,6 @@
 import moment from "moment";
 
-export const filterProjects = (state, action) => {
+export const filterList = (state, action) => {
   switch (action.type) {
     case "NAME_ASC":
       return [...state].sort((a, b) => a.name.localeCompare(b.name));

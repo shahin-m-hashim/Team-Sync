@@ -1,39 +1,23 @@
 /* eslint-disable react/prop-types */
 import add from "../../assets/images/Add.png";
-import filter from "../../assets/images/Filter.png";
 import switchIcon from "../../assets/images/Switch.png";
-import dropArrow from "../../assets/images/Expand Arrow.png";
-import FilterDropDownMenu from "../FilterDropDownMenu";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext } from "react";
 import { projectContext } from "@/contexts/projectContext";
+import { teamContext } from "@/contexts/teamContext";
+import FilterButton from "../FilterButton";
 
-export default function ListHeader({ setShowAddPopUp }) {
-  const filterBtnTextRef = useRef();
-  const filterDropDownRef = useRef();
-  const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
-  const { setListOnlyAdminProjects, setSearchByName } =
-    useContext(projectContext);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        filterDropDownRef.current &&
-        !filterDropDownRef.current.contains(event.target)
-      ) {
-        setShowFilterDropDownMenu(false);
-      }
-    };
-
-    if (showFilterDropDownMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showFilterDropDownMenu]);
+export default function ListHeader({
+  setShowAddPopUp,
+  setDisplayList,
+  displayList,
+}) {
+  const {
+    setListOnlyAdminProjects,
+    searchByProjectName,
+    setSearchByProjectName,
+  } = useContext(projectContext);
+  const { setListOnlyAdminTeams, searchByTeamName, setSearchByTeamName } =
+    useContext(teamContext);
 
   return (
     <div
@@ -41,47 +25,51 @@ export default function ListHeader({ setShowAddPopUp }) {
       className="flex items-center justify-between py-3 text-sm px-7"
     >
       <div className="flex flex-col gap-1">
-        <span className="font-medium">Projects</span>
-        <span className="text-[#828282]">List of all projects</span>
+        <span className="font-medium">{displayList}</span>
+        <span className="text-[#828282]">List of all {displayList}</span>
       </div>
       <div className="flex gap-5">
-        <div
-          className="relative flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl"
-          ref={filterDropDownRef}
-        >
-          <img src={filter} alt="filter" className="size-5" />
-          <span ref={filterBtnTextRef}>Filter</span>
-          <button
-            onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
-          >
-            <img src={dropArrow} alt="dropArrow" className="size-5" />
-          </button>
-          {showFilterDropDownMenu && (
-            <FilterDropDownMenu
-              filterBtnTextRef={filterBtnTextRef}
-              setShowFilterDropDownMenu={setShowFilterDropDownMenu}
-            />
-          )}
-        </div>
-        <input
-          type="text"
-          placeholder="Search by name"
-          className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
-          onChange={(e) => setSearchByName(e.target.value)}
-        />
+        <FilterButton displayList={displayList} />
+        {displayList === "Projects" && (
+          <input
+            type="text"
+            placeholder="Search by project name"
+            value={searchByProjectName}
+            className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
+            onChange={(e) => setSearchByProjectName(e.target.value)}
+          />
+        )}
+        {displayList === "Teams" && (
+          <input
+            type="text"
+            placeholder="Search by team name"
+            value={searchByTeamName}
+            className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
+            onChange={(e) => setSearchByTeamName(e.target.value)}
+          />
+        )}
       </div>
       <div className="flex gap-10 text-[#828282]">
-        <span>Projects</span>
-        <span>Teams</span>
+        <button onClick={() => setDisplayList("Projects")}>Projects</button>
+        <button onClick={() => setDisplayList("Teams")}>Teams</button>
         <span>Sub Teams</span>
         <span>Tasks</span>
       </div>
       <div className="inline-flex gap-5">
-        <button
-          onClick={() => setListOnlyAdminProjects((prevState) => !prevState)}
-        >
-          <img src={switchIcon} className="size-10" alt="switchProjectView" />
-        </button>
+        {displayList === "Projects" && (
+          <button
+            onClick={() => setListOnlyAdminProjects((prevState) => !prevState)}
+          >
+            <img src={switchIcon} className="size-10" alt="switchProjectView" />
+          </button>
+        )}
+        {displayList === "Teams" && (
+          <button
+            onClick={() => setListOnlyAdminTeams((prevState) => !prevState)}
+          >
+            <img src={switchIcon} className="size-10" alt="switchTeamView" />
+          </button>
+        )}
         <button onClick={() => setShowAddPopUp(true)}>
           <img src={add} className="size-10" alt="addProject" />
         </button>

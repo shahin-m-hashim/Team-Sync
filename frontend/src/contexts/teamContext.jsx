@@ -7,11 +7,11 @@ import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
 import { filterList } from "@/helpers/filterList";
 
-export const projectContext = createContext();
+export const teamContext = createContext();
 
-let projects = [
+let teams = [
   {
-    name: "Project 1",
+    name: "Sam 1",
     createdDate: "01/02/2024",
     icon: google,
     progress: 0,
@@ -19,7 +19,7 @@ let projects = [
     role: "Leader",
   },
   {
-    name: "Team 3",
+    name: "Alaska 3",
     createdDate: "10/03/2024",
     icon: facebook,
     progress: 20,
@@ -38,49 +38,49 @@ let projects = [
     name: "Team 5",
     createdDate: "18/06/2024",
     icon: youtube,
-    progress: 50,
-    status: "Stopped",
+    progress: 10,
+    status: "Pending",
     role: "Leader",
   },
   {
-    name: "Project 2",
+    name: "Shad 2",
     createdDate: "27/01/2024",
     icon: youtube,
-    progress: 50,
+    progress: 80,
     status: "Stopped",
     role: "Leader",
   },
 ];
 
-const ProjectProvider = ({ children }) => {
-  const [projectFilterBtnText, setProjectFilterBtnText] = useState("Filter");
-  const [searchByProjectName, setSearchByProjectName] = useState(null);
-  const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
+const TeamProvider = ({ children }) => {
+  const [teamFilterBtnText, setTeamFilterBtnText] = useState("Filter");
+  const [searchByTeamName, setSearchByTeamName] = useState(null);
+  const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
 
-  const [filteredProjects, dispatch] = useReducer(filterList, [...projects]);
+  const [filteredTeams, dispatch] = useReducer(filterList, [...teams]);
 
-  const setFilterProjects = (action) => dispatch(action);
+  const setFilterTeams = (action) => dispatch(action);
 
-  projects = listOnlyAdminProjects
-    ? filteredProjects.filter((project) => project.role === "Leader")
-    : filteredProjects;
+  teams = listOnlyAdminTeams
+    ? filteredTeams.filter((project) => project.role === "Leader")
+    : filteredTeams;
 
   return (
-    <projectContext.Provider
+    <teamContext.Provider
       value={{
-        projects,
-        listOnlyAdminProjects,
-        searchByProjectName,
-        projectFilterBtnText,
-        setProjectFilterBtnText,
-        setSearchByProjectName,
-        setListOnlyAdminProjects,
-        setFilterProjects,
+        teams,
+        teamFilterBtnText,
+        listOnlyAdminTeams,
+        searchByTeamName,
+        setSearchByTeamName,
+        setListOnlyAdminTeams,
+        setFilterTeams,
+        setTeamFilterBtnText,
       }}
     >
       {children}
-    </projectContext.Provider>
+    </teamContext.Provider>
   );
 };
 
-export default ProjectProvider;
+export default TeamProvider;
