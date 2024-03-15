@@ -54,7 +54,7 @@ let teams = [
 
 const TeamProvider = ({ children }) => {
   const [teamFilterBtnText, setTeamFilterBtnText] = useState("Filter");
-  const [searchByTeamName, setSearchByTeamName] = useState(null);
+  const [searchByTeamName, setSearchByTeamName] = useState("");
   const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
 
   const [filteredTeams, dispatch] = useReducer(filterList, [...teams]);

@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import add from "../../assets/images/Add.png";
+import reset from "../../assets/images/Reset.png";
 import switchIcon from "../../assets/images/Switch.png";
 import { useContext } from "react";
 import { projectContext } from "@/contexts/projectContext";
@@ -15,9 +16,14 @@ export default function ListHeader({
     setListOnlyAdminProjects,
     searchByProjectName,
     setSearchByProjectName,
+    setProjectFilterBtnText,
   } = useContext(projectContext);
-  const { setListOnlyAdminTeams, searchByTeamName, setSearchByTeamName } =
-    useContext(teamContext);
+  const {
+    setListOnlyAdminTeams,
+    searchByTeamName,
+    setSearchByTeamName,
+    setTeamFilterBtnText,
+  } = useContext(teamContext);
 
   return (
     <div
@@ -57,18 +63,50 @@ export default function ListHeader({
       </div>
       <div className="inline-flex gap-5">
         {displayList === "Projects" && (
-          <button
-            onClick={() => setListOnlyAdminProjects((prevState) => !prevState)}
-          >
-            <img src={switchIcon} className="size-10" alt="switchProjectView" />
-          </button>
+          <>
+            <button
+              onClick={() => {
+                setSearchByProjectName("");
+                setListOnlyAdminProjects(false);
+                setProjectFilterBtnText("Filter");
+              }}
+            >
+              <img src={reset} className="size-10" alt="addProject" />
+            </button>
+            <button
+              onClick={() =>
+                setListOnlyAdminProjects((prevState) => !prevState)
+              }
+            >
+              <img
+                src={switchIcon}
+                className="size-10"
+                alt="switchProjectView"
+              />
+            </button>
+          </>
         )}
         {displayList === "Teams" && (
-          <button
-            onClick={() => setListOnlyAdminTeams((prevState) => !prevState)}
-          >
-            <img src={switchIcon} className="size-10" alt="switchTeamView" />
-          </button>
+          <>
+            <button
+              onClick={() => {
+                setSearchByTeamName("");
+                setListOnlyAdminTeams(false);
+                setTeamFilterBtnText("Filter");
+              }}
+            >
+              <img src={reset} className="size-10" alt="addProject" />
+            </button>
+            <button
+              onClick={() => setListOnlyAdminTeams((prevState) => !prevState)}
+            >
+              <img
+                src={switchIcon}
+                className="size-10"
+                alt="switchProjectView"
+              />
+            </button>
+          </>
         )}
         <button onClick={() => setShowAddPopUp(true)}>
           <img src={add} className="size-10" alt="addProject" />

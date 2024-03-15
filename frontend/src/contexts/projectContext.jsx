@@ -53,8 +53,8 @@ let projects = [
 ];
 
 const ProjectProvider = ({ children }) => {
+  const [searchByProjectName, setSearchByProjectName] = useState("");
   const [projectFilterBtnText, setProjectFilterBtnText] = useState("Filter");
-  const [searchByProjectName, setSearchByProjectName] = useState(null);
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
 
   const [filteredProjects, dispatch] = useReducer(filterList, [...projects]);
@@ -72,10 +72,10 @@ const ProjectProvider = ({ children }) => {
         listOnlyAdminProjects,
         searchByProjectName,
         projectFilterBtnText,
+        setFilterProjects,
         setProjectFilterBtnText,
         setSearchByProjectName,
         setListOnlyAdminProjects,
-        setFilterProjects,
       }}
     >
       {children}
