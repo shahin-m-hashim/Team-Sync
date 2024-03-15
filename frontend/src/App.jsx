@@ -46,8 +46,12 @@ const router = createBrowserRouter([
     element: <ResetPasswordPage />,
   },
   {
-    path: "dashboard",
-    element: <DashboardPage />,
+    path: "projects",
+    element: <DashboardPage tab="Project" />,
+  },
+  {
+    path: "teams",
+    element: <DashboardPage tab="Team" />,
   },
   {
     path: "reLogin",
