@@ -59,7 +59,7 @@ const ProjectProvider = ({ children }) => {
   const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
 
-  const resetList = () => {
+  const resetProjectList = () => {
     filterProjects({
       type: "RESET",
       initialState,
@@ -82,10 +82,10 @@ const ProjectProvider = ({ children }) => {
         projectNameSearchTxt,
         projectFilterBtnTxt,
         filterProjects,
+        resetProjectList,
         setProjectFilterBtnTxt,
         setProjectNameSearchTxt,
         setListOnlyAdminProjects,
-        resetList,
       }}
     >
       {children}
