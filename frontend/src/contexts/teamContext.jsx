@@ -53,13 +53,13 @@ let teams = [
 ];
 
 const TeamProvider = ({ children }) => {
-  const [teamFilterBtnText, setTeamFilterBtnText] = useState("Filter");
-  const [searchByTeamName, setSearchByTeamName] = useState("");
+  const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
+  const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
 
   const [filteredTeams, dispatch] = useReducer(filterList, [...teams]);
 
-  const setFilterTeams = (action) => dispatch(action);
+  const filterTeams = (action) => dispatch(action);
 
   teams = listOnlyAdminTeams
     ? filteredTeams.filter((project) => project.role === "Leader")
@@ -69,13 +69,13 @@ const TeamProvider = ({ children }) => {
     <teamContext.Provider
       value={{
         teams,
-        teamFilterBtnText,
+        teamFilterBtnTxt,
         listOnlyAdminTeams,
-        searchByTeamName,
-        setSearchByTeamName,
+        teamNameSearchTxt,
+        filterTeams,
+        setTeamFilterBtnTxt,
+        setTeamNameSearchTxt,
         setListOnlyAdminTeams,
-        setFilterTeams,
-        setTeamFilterBtnText,
       }}
     >
       {children}

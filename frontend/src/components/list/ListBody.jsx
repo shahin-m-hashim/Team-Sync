@@ -6,14 +6,16 @@ import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
 
 export default function ListBody({ displayList }) {
-  const { projects, searchByProjectName } = useContext(projectContext);
-  const { teams, searchByTeamName } = useContext(teamContext);
+  const { projects, projectNameSearchTxt } = useContext(projectContext);
+  const { teams, teamNameSearchTxt } = useContext(teamContext);
 
-  if (displayList === "Projects") {
-    if (searchByProjectName && projects.length > 0) {
+  if (displayList === "Project") {
+    if (projectNameSearchTxt && projects.length > 0) {
       return projects
         .filter((project) =>
-          project.name.toLowerCase().includes(searchByProjectName.toLowerCase())
+          project.name
+            .toLowerCase()
+            .includes(projectNameSearchTxt.toLowerCase())
         )
         .map((project, index) => <ListItem key={index} {...project} />);
     }
@@ -25,11 +27,11 @@ export default function ListBody({ displayList }) {
     );
   }
 
-  if (displayList === "Teams") {
-    if (searchByTeamName && teams.length > 0) {
+  if (displayList === "Team") {
+    if (teamNameSearchTxt && teams.length > 0) {
       return teams
         .filter((project) =>
-          project.name.toLowerCase().includes(searchByTeamName.toLowerCase())
+          project.name.toLowerCase().includes(teamNameSearchTxt.toLowerCase())
         )
         .map((project, index) => <ListItem key={index} {...project} />);
     }
