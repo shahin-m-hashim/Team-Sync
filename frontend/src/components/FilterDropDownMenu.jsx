@@ -1,32 +1,45 @@
 /* eslint-disable react/prop-types */
-import { projectContext } from "@/contexts/projectContext";
 import { useContext } from "react";
+import { projectContext } from "@/contexts/projectContext";
+import { teamContext } from "@/contexts/teamContext";
 
 export default function FilterDropDownMenu({
-  filterBtnTextRef,
+  displayList,
   setShowFilterDropDownMenu,
 }) {
-  const { setFilterProjects } = useContext(projectContext);
+  const { setFilterProjects, setProjectFilterBtnText } =
+    useContext(projectContext);
+  const { setFilterTeams, setTeamFilterBtnText } = useContext(teamContext);
+
+  // Determine which set of state and functions to use based on the displayList
+  const setFilter =
+    displayList === "Projects" ? setFilterProjects : setFilterTeams;
+  const setFilterBtnTextFunc =
+    displayList === "Projects" ? setProjectFilterBtnText : setTeamFilterBtnText;
 
   const FilterButtons = ({ type }) => {
+    const ascOnClickHandler = () => {
+      setShowFilterDropDownMenu(false);
+      setFilterBtnTextFunc(`${type} : ASC`);
+      setFilter({ type: `${type}_ASC`.toUpperCase() });
+    };
+
+    const descOnClickHandler = () => {
+      setShowFilterDropDownMenu(false);
+      setFilterBtnTextFunc(`${type} : DESC`);
+      setFilter({ type: `${type}_DESC`.toUpperCase() });
+    };
+
     return (
       <>
         <button
-          onClick={() => {
-            setShowFilterDropDownMenu(false);
-            filterBtnTextRef.current.innerText = `${type} : ASC`;
-            setFilterProjects({ type: `${type}_ASC`.toUpperCase() });
-          }}
+          onClick={ascOnClickHandler}
           className="bg-[#61E125] min-w-10 text-xs rounded-2xl"
         >
           Asc
-        </button>{" "}
+        </button>
         <button
-          onClick={() => {
-            setShowFilterDropDownMenu(false);
-            filterBtnTextRef.current.innerText = `${type} : DESC`;
-            setFilterProjects({ type: `${type}_DESC`.toUpperCase() });
-          }}
+          onClick={descOnClickHandler}
           className="bg-[#F7C217] min-w-10 text-xs rounded-2xl"
         >
           Desc
