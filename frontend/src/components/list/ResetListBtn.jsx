@@ -6,14 +6,18 @@ import { projectContext } from "@/contexts/projectContext";
 
 const ResetListBtn = ({ displayList }) => {
   const {
-    resetList,
+    resetProjectList,
     setProjectNameSearchTxt,
     setProjectFilterBtnTxt,
     setListOnlyAdminProjects,
   } = useContext(projectContext);
 
-  const { setTeamNameSearchTxt, setTeamFilterBtnTxt, setListOnlyAdminTeams } =
-    useContext(teamContext);
+  const {
+    resetTeamList,
+    setTeamNameSearchTxt,
+    setTeamFilterBtnTxt,
+    setListOnlyAdminTeams,
+  } = useContext(teamContext);
 
   if (displayList === "Project") {
     return (
@@ -22,7 +26,7 @@ const ResetListBtn = ({ displayList }) => {
           setProjectNameSearchTxt("");
           setListOnlyAdminProjects(false);
           setProjectFilterBtnTxt("Filter");
-          resetList();
+          resetProjectList();
         }}
       >
         <img src={reset} className="size-10" alt="resetProjects" />
@@ -37,6 +41,7 @@ const ResetListBtn = ({ displayList }) => {
           setTeamNameSearchTxt("");
           setListOnlyAdminTeams(false);
           setTeamFilterBtnTxt("Filter");
+          resetTeamList();
         }}
       >
         <img src={reset} className="size-10" alt="resetTeams" />

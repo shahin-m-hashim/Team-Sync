@@ -52,10 +52,19 @@ let teams = [
   },
 ];
 
+const initialState = teams;
+
 const TeamProvider = ({ children }) => {
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
+
+  const resetTeamList = () => {
+    filterTeams({
+      type: "RESET",
+      initialState,
+    });
+  };
 
   const [filteredTeams, dispatch] = useReducer(filterList, [...teams]);
 
@@ -73,6 +82,7 @@ const TeamProvider = ({ children }) => {
         listOnlyAdminTeams,
         teamNameSearchTxt,
         filterTeams,
+        resetTeamList,
         setTeamFilterBtnTxt,
         setTeamNameSearchTxt,
         setListOnlyAdminTeams,
