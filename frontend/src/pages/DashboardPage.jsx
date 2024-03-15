@@ -14,32 +14,34 @@ export default function DashboardPage() {
   const [showAddPopUp, setShowAddPopUp] = useState(false);
 
   return (
-    <div className="grid h-screen grid-cols-[250px,1fr] relative ">
+    <>
       <SideBar />
-      <div className="grid grid-rows-[50px,1fr,2fr]">
-        <Navbar />
-        <div
-          id="dashHeader"
-          className="grid grid-cols-[1.3fr,1fr,270px] text-white"
-        >
-          <StatusCard />
-          <ActivityCard />
-          <MessageCard />
-        </div>
-        <ProjectProvider>
+      <Navbar />
+      <div id="dashMain">
+        <div className="grid max-h-[703px] m-0 ml-[235px] grid-rows-[1fr,2fr]">
           <div
-            id="dashBody"
-            className="bg-[#141414] m-1 mt-0 rounded-lg text-white"
+            id="dashHeader"
+            className="grid mt-11 grid-cols-[1.3fr,1fr,270px] text-white"
           >
-            <ListHeader setShowAddPopUp={setShowAddPopUp} />
-            <ListSubHeader />
-            <ListBody />
+            <StatusCard />
+            <ActivityCard />
+            <MessageCard />
           </div>
-        </ProjectProvider>
+          <ProjectProvider>
+            <div
+              id="dashBody"
+              className="bg-[#141414] m-1 mt-0 rounded-lg text-white"
+            >
+              <ListHeader setShowAddPopUp={setShowAddPopUp} />
+              <ListSubHeader />
+              <ListBody />
+            </div>
+          </ProjectProvider>
+        </div>
+        {showAddPopUp && (
+          <AddComponent name="Project" setShowAddPopUp={setShowAddPopUp} />
+        )}
       </div>
-      {showAddPopUp && (
-        <AddComponent name="Project" setShowAddPopUp={setShowAddPopUp} />
-      )}
-    </div>
+    </>
   );
 }
