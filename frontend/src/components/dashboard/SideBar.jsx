@@ -19,7 +19,7 @@ export default function SideBar() {
   return (
     <div
       id="sidebar"
-      className="bg-[#141414] w-[232px] fixed left-0 top-0 bottom-0 m-1 mr-0 flex flex-col justify-between items-start p-3 rounded-lg text-white"
+      className="bg-[#141414] z-50 w-[232px] fixed left-0 top-0 bottom-0 m-1 mr-0 flex flex-col justify-between items-start p-3 rounded-lg text-white"
     >
       <img src={teamSyncLogo} alt="teamSyncLogo" className="w-16 h-14" />
       <div

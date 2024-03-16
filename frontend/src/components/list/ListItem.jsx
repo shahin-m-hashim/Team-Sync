@@ -25,9 +25,9 @@ export default function ListItem({
       id="listItem"
       className={cn(
         displayList !== "Task"
-          ? "grid-cols-[1.5fr,150px,100px,2.5fr,150px,150px,80px,80px]"
-          : "grid-cols-10",
-        "grid items-center my-[1px] border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
+          ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
+          : "grid-cols-[160px,120px,155px,115px,120px,120px,120px,70px,70px,70px]",
+        "grid items-center my-[1px] gap-3 border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
       )}
     >
       <span>{name}</span>
@@ -37,7 +37,7 @@ export default function ListItem({
           <img src={icon} alt="project icon" />
         </div>
       ) : (
-        <span>{assignee}</span>
+        <span className="pl-2">{assignee}</span>
       )}
       {displayList !== "Task" ? (
         <div className="flex items-center">
@@ -52,12 +52,12 @@ export default function ListItem({
           </div>
         </div>
       ) : (
-        <button className="pl-8">
+        <button className="pl-7">
           <img src={attach} width={20} alt="attach icon" />
         </button>
       )}
       {displayList !== "Task" ? (
-        <div className="pl-5">
+        <div className="pl-8">
           <div
             className={cn(
               {
@@ -89,7 +89,7 @@ export default function ListItem({
         </div>
       )}
       {displayList !== "Task" ? (
-        <span>{role}</span>
+        <span className="pl-2">{role}</span>
       ) : (
         <span>{deadlineDate}</span>
       )}
@@ -111,15 +111,15 @@ export default function ListItem({
               <span>{status}</span>
             </div>
           </div>
-          <button>
+          <button className="pl-3">
             <img src={submitIcon} width={30} alt="submit tasks icon" />
           </button>
         </>
       )}
-      <button className={cn(displayList !== "Task" ? "pl-8" : "pl-0")}>
+      <button className={cn(displayList !== "Task" ? "pl-8" : "pl-3")}>
         <img src={settings} width={25} alt="settings icon" />
       </button>
-      <button className={cn(displayList !== "Task" ? "pl-10" : "pl-0")}>
+      <button className={cn(displayList !== "Task" ? "pl-10" : "pl-3")}>
         <img src={deleteIcon} width={25} alt="delete icon" />
       </button>
     </div>

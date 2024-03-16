@@ -3,7 +3,7 @@ export default function Navbar() {
   return (
     <div
       id="dashNavbar"
-      className="bg-[#141414] z-10 min-h-10 fixed top-0 right-0 left-[235px] m-1 mb-0 rounded-lg flex justify-between items-center"
+      className="bg-[#141414] z-50 min-h-10 fixed top-0 right-0 left-[235px] m-1 mb-0 rounded-lg flex justify-between items-center"
     >
       <span className="text-[#9685FF] font-semibold pl-3">TeamSync</span>
       <div className="inline-flex items-center gap-3 pr-3">
