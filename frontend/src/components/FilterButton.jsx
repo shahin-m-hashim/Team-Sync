@@ -6,12 +6,14 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
+import { taskContext } from "@/contexts/taskContext";
 
 export default function FilterButton({ displayList }) {
   const filterDropDownRef = useRef();
   const { teamFilterBtnTxt } = useContext(teamContext);
   const { projectFilterBtnTxt } = useContext(projectContext);
   const { subTeamFilterBtnTxt } = useContext(subTeamContext);
+  const { taskFilterBtnTxt } = useContext(taskContext);
   const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function FilterButton({ displayList }) {
       {displayList === "Project" && <span>{projectFilterBtnTxt}</span>}
       {displayList === "Team" && <span>{teamFilterBtnTxt}</span>}
       {displayList === "Sub Team" && <span>{subTeamFilterBtnTxt}</span>}
+      {displayList === "Task" && <span>{taskFilterBtnTxt}</span>}
       <button
         onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
       >

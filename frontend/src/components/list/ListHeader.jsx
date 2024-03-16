@@ -27,7 +27,7 @@ export default function ListHeader({
         <button onClick={() => setDisplayList("Project")}>Projects</button>
         <button onClick={() => setDisplayList("Team")}>Teams</button>
         <button onClick={() => setDisplayList("Sub Team")}>Sub Teams</button>
-        <span>Tasks</span>
+        <button onClick={() => setDisplayList("Task")}>Tasks</button>
       </div>
       <div className="inline-flex gap-5">
         <ResetListBtn displayList={displayList} />

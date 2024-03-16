@@ -4,11 +4,14 @@ import { teamContext } from "@/contexts/teamContext";
 import switchIcon from "../../assets/images/Switch.png";
 import { projectContext } from "@/contexts/projectContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
+import { taskContext } from "@/contexts/taskContext";
 
 const SwitchListBtn = ({ displayList }) => {
   const { setListOnlyAdminTeams } = useContext(teamContext);
   const { setListOnlyAdminProjects } = useContext(projectContext);
   const { setListOnlyAdminSubTeams } = useContext(subTeamContext);
+  // eslint-disable-next-line no-undef
+  const { setListOnlyYourTasks } = useContext(taskContext);
 
   if (displayList === "Project") {
     return (
@@ -33,6 +36,14 @@ const SwitchListBtn = ({ displayList }) => {
       <button
         onClick={() => setListOnlyAdminSubTeams((prevState) => !prevState)}
       >
+        <img src={switchIcon} className="size-10" alt="switchTeamView" />
+      </button>
+    );
+  }
+
+  if (displayList === "Task") {
+    return (
+      <button onClick={() => setListOnlyYourTasks((prevState) => !prevState)}>
         <img src={switchIcon} className="size-10" alt="switchTeamView" />
       </button>
     );
