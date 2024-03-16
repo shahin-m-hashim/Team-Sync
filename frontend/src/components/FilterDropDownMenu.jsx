@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
+import { taskContext } from "@/contexts/taskContext";
 
 export default function FilterDropDownMenu({
   displayList,
@@ -11,6 +12,7 @@ export default function FilterDropDownMenu({
   const { filterTeams, setTeamFilterBtnTxt } = useContext(teamContext);
   const { filterProjects, setProjectFilterBtnTxt } = useContext(projectContext);
   const { filterSubTeams, setSubTeamFilterBtnTxt } = useContext(subTeamContext);
+  const { filterTasks, setTaskFilterBtnTxt } = useContext(taskContext);
 
   const handleFilterClick = (filterBy, order) => {
     setShowFilterDropDownMenu(false);
@@ -24,16 +26,20 @@ export default function FilterDropDownMenu({
     setFilter = filterProjects;
   } else if (displayList === "Team") {
     setFilter = filterTeams;
-  } else {
+  } else if (displayList === "Sub Team") {
     setFilter = filterSubTeams;
+  } else {
+    setFilter = filterTasks;
   }
 
   if (displayList === "Project") {
     setFilterBtnTxt = setProjectFilterBtnTxt;
   } else if (displayList === "Team") {
     setFilterBtnTxt = setTeamFilterBtnTxt;
-  } else {
+  } else if (displayList === "Sub Team") {
     setFilterBtnTxt = setSubTeamFilterBtnTxt;
+  } else {
+    setFilterBtnTxt = setTaskFilterBtnTxt;
   }
 
   const FilterButtons = ({ filterBy }) => (
@@ -68,8 +74,14 @@ export default function FilterDropDownMenu({
     <div className="absolute text-center top-9 right-[-10px] flex flex-col justify-evenly p-2 py-0 rounded-xl min-w-[200px] h-[150px] bg-[#4D4D4D]">
       <FilterOption filterBy="Name" />
       <FilterOption filterBy="Created" />
-      <FilterOption filterBy="Progress" />
+      {displayList !== "Task" && <FilterOption filterBy="Progress" />}
       <FilterOption filterBy="Status" />
+      {displayList === "Task" && (
+        <>
+          <FilterOption filterBy="Priority" />
+          <FilterOption filterBy="Deadline" />
+        </>
+      )}
     </div>
   );
 }

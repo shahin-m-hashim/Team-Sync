@@ -2,6 +2,7 @@
 import { useState } from "react";
 import uploadIcon from "@/assets/images/uploadIcon.png";
 import closeIcon from "@/assets/images/Close.png";
+import { cn } from "@/lib/utils";
 
 export default function AddComponent({ displayList, setShowAddPopUp }) {
   const [teamName, setTeamName] = useState("");
@@ -56,7 +57,13 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
             "Your Sub Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."}
         </div>
         <div className="bg-[#4D4D4D] size-[380px] mt-3">
-          <div className="flex gap-12 p-3">
+          <div
+            className={cn("flex p-3", {
+              "gap-[3.3rem]": displayList === "Project",
+              "gap-16": displayList === "Team",
+              "gap-8": displayList === "Sub Team",
+            })}
+          >
             <span>{displayList} Icon</span>
             <label className="mt-3 rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2 cursor-pointer">
               <input

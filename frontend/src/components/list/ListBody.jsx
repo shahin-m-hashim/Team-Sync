@@ -5,11 +5,13 @@ import EmptyListBody from "./EmptyListBody";
 import { projectContext } from "@/contexts/projectContext";
 import { teamContext } from "@/contexts/teamContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
+import { taskContext } from "@/contexts/taskContext";
 
 export default function ListBody({ displayList }) {
   const { teams, teamNameSearchTxt } = useContext(teamContext);
   const { projects, projectNameSearchTxt } = useContext(projectContext);
   const { subTeams, subTeamNameSearchTxt } = useContext(subTeamContext);
+  const { tasks, taskNameSearchTxt } = useContext(taskContext);
 
   if (displayList === "Project") {
     if (projectNameSearchTxt && projects.length > 0) {
@@ -58,6 +60,26 @@ export default function ListBody({ displayList }) {
 
     return subTeams.length > 0 ? (
       subTeams.map((subTeam, index) => <ListItem key={index} {...subTeam} />)
+    ) : (
+      <EmptyListBody name={displayList} />
+    );
+  }
+
+  if (displayList === "Task") {
+    if (taskNameSearchTxt && tasks.length > 0) {
+      return tasks
+        .filter((task) =>
+          task.name.toLowerCase().includes(taskNameSearchTxt.toLowerCase())
+        )
+        .map((task, index) => (
+          <ListItem key={index} {...task} displayList={displayList} />
+        ));
+    }
+
+    return tasks.length > 0 ? (
+      tasks.map((task, index) => (
+        <ListItem key={index} {...task} displayList={displayList} />
+      ))
     ) : (
       <EmptyListBody name={displayList} />
     );
