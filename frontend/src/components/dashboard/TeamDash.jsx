@@ -7,26 +7,31 @@ import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "@/components/list/ListSubHeader";
 
 export default function TeamDash({
-  setDisplayList,
-  displayList,
+  setRenderList,
+  renderList,
   setShowAddPopUp,
 }) {
   return (
-    <div className="grid max-h-[703px] m-0 ml-[235px] grid-rows-[1fr,2fr]">
-      <div className="grid mt-11 grid-cols-[1.3fr,1fr,270px] text-white">
+    <>
+      <div className="grid grid-cols-[1.3fr,1fr,270px] text-white">
         <StatusCard />
         <ActivityCard />
         <MessageCard />
       </div>
-      <div className="bg-[#141414] m-1 mt-0 rounded-lg text-white">
+      <div className="bg-[#141414] mx-1 rounded-t-md text-white">
         <ListHeader
           setShowAddPopUp={setShowAddPopUp}
-          setDisplayList={setDisplayList}
-          displayList={displayList}
+          setRenderList={setRenderList}
+          renderList={renderList}
         />
-        <ListSubHeader />
-        <ListBody displayList={displayList} />
       </div>
-    </div>
+      <div
+        id="scrollableListBody"
+        className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
+      >
+        <ListSubHeader renderList={renderList} />
+        <ListBody renderList={renderList} />
+      </div>
+    </>
   );
 }

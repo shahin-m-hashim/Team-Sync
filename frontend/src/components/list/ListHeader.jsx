@@ -7,8 +7,8 @@ import SwitchListBtn from "./SwitchListBtn";
 
 export default function ListHeader({
   setShowAddPopUp,
-  setDisplayList,
-  displayList,
+  setRenderList,
+  renderList,
 }) {
   return (
     <div
@@ -16,22 +16,22 @@ export default function ListHeader({
       className="flex items-center justify-between py-3 text-sm px-7"
     >
       <div className="flex flex-col gap-1">
-        <span className="font-medium">{displayList}s</span>
-        <span className="text-[#828282]">List of all {displayList}s</span>
+        <span className="font-medium">{renderList}s</span>
+        <span className="text-[#828282]">List of all {renderList}s</span>
       </div>
       <div className="flex gap-5">
-        <FilterButton displayList={displayList} />
-        <SearchInput displayList={displayList} />
+        <FilterButton renderList={renderList} />
+        <SearchInput renderList={renderList} />
       </div>
       <div className="flex gap-10 text-[#828282]">
-        <button onClick={() => setDisplayList("Project")}>Projects</button>
-        <button onClick={() => setDisplayList("Team")}>Teams</button>
-        <button onClick={() => setDisplayList("Sub Team")}>Sub Teams</button>
-        <button onClick={() => setDisplayList("Task")}>Tasks</button>
+        <button onClick={() => setRenderList("Project")}>Projects</button>
+        <button onClick={() => setRenderList("Team")}>Teams</button>
+        <button onClick={() => setRenderList("Sub Team")}>Sub Teams</button>
+        <button onClick={() => setRenderList("Task")}>Tasks</button>
       </div>
       <div className="inline-flex gap-5">
-        <ResetListBtn displayList={displayList} />
-        <SwitchListBtn displayList={displayList} />
+        <ResetListBtn renderList={renderList} />
+        <SwitchListBtn renderList={renderList} />
         <button onClick={() => setShowAddPopUp(true)}>
           <img src={add} className="size-10" alt="addToList" />
         </button>

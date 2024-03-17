@@ -8,7 +8,7 @@ import { teamContext } from "@/contexts/teamContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
 import { taskContext } from "@/contexts/taskContext";
 
-export default function FilterButton({ displayList }) {
+export default function FilterButton({ renderList }) {
   const filterDropDownRef = useRef();
   const { teamFilterBtnTxt } = useContext(teamContext);
   const { projectFilterBtnTxt } = useContext(projectContext);
@@ -43,10 +43,10 @@ export default function FilterButton({ displayList }) {
       ref={filterDropDownRef}
     >
       <img src={filter} alt="filter" className="size-5" />
-      {displayList === "Project" && <span>{projectFilterBtnTxt}</span>}
-      {displayList === "Team" && <span>{teamFilterBtnTxt}</span>}
-      {displayList === "Sub Team" && <span>{subTeamFilterBtnTxt}</span>}
-      {displayList === "Task" && <span>{taskFilterBtnTxt}</span>}
+      {renderList === "Project" && <span>{projectFilterBtnTxt}</span>}
+      {renderList === "Team" && <span>{teamFilterBtnTxt}</span>}
+      {renderList === "Sub Team" && <span>{subTeamFilterBtnTxt}</span>}
+      {renderList === "Task" && <span>{taskFilterBtnTxt}</span>}
       <button
         onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
       >
@@ -54,7 +54,7 @@ export default function FilterButton({ displayList }) {
       </button>
       {showFilterDropDownMenu && (
         <FilterDropDownMenu
-          displayList={displayList}
+          renderList={renderList}
           setShowFilterDropDownMenu={setShowFilterDropDownMenu}
         />
       )}

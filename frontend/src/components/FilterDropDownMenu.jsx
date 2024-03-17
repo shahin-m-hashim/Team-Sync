@@ -6,7 +6,7 @@ import { subTeamContext } from "@/contexts/subTeamContext";
 import { taskContext } from "@/contexts/taskContext";
 
 export default function FilterDropDownMenu({
-  displayList,
+  renderList,
   setShowFilterDropDownMenu,
 }) {
   const { filterTeams, setTeamFilterBtnTxt } = useContext(teamContext);
@@ -22,21 +22,21 @@ export default function FilterDropDownMenu({
 
   let setFilter, setFilterBtnTxt;
 
-  if (displayList === "Project") {
+  if (renderList === "Project") {
     setFilter = filterProjects;
-  } else if (displayList === "Team") {
+  } else if (renderList === "Team") {
     setFilter = filterTeams;
-  } else if (displayList === "Sub Team") {
+  } else if (renderList === "Sub Team") {
     setFilter = filterSubTeams;
   } else {
     setFilter = filterTasks;
   }
 
-  if (displayList === "Project") {
+  if (renderList === "Project") {
     setFilterBtnTxt = setProjectFilterBtnTxt;
-  } else if (displayList === "Team") {
+  } else if (renderList === "Team") {
     setFilterBtnTxt = setTeamFilterBtnTxt;
-  } else if (displayList === "Sub Team") {
+  } else if (renderList === "Sub Team") {
     setFilterBtnTxt = setSubTeamFilterBtnTxt;
   } else {
     setFilterBtnTxt = setTaskFilterBtnTxt;
@@ -74,9 +74,9 @@ export default function FilterDropDownMenu({
     <div className="absolute text-center top-9 right-[-10px] flex flex-col justify-evenly p-2 py-0 rounded-xl min-w-[200px] h-[150px] bg-[#4D4D4D]">
       <FilterOption filterBy="Name" />
       <FilterOption filterBy="Created" />
-      {displayList !== "Task" && <FilterOption filterBy="Progress" />}
+      {renderList !== "Task" && <FilterOption filterBy="Progress" />}
       <FilterOption filterBy="Status" />
-      {displayList === "Task" && (
+      {renderList === "Task" && (
         <>
           <FilterOption filterBy="Priority" />
           <FilterOption filterBy="Deadline" />

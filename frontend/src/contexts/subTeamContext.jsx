@@ -50,6 +50,46 @@ let subTeams = [
     status: "Stopped",
     role: "Leader",
   },
+  {
+    name: "Project 1",
+    createdDate: "01/02/2024",
+    icon: google,
+    progress: 0,
+    status: "Not Started",
+    role: "Leader",
+  },
+  {
+    name: "Sub Team 3",
+    createdDate: "10/03/2024",
+    icon: facebook,
+    progress: 20,
+    status: "Pending",
+    role: "Member",
+  },
+  {
+    name: "Sub Team 4",
+    createdDate: "25/01/2024",
+    icon: instagram,
+    progress: 100,
+    status: "Done",
+    role: "Co-Leader",
+  },
+  {
+    name: "Team 5",
+    createdDate: "18/06/2024",
+    icon: youtube,
+    progress: 50,
+    status: "Stopped",
+    role: "Leader",
+  },
+  {
+    name: "BACKEND",
+    createdDate: "27/01/2024",
+    icon: youtube,
+    progress: 50,
+    status: "Stopped",
+    role: "Leader",
+  },
 ];
 
 const initialState = subTeams;

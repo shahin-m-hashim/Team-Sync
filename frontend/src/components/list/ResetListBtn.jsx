@@ -6,7 +6,7 @@ import { projectContext } from "@/contexts/projectContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
 import { taskContext } from "@/contexts/taskContext";
 
-const ResetListBtn = ({ displayList }) => {
+const ResetListBtn = ({ renderList }) => {
   const {
     resetProjectList,
     setProjectNameSearchTxt,
@@ -35,7 +35,7 @@ const ResetListBtn = ({ displayList }) => {
     setListOnlyYourTasks,
   } = useContext(taskContext);
 
-  if (displayList === "Project") {
+  if (renderList === "Project") {
     return (
       <button
         onClick={() => {
@@ -50,7 +50,7 @@ const ResetListBtn = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Team") {
+  if (renderList === "Team") {
     return (
       <button
         onClick={() => {
@@ -65,7 +65,7 @@ const ResetListBtn = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Sub Team") {
+  if (renderList === "Sub Team") {
     return (
       <button
         onClick={() => {
@@ -80,7 +80,7 @@ const ResetListBtn = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Task") {
+  if (renderList === "Task") {
     return (
       <button
         onClick={() => {

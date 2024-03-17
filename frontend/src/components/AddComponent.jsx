@@ -4,7 +4,7 @@ import uploadIcon from "@/assets/images/uploadIcon.png";
 import closeIcon from "@/assets/images/Close.png";
 import { cn } from "@/lib/utils";
 
-export default function AddComponent({ displayList, setShowAddPopUp }) {
+export default function AddComponent({ renderList, setShowAddPopUp }) {
   const [teamName, setTeamName] = useState("");
 
   const handleFileUpload = (file) => {
@@ -13,7 +13,7 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
 
   const nameInput = () => {
     let placeholderText = "";
-    switch (displayList) {
+    switch (renderList) {
       case "Project":
         placeholderText = "Enter Your Project Name";
         break;
@@ -42,29 +42,29 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-3 flex-col w-[400px] h-[400px] bg-[#313338] text-white py-3 px-5">
         <div className="grid grid-cols-[1fr,25px] w-full">
           <span className="flex justify-center ml-2 text-xl">
-            Customize Your {displayList}
+            Customize Your {renderList}
           </span>
           <button onClick={() => setShowAddPopUp(false)}>
             <img src={closeIcon} alt="Close" />
           </button>
         </div>
         <div className="text-[#828282] text-center text-sm">
-          {displayList === "Project" &&
+          {renderList === "Project" &&
             "Your project is where you can create your teams, add members and work with them effortlessly."}
-          {displayList === "Team" &&
+          {renderList === "Team" &&
             "Your Team is where you can organize your sub teams, add members and work with them effortlessly."}
-          {displayList === "Sub Team" &&
+          {renderList === "Sub Team" &&
             "Your Sub Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."}
         </div>
         <div className="bg-[#4D4D4D] size-[380px] mt-3">
           <div
             className={cn("flex p-3", {
-              "gap-[3.3rem]": displayList === "Project",
-              "gap-16": displayList === "Team",
-              "gap-8": displayList === "Sub Team",
+              "gap-[3.3rem]": renderList === "Project",
+              "gap-16": renderList === "Team",
+              "gap-8": renderList === "Sub Team",
             })}
           >
-            <span>{displayList} Icon</span>
+            <span>{renderList} Icon</span>
             <label className="mt-3 rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2 cursor-pointer">
               <input
                 type="file"
@@ -79,12 +79,12 @@ export default function AddComponent({ displayList, setShowAddPopUp }) {
           </div>
           <hr />
           <div className="p-3">
-            <span>{displayList} Name</span>
+            <span>{renderList} Name</span>
             {nameInput()}
           </div>
         </div>
         <button className="rounded-lg font-bold w-full px-3 py-2 bg-[#3085e5] text-black">
-          Create Your {displayList}
+          Create Your {renderList}
         </button>
       </div>
     </div>

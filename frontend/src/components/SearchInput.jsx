@@ -5,7 +5,7 @@ import { teamContext } from "@/contexts/teamContext";
 import { useContext } from "react";
 
 /* eslint-disable react/prop-types */
-const SearchInput = ({ displayList }) => {
+const SearchInput = ({ renderList }) => {
   const { projectNameSearchTxt, setProjectNameSearchTxt } =
     useContext(projectContext);
   const { teamNameSearchTxt, setTeamNameSearchTxt } = useContext(teamContext);
@@ -13,7 +13,7 @@ const SearchInput = ({ displayList }) => {
     useContext(subTeamContext);
   const { taskNameSearchTxt, setTaskNameSearchTxt } = useContext(taskContext);
 
-  if (displayList === "Project") {
+  if (renderList === "Project") {
     return (
       <input
         type="text"
@@ -25,7 +25,7 @@ const SearchInput = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Team") {
+  if (renderList === "Team") {
     return (
       <input
         type="text"
@@ -37,7 +37,7 @@ const SearchInput = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Sub Team") {
+  if (renderList === "Sub Team") {
     return (
       <input
         type="text"
@@ -49,7 +49,7 @@ const SearchInput = ({ displayList }) => {
     );
   }
 
-  if (displayList === "Task") {
+  if (renderList === "Task") {
     return (
       <input
         type="text"
