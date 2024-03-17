@@ -7,13 +7,13 @@ import { teamContext } from "@/contexts/teamContext";
 import { subTeamContext } from "@/contexts/subTeamContext";
 import { taskContext } from "@/contexts/taskContext";
 
-export default function ListBody({ displayList }) {
+export default function ListBody({ renderList }) {
   const { teams, teamNameSearchTxt } = useContext(teamContext);
   const { projects, projectNameSearchTxt } = useContext(projectContext);
   const { subTeams, subTeamNameSearchTxt } = useContext(subTeamContext);
   const { tasks, taskNameSearchTxt } = useContext(taskContext);
 
-  if (displayList === "Project") {
+  if (renderList === "Project") {
     if (projectNameSearchTxt && projects.length > 0) {
       return projects
         .filter((project) =>
@@ -27,11 +27,11 @@ export default function ListBody({ displayList }) {
     return projects.length > 0 ? (
       projects.map((project, index) => <ListItem key={index} {...project} />)
     ) : (
-      <EmptyListBody name={displayList} />
+      <EmptyListBody name={renderList} />
     );
   }
 
-  if (displayList === "Team") {
+  if (renderList === "Team") {
     if (teamNameSearchTxt && teams.length > 0) {
       return teams
         .filter((team) =>
@@ -43,11 +43,11 @@ export default function ListBody({ displayList }) {
     return teams.length > 0 ? (
       teams.map((team, index) => <ListItem key={index} {...team} />)
     ) : (
-      <EmptyListBody name={displayList} />
+      <EmptyListBody name={renderList} />
     );
   }
 
-  if (displayList === "Sub Team") {
+  if (renderList === "Sub Team") {
     if (subTeamNameSearchTxt && subTeams.length > 0) {
       return subTeams
         .filter((subTeam) =>
@@ -61,27 +61,27 @@ export default function ListBody({ displayList }) {
     return subTeams.length > 0 ? (
       subTeams.map((subTeam, index) => <ListItem key={index} {...subTeam} />)
     ) : (
-      <EmptyListBody name={displayList} />
+      <EmptyListBody name={renderList} />
     );
   }
 
-  if (displayList === "Task") {
+  if (renderList === "Task") {
     if (taskNameSearchTxt && tasks.length > 0) {
       return tasks
         .filter((task) =>
           task.name.toLowerCase().includes(taskNameSearchTxt.toLowerCase())
         )
         .map((task, index) => (
-          <ListItem key={index} {...task} displayList={displayList} />
+          <ListItem key={index} {...task} renderList={renderList} />
         ));
     }
 
     return tasks.length > 0 ? (
       tasks.map((task, index) => (
-        <ListItem key={index} {...task} displayList={displayList} />
+        <ListItem key={index} {...task} renderList={renderList} />
       ))
     ) : (
-      <EmptyListBody name={displayList} />
+      <EmptyListBody name={renderList} />
     );
   }
 }

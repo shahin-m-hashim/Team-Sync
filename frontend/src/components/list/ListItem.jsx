@@ -18,13 +18,13 @@ export default function ListItem({
   role,
   submitIcon = submit,
   deadlineDate,
-  displayList,
+  renderList,
 }) {
   return (
     <div
       id="listItem"
       className={cn(
-        displayList !== "Task"
+        renderList !== "Task"
           ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
           : "grid-cols-[160px,120px,155px,115px,120px,120px,120px,70px,70px,70px]",
         "grid items-center my-[1px] gap-3 border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
@@ -32,14 +32,14 @@ export default function ListItem({
     >
       <span>{name}</span>
       <span>{createdDate}</span>
-      {displayList !== "Task" ? (
+      {renderList !== "Task" ? (
         <div className="flex items-center pl-1">
           <img src={icon} alt="project icon" />
         </div>
       ) : (
         <span className="pl-2">{assignee}</span>
       )}
-      {displayList !== "Task" ? (
+      {renderList !== "Task" ? (
         <div className="flex items-center">
           <div className="inline-flex text-xs font-semibold items-center justify-center bg-[#5030E5] size-9 rounded-[50%]">
             {progress}%
@@ -56,7 +56,7 @@ export default function ListItem({
           <img src={attach} width={20} alt="attach icon" />
         </button>
       )}
-      {displayList !== "Task" ? (
+      {renderList !== "Task" ? (
         <div className="pl-8">
           <div
             className={cn(
@@ -88,15 +88,15 @@ export default function ListItem({
           </div>
         </div>
       )}
-      {displayList !== "Task" ? (
+      {renderList !== "Task" ? (
         <span className="pl-2">{role}</span>
       ) : (
         <span>{deadlineDate}</span>
       )}
 
-      {displayList === "Task" && (
+      {renderList === "Task" && (
         <>
-          <div className={cn(displayList !== "Task" ? "pl-5" : "pl-0")}>
+          <div className={cn(renderList !== "Task" ? "pl-5" : "pl-0")}>
             <div
               className={cn(
                 {
@@ -116,10 +116,10 @@ export default function ListItem({
           </button>
         </>
       )}
-      <button className={cn(displayList !== "Task" ? "pl-8" : "pl-3")}>
+      <button className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}>
         <img src={settings} width={25} alt="settings icon" />
       </button>
-      <button className={cn(displayList !== "Task" ? "pl-10" : "pl-3")}>
+      <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>
         <img src={deleteIcon} width={25} alt="delete icon" />
       </button>
     </div>

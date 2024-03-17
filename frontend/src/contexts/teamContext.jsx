@@ -50,6 +50,46 @@ let teams = [
     status: "Stopped",
     role: "Leader",
   },
+  {
+    name: "Sam 1",
+    createdDate: "01/02/2024",
+    icon: google,
+    progress: 0,
+    status: "Not Started",
+    role: "Leader",
+  },
+  {
+    name: "Alaska 3",
+    createdDate: "10/03/2024",
+    icon: facebook,
+    progress: 20,
+    status: "Pending",
+    role: "Member",
+  },
+  {
+    name: "Project 4",
+    createdDate: "25/01/2024",
+    icon: instagram,
+    progress: 100,
+    status: "Done",
+    role: "Co-Leader",
+  },
+  {
+    name: "Team 5",
+    createdDate: "18/06/2024",
+    icon: youtube,
+    progress: 10,
+    status: "Pending",
+    role: "Leader",
+  },
+  {
+    name: "Shad 2",
+    createdDate: "27/01/2024",
+    icon: youtube,
+    progress: 80,
+    status: "Stopped",
+    role: "Leader",
+  },
 ];
 
 const initialState = teams;
