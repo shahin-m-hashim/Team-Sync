@@ -1,20 +1,24 @@
 /* eslint-disable react/prop-types */
 import ActivityCard from "@/components/cards/ActivityCard";
 import MessageCard from "@/components/cards/MessageCard";
-import StatusCard from "@/components/cards/StatusCard";
 import ListHeader from "@/components/list/ListHeader";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "@/components/list/ListSubHeader";
+import { useContext } from "react";
+import { projectContext } from "@/contexts/projectContext";
+import StatusCard from "../cards/StatusCard";
 
 export default function ProjectDash({
   setRenderList,
   renderList,
   setShowAddPopUp,
 }) {
+  const { projectProgress } = useContext(projectContext);
+
   return (
     <>
       <div className="grid grid-cols-[1.3fr,1fr,270px] text-white">
-        <StatusCard />
+        <StatusCard progress={projectProgress} />
         <ActivityCard />
         <MessageCard />
       </div>

@@ -6,6 +6,7 @@ import facebook from "../assets/images/project icons/Facebook.png";
 import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
 import { filterList } from "@/helpers/filterList";
+import calcStatusProgress from "@/helpers/calcStatusProgress";
 
 export const projectContext = createContext();
 
@@ -87,7 +88,7 @@ let projects = [
     createdDate: "27/01/2024",
     icon: youtube,
     progress: 50,
-    status: "Stopped",
+    status: "Pending",
     role: "Leader",
   },
   {
@@ -159,7 +160,7 @@ let projects = [
     createdDate: "18/06/2024",
     icon: youtube,
     progress: 50,
-    status: "Stopped",
+    status: "Not Started",
     role: "Leader",
   },
   {
@@ -167,7 +168,7 @@ let projects = [
     createdDate: "27/01/2024",
     icon: youtube,
     progress: 50,
-    status: "Stopped",
+    status: "Pending",
     role: "Leader",
   },
   {
@@ -239,7 +240,7 @@ let projects = [
     createdDate: "18/06/2024",
     icon: youtube,
     progress: 50,
-    status: "Stopped",
+    status: "Done",
     role: "Leader",
   },
   {
@@ -274,10 +275,13 @@ const ProjectProvider = ({ children }) => {
     ? filteredProjects.filter((project) => project.role === "Leader")
     : filteredProjects;
 
+  const projectProgress = calcStatusProgress(projects);
+
   return (
     <projectContext.Provider
       value={{
         projects,
+        projectProgress,
         listOnlyAdminProjects,
         projectNameSearchTxt,
         projectFilterBtnTxt,
