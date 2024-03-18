@@ -275,13 +275,13 @@ const ProjectProvider = ({ children }) => {
     ? filteredProjects.filter((project) => project.role === "Leader")
     : filteredProjects;
 
-  const projectProgress = calcStatusProgress(projects);
+  const statusProgress = calcStatusProgress(projects);
 
   return (
     <projectContext.Provider
       value={{
         projects,
-        projectProgress,
+        statusProgress,
         listOnlyAdminProjects,
         projectNameSearchTxt,
         projectFilterBtnTxt,

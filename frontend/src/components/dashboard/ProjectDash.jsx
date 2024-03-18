@@ -13,12 +13,12 @@ export default function ProjectDash({
   renderList,
   setShowAddPopUp,
 }) {
-  const { projectProgress } = useContext(projectContext);
+  const { statusProgress } = useContext(projectContext);
 
   return (
     <>
-      <div className="grid grid-cols-[1.3fr,1fr,270px] text-white">
-        <StatusCard progress={projectProgress} />
+      <div className="grid grid-cols-[1.3fr,1fr,330px] text-white">
+        <StatusCard statusProgress={statusProgress} />
         <ActivityCard />
         <MessageCard />
       </div>
