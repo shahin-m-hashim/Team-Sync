@@ -6,6 +6,7 @@ import facebook from "../assets/images/project icons/Facebook.png";
 import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
 import { filterList } from "@/helpers/filterList";
+import calcStatusProgress from "@/helpers/calcStatusProgress";
 
 export const teamContext = createContext();
 
@@ -114,10 +115,13 @@ const TeamProvider = ({ children }) => {
     ? filteredTeams.filter((project) => project.role === "Leader")
     : filteredTeams;
 
+  const statusProgress = calcStatusProgress(teams);
+
   return (
     <teamContext.Provider
       value={{
         teams,
+        statusProgress,
         teamFilterBtnTxt,
         listOnlyAdminTeams,
         teamNameSearchTxt,

@@ -5,6 +5,7 @@ import { filterList } from "@/helpers/filterList";
 
 import editSubmitted from "../assets/images/Edit submitted.png";
 import viewSubmitted from "../assets/images/View submitted.png";
+import calcStatusProgress from "@/helpers/calcStatusProgress";
 
 export const taskContext = createContext();
 
@@ -167,10 +168,13 @@ const TaskProvider = ({ children }) => {
     ? filteredTasks.filter((project) => project.assignee === "Ajmal256")
     : filteredTasks;
 
+  const statusProgress = calcStatusProgress(tasks);
+
   return (
     <taskContext.Provider
       value={{
         tasks,
+        statusProgress,
         taskFilterBtnTxt,
         listOnlyYourTasks,
         taskNameSearchTxt,
