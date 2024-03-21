@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-const CircularStatusBar = ({ statusProgress, width }) => {
-  const totalTasks = Object.values(statusProgress).reduce(
+const CircularStatusBar = ({ statusCount, width }) => {
+  const totalTasks = Object.values(statusCount).reduce(
     (acc, val) => acc + val,
     0
   );
@@ -38,7 +38,7 @@ const CircularStatusBar = ({ statusProgress, width }) => {
       />
     );
 
-    const statusProgressCircles = Object.entries(statusProgress).map(
+    const statusProgressCircles = Object.entries(statusCount).map(
       ([status, value]) => {
         const percentage = getPercentage(value);
         const color = getColor(status);
@@ -61,7 +61,7 @@ const CircularStatusBar = ({ statusProgress, width }) => {
       }
     );
 
-    return [backgroundCircle, ...statusProgressCircles]; // Include the background circle before the progress circles
+    return [backgroundCircle, ...statusProgressCircles];
   };
 
   return (

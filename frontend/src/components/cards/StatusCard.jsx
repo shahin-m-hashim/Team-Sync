@@ -2,42 +2,49 @@
 import { cn } from "@/lib/utils";
 import CircularStatusBar from "../CircularStatusBar";
 import StatusBarChart from "../StatusBarChart";
+import calcStatusCount from "@/helpers/calcStatusCount";
+import CircularProgress from "../CircularProgress";
+import calcOverallProgress from "@/helpers/calcOverallProgress";
 
-export default function StatusCard({ statusProgress }) {
-  const { notStarted = 0, pending = 0, stopped = 0, done = 0 } = statusProgress;
+export default function StatusCard({ list = [], renderList }) {
+  const statusCount = calcStatusCount(list);
+  const overallProgress = calcOverallProgress(list);
 
-  if (notStarted === 0 && pending === 0 && stopped === 0 && done === 0) {
-    statusProgress.empty = 0;
+  if (Object.keys(list).length === 0) {
+    statusCount.empty = true;
   }
 
   return (
     <div
       className={cn(
-        statusProgress.empty !== 0 && "p-5 gap-2",
+        statusCount.empty && "p-5 gap-2",
         "bg-[#141414] m-1 rounded-lg flex flex-col"
       )}
     >
-      {statusProgress.empty !== 0 && (
-        <span className="font-medium text-center">Overall Status</span>
+      {!statusCount.empty && (
+        <span className="mt-2 font-medium text-center">Overall Status</span>
       )}
       <div
         id="status"
         className={cn(
-          statusProgress.empty === 0
-            ? "p-5 justify-evenly"
-            : "gap-3 ml-[-18px]",
-          "flex "
+          !statusCount.empty ? "p-5 justify-evenly" : "gap-3",
+          "flex h-full"
         )}
       >
-        <div className="relative flex items-center justify-center text-center">
-          <CircularStatusBar statusProgress={statusProgress} width="62%" />
+        <div
+          className={cn(
+            !statusCount.empty && renderList === "Task" && "ml-[-50px]",
+            "relative flex items-center justify-center text-center"
+          )}
+        >
+          <CircularStatusBar statusCount={statusCount} width="65%" />
           <span
             className={cn(
-              done === 0 ? "text-lg" : "text-xl bottom-[38%]",
+              statusCount.empty ? "text-lg" : "text-xl bottom-[38%]",
               "absolute"
             )}
           >
-            {done === 0 ? (
+            {statusCount.empty ? (
               <span>
                 <span>Nothing </span>
                 <br />
@@ -45,35 +52,42 @@ export default function StatusCard({ statusProgress }) {
               </span>
             ) : (
               <span>
-                {done} <br /> Complete
+                {statusCount.done} <br /> Complete
               </span>
             )}
           </span>
         </div>
-        {statusProgress.empty === 0 ? (
-          <div className="flex flex-col flex-grow gap-5 py-2 2xl:pr-20">
+        {statusCount.empty ? (
+          <div
+            className={cn(
+              !statusCount.empty && "items-center",
+              "flex flex-col justify-center flex-grow gap-5 pt-2"
+            )}
+          >
             <span className="font-medium">Overall Status</span>
-            <div className="flex flex-col gap-2 text-gra">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-5">
                 <div className="rounded-[50%] bg-[#3CDA7D] size-5" />
-                <span>Complete : {done}</span>
+                <span>Complete : {statusCount.done}</span>
               </div>
               <div className="flex items-center gap-5">
                 <div className="rounded-[50%] bg-[#F9BD3B] size-5" />
-                <span>Not Started : {notStarted}</span>
+                <span>Not Started : {statusCount.notStarted}</span>
               </div>
               <div className="flex items-center gap-5">
                 <div className="rounded-[50%] bg-[#A87BFF] size-5" />
-                <span>Pending : {pending}</span>
+                <span>Pending : {statusCount.pending}</span>
               </div>
               <div className="flex items-center gap-5">
                 <div className="rounded-[50%] bg-[#B10F0F] size-5" />
-                <span>Stopped : {stopped}</span>
+                <span>Stopped : {statusCount.stopped}</span>
               </div>
             </div>
           </div>
+        ) : renderList !== "Task" ? (
+          <CircularProgress overallProgress={overallProgress} width="65%" />
         ) : (
-          <StatusBarChart statusProgress={statusProgress} />
+          <StatusBarChart statusCount={statusCount} />
         )}
       </div>
     </div>

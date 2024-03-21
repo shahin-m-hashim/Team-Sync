@@ -1,15 +1,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useReducer, useState } from "react";
-import { filterList } from "@/helpers/filterList";
-
+import { listReducer } from "@/helpers/listReducer";
 import editSubmitted from "../assets/images/Edit submitted.png";
 import viewSubmitted from "../assets/images/View submitted.png";
-import calcStatusProgress from "@/helpers/calcStatusProgress";
+import { createContext, useEffect, useReducer, useState } from "react";
 
 export const taskContext = createContext();
 
-let tasks = [
+const initialTasks = [
   {
     name: "Header",
     createdDate: "01/02/2024",
@@ -146,7 +144,9 @@ let tasks = [
   },
 ];
 
-const initialState = tasks;
+const yourTasks = initialTasks.filter(
+  (project) => project.assignee === "Ajmal256"
+);
 
 const TaskProvider = ({ children }) => {
   const [taskNameSearchTxt, setTaskNameSearchTxt] = useState("");
@@ -154,32 +154,45 @@ const TaskProvider = ({ children }) => {
   const [listOnlyYourTasks, setListOnlyYourTasks] = useState(false);
 
   const resetTaskList = () => {
-    filterTasks({
+    setTaskNameSearchTxt("");
+    setListOnlyYourTasks(false);
+    setTaskFilterBtnTxt("Filter");
+    setTasks({
       type: "RESET",
-      initialState,
+      initialState: initialTasks,
     });
   };
 
-  const [filteredTasks, dispatch] = useReducer(filterList, [...tasks]);
+  const [tasks, dispatch] = useReducer(listReducer, [...initialTasks]);
+  const setTasks = (action) => dispatch(action);
 
-  const filterTasks = (action) => dispatch(action);
-
-  tasks = listOnlyYourTasks
-    ? filteredTasks.filter((project) => project.assignee === "Ajmal256")
-    : filteredTasks;
-
-  const statusProgress = calcStatusProgress(tasks);
+  useEffect(() => {
+    setTaskNameSearchTxt("");
+    setTaskFilterBtnTxt("Filter");
+    if (listOnlyYourTasks) {
+      setTasks({
+        type: "SWITCH",
+        payload: yourTasks,
+      });
+    } else {
+      setTasks({
+        type: "SWITCH",
+        payload: initialTasks,
+      });
+    }
+  }, [listOnlyYourTasks]);
 
   return (
     <taskContext.Provider
       value={{
         tasks,
-        statusProgress,
+        setTasks,
+        yourTasks,
+        initialTasks,
+        resetTaskList,
         taskFilterBtnTxt,
         listOnlyYourTasks,
         taskNameSearchTxt,
-        filterTasks,
-        resetTaskList,
         setTaskFilterBtnTxt,
         setTaskNameSearchTxt,
         setListOnlyYourTasks,

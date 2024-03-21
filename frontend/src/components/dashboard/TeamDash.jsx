@@ -5,24 +5,26 @@ import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
 import { useContext } from "react";
 import { teamContext } from "@/contexts/teamContext";
-import CircularProgress from "../CircularProgress";
-import CircularStatusBar from "../CircularStatusBar";
-import { cn } from "@/lib/utils";
-import { projectContext } from "@/contexts/projectContext";
+import StatusCard from "../cards/StatusCard";
 
 export default function TeamDash({
   setRenderList,
   renderList,
   setShowAddPopUp,
 }) {
-  const { projects } = useContext(projectContext);
-  const { statusProgress } = useContext(teamContext);
-
-  const { notStarted, pending, stopped, done } = statusProgress;
-
-  if (notStarted === 0 && pending === 0 && stopped === 0 && done === 0) {
-    statusProgress.empty = 0;
-  }
+  const {
+    teams,
+    setTeams,
+    leaderTeams,
+    initialTeams,
+    resetTeamList,
+    teamFilterBtnTxt,
+    teamNameSearchTxt,
+    listOnlyAdminTeams,
+    setTeamFilterBtnTxt,
+    setTeamNameSearchTxt,
+    setListOnlyAdminTeams,
+  } = useContext(teamContext);
 
   return (
     <>
@@ -35,36 +37,23 @@ export default function TeamDash({
             nom: 20,
           }}
         />
-        <div className="bg-[#141414] m-1 rounded-lg flex p-5 px-10 ">
-          <div className="relative flex items-center justify-center text-center">
-            <CircularStatusBar statusProgress={statusProgress} width="73%" />
-            <span
-              className={cn(
-                done === 0 ? "text-lg" : "text-xl bottom-[38%]",
-                "absolute"
-              )}
-            >
-              {done === 0 ? (
-                <span>
-                  <span>Nothing </span>
-                  <br />
-                  <span>To Show !!!</span>
-                </span>
-              ) : (
-                <span>
-                  {done} <br /> Complete
-                </span>
-              )}
-            </span>
-          </div>
-          <CircularProgress list={projects} />
-        </div>
+        <StatusCard list={teams} renderList={renderList} />
       </div>
       <div className="bg-[#141414] mx-1 rounded-t-md text-white">
         <ListHeader
-          setShowAddPopUp={setShowAddPopUp}
-          setRenderList={setRenderList}
+          setList={setTeams}
           renderList={renderList}
+          resetList={resetTeamList}
+          leaderList={leaderTeams}
+          setRenderList={setRenderList}
+          initialList={initialTeams}
+          setShowAddPopUp={setShowAddPopUp}
+          filterBtnTxt={teamFilterBtnTxt}
+          switchList={listOnlyAdminTeams}
+          setSwitchList={setListOnlyAdminTeams}
+          listNameSearchTxt={teamNameSearchTxt}
+          setFilterBtnTxt={setTeamFilterBtnTxt}
+          setListNameSearchTxt={setTeamNameSearchTxt}
         />
       </div>
       <div
@@ -72,7 +61,11 @@ export default function TeamDash({
         className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
       >
         <ListSubHeader renderList={renderList} />
-        <ListBody renderList={renderList} />
+        <ListBody
+          list={teams}
+          renderList={renderList}
+          listNameSearchTxt={teamNameSearchTxt}
+        />
       </div>
     </>
   );

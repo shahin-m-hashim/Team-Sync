@@ -1,31 +1,31 @@
-function calcStatusProgress(collection) {
-  const progress = {
+function calcStatusCount(list = []) {
+  const statusCount = {
     notStarted: 0,
     pending: 0,
     stopped: 0,
     done: 0,
   };
 
-  collection.forEach((doc) => {
+  list.forEach((doc) => {
     switch (doc.status) {
       case "Not Started":
-        progress.notStarted++;
+        statusCount.notStarted++;
         break;
       case "Pending":
-        progress.pending++;
+        statusCount.pending++;
         break;
       case "Stopped":
-        progress.stopped++;
+        statusCount.stopped++;
         break;
       case "Done":
-        progress.done++;
+        statusCount.done++;
         break;
       default:
         break;
     }
   });
 
-  return progress;
+  return statusCount;
 }
 
-export default calcStatusProgress;
+export default calcStatusCount;

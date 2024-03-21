@@ -1,18 +1,17 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useReducer, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import google from "../assets/images/project icons/Google.png";
 import facebook from "../assets/images/project icons/Facebook.png";
 import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
-import { filterList } from "@/helpers/filterList";
-import calcStatusProgress from "@/helpers/calcStatusProgress";
+import { listReducer } from "@/helpers/listReducer";
 
 export const teamContext = createContext();
 
-let teams = [
+const initialTeams = [
   {
-    name: "Sam 1",
+    name: "Team 3",
     createdDate: "01/02/2024",
     icon: google,
     progress: 0,
@@ -20,15 +19,15 @@ let teams = [
     role: "Leader",
   },
   {
-    name: "Alaska 3",
+    name: "Project 6",
     createdDate: "10/03/2024",
     icon: facebook,
-    progress: 20,
+    progress: 40,
     status: "Pending",
     role: "Member",
   },
   {
-    name: "Project 4",
+    name: "Team 4",
     createdDate: "25/01/2024",
     icon: instagram,
     progress: 100,
@@ -36,64 +35,63 @@ let teams = [
     role: "Co-Leader",
   },
   {
-    name: "Team 5",
+    name: "Project 8",
     createdDate: "18/06/2024",
     icon: youtube,
-    progress: 10,
+    progress: 75,
     status: "Pending",
     role: "Leader",
   },
   {
-    name: "Shad 2",
+    name: "Team 5",
     createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 80,
-    status: "Stopped",
-    role: "Leader",
+    icon: facebook,
+    progress: 15,
+    status: "Done",
+    role: "Co-Leader",
   },
   {
-    name: "Sam 1",
-    createdDate: "01/02/2024",
+    name: "Team 2",
+    createdDate: "15/03/2024",
     icon: google,
-    progress: 0,
-    status: "Not Started",
+    progress: 85,
+    status: "Pending",
+    role: "guide",
+  },
+  {
+    name: "Team 10",
+    createdDate: "22/04/2024",
+    icon: youtube,
+    progress: 35,
+    status: "Stopped",
     role: "Leader",
   },
   {
-    name: "Alaska 3",
-    createdDate: "10/03/2024",
+    name: "Team 7",
+    createdDate: "7/05/2024",
     icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
+    progress: 40,
+    status: "Not Started",
+    role: "guide",
   },
   {
-    name: "Project 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
+    name: "Team 9",
+    createdDate: "27/02/2024",
+    icon: youtube,
     progress: 100,
     status: "Done",
     role: "Co-Leader",
   },
   {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 10,
+    name: "Team 1",
+    createdDate: "2/03/2024",
+    icon: google,
+    progress: 75,
     status: "Pending",
-    role: "Leader",
-  },
-  {
-    name: "Shad 2",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 80,
-    status: "Stopped",
-    role: "Leader",
+    role: "guide",
   },
 ];
-
-const initialState = teams;
+const leaderTeams = initialTeams.filter((team) => team.role === "Leader");
 
 const TeamProvider = ({ children }) => {
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
@@ -101,31 +99,44 @@ const TeamProvider = ({ children }) => {
   const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
 
   const resetTeamList = () => {
-    filterTeams({
+    setTeamNameSearchTxt("");
+    setListOnlyAdminTeams(false);
+    setTeamFilterBtnTxt("Filter");
+    setTeams({
       type: "RESET",
-      initialState,
+      initialState: initialTeams,
     });
   };
 
-  const [filteredTeams, dispatch] = useReducer(filterList, [...teams]);
+  const [teams, dispatch] = useReducer(listReducer, initialTeams);
+  const setTeams = (action) => dispatch(action);
 
-  const filterTeams = (action) => dispatch(action);
-
-  teams = listOnlyAdminTeams
-    ? filteredTeams.filter((project) => project.role === "Leader")
-    : filteredTeams;
-
-  const statusProgress = calcStatusProgress(teams);
+  useEffect(() => {
+    setTeamNameSearchTxt("");
+    setTeamFilterBtnTxt("Filter");
+    if (listOnlyAdminTeams) {
+      setTeams({
+        type: "SWITCH",
+        payload: leaderTeams,
+      });
+    } else {
+      setTeams({
+        type: "SWITCH",
+        payload: initialTeams,
+      });
+    }
+  }, [listOnlyAdminTeams]);
 
   return (
     <teamContext.Provider
       value={{
         teams,
-        statusProgress,
-        teamFilterBtnTxt,
+        initialTeams,
+        leaderTeams,
         listOnlyAdminTeams,
         teamNameSearchTxt,
-        filterTeams,
+        teamFilterBtnTxt,
+        setTeams,
         resetTeamList,
         setTeamFilterBtnTxt,
         setTeamNameSearchTxt,

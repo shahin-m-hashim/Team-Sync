@@ -1,18 +1,9 @@
 /* eslint-disable react/prop-types */
 
-const CircularProgress = ({ list }) => {
-  if (list.length === 0) list = [{ progress: 100 }];
-
-  const totalProgress = list.reduce((acc, team) => acc + team.progress, 0);
-
-  const overallPercentage = Math.min(
-    (totalProgress / (list.length * 100)) * 100,
-    100
-  );
-
+const CircularProgress = ({ overallProgress }) => {
   return (
     <div className="flex items-center justify-center">
-      <div className="relative w-[70%]">
+      <div className="relative w-[65%]">
         <svg className="w-full h-full" viewBox="0 0 36 36">
           <circle
             className="text-gray-300 stroke-current"
@@ -30,7 +21,7 @@ const CircularProgress = ({ list }) => {
             strokeWidth="2"
             fill="none"
             strokeLinecap="round"
-            strokeDasharray={`${overallPercentage}, 100`}
+            strokeDasharray={`${overallProgress}, 100`}
             transform="rotate(-90 18 18)"
           />
         </svg>
@@ -38,7 +29,7 @@ const CircularProgress = ({ list }) => {
           <span className="text-xl font-bold text-center text-[#0098EF]">
             <span className="text-lg font-medium text-white">Progress</span>
             <br />
-            {`${Math.round(overallPercentage)}%`}
+            {overallProgress || 0}%
           </span>
         </div>
       </div>

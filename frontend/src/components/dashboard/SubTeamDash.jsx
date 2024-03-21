@@ -3,68 +3,57 @@ import ListHeader from "@/components/list/ListHeader";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
-import CircularStatusBar from "../CircularStatusBar";
-import { cn } from "@/lib/utils";
-import CircularProgress from "../CircularProgress";
 import { useContext } from "react";
 import { subTeamContext } from "@/contexts/subTeamContext";
-import { teamContext } from "@/contexts/teamContext";
+import StatusCard from "../cards/StatusCard";
 
 export default function SubTeamDash({
-  setRenderList,
   renderList,
+  setRenderList,
   setShowAddPopUp,
 }) {
-  const { teams } = useContext(teamContext);
-  const { statusProgress } = useContext(subTeamContext);
-
-  const { notStarted, pending, stopped, done } = statusProgress;
-
-  if (notStarted === 0 && pending === 0 && stopped === 0 && done === 0) {
-    statusProgress.empty = 0;
-  }
+  const {
+    subTeams,
+    setSubTeams,
+    leaderSubTeams,
+    initialSubTeams,
+    resetSubTeamList,
+    subTeamFilterBtnTxt,
+    subTeamNameSearchTxt,
+    listOnlyAdminSubTeams,
+    setSubTeamFilterBtnTxt,
+    setSubTeamNameSearchTxt,
+    setListOnlyAdminSubTeams,
+  } = useContext(subTeamContext);
 
   return (
     <>
       <div className="grid grid-cols-[1fr,1fr] text-white">
         <DetailCard
           details={{
-            name: "Team 1",
+            name: "Project 1",
             leader: "Shahin123",
             guide: "Sindhiya",
-            nom: 30,
+            nom: 20,
           }}
         />
-        <div className="bg-[#141414] m-1 rounded-lg flex p-5 px-10 ">
-          <div className="relative flex items-center justify-center text-center">
-            <CircularStatusBar statusProgress={statusProgress} width="73%" />
-            <span
-              className={cn(
-                done === 0 ? "text-lg" : "text-xl bottom-[38%]",
-                "absolute"
-              )}
-            >
-              {done === 0 ? (
-                <span>
-                  <span>Nothing </span>
-                  <br />
-                  <span>To Show !!!</span>
-                </span>
-              ) : (
-                <span>
-                  {done} <br /> Complete
-                </span>
-              )}
-            </span>
-          </div>
-          <CircularProgress list={teams} />
-        </div>
+        <StatusCard list={subTeams} renderList={renderList} />
       </div>
       <div className="bg-[#141414] mx-1 rounded-t-md text-white">
         <ListHeader
-          setShowAddPopUp={setShowAddPopUp}
-          setRenderList={setRenderList}
+          setList={setSubTeams}
           renderList={renderList}
+          resetList={resetSubTeamList}
+          leaderList={leaderSubTeams}
+          setRenderList={setRenderList}
+          initialList={initialSubTeams}
+          setShowAddPopUp={setShowAddPopUp}
+          filterBtnTxt={subTeamFilterBtnTxt}
+          switchList={listOnlyAdminSubTeams}
+          setSwitchList={setListOnlyAdminSubTeams}
+          listNameSearchTxt={subTeamNameSearchTxt}
+          setFilterBtnTxt={setSubTeamFilterBtnTxt}
+          setListNameSearchTxt={setSubTeamNameSearchTxt}
         />
       </div>
       <div
@@ -72,7 +61,11 @@ export default function SubTeamDash({
         className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
       >
         <ListSubHeader renderList={renderList} />
-        <ListBody renderList={renderList} />
+        <ListBody
+          list={subTeams}
+          renderList={renderList}
+          listNameSearchTxt={subTeamNameSearchTxt}
+        />
       </div>
     </>
   );

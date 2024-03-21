@@ -63,7 +63,7 @@ export default function ActivityCard() {
   );
 
   return (
-    <div className="flex flex-col bg-[#141414] my-1 rounded-lg p-3 justify-around">
+    <div className="flex flex-col bg-[#141414] my-1 p-2 rounded-lg gap-2 justify-around">
       <span className="font-semibold">Activity</span>
       {activities.length ? <ActivityCards /> : <EmptyActivityCard />}
     </div>

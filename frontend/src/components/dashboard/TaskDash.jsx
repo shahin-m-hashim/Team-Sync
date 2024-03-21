@@ -3,68 +3,57 @@ import ListHeader from "@/components/list/ListHeader";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
-import CircularStatusBar from "../CircularStatusBar";
-import { cn } from "@/lib/utils";
-import CircularProgress from "../CircularProgress";
 import { useContext } from "react";
-import { subTeamContext } from "@/contexts/subTeamContext";
+import StatusCard from "../cards/StatusCard";
 import { taskContext } from "@/contexts/taskContext";
 
-export default function TaskDash({
-  setRenderList,
+export default function SubTeamDash({
   renderList,
+  setRenderList,
   setShowAddPopUp,
 }) {
-  const { subTeams } = useContext(subTeamContext);
-  const { statusProgress } = useContext(taskContext);
-
-  const { notStarted, pending, stopped, done } = statusProgress;
-
-  if (notStarted === 0 && pending === 0 && stopped === 0 && done === 0) {
-    statusProgress.empty = 0;
-  }
+  const {
+    tasks,
+    setTasks,
+    yourTasks,
+    initialTasks,
+    resetTaskList,
+    taskFilterBtnTxt,
+    taskNameSearchTxt,
+    listOnlyYourTasks,
+    setTaskFilterBtnTxt,
+    setTaskNameSearchTxt,
+    setListOnlyYourTasks,
+  } = useContext(taskContext);
 
   return (
     <>
       <div className="grid grid-cols-[1fr,1fr] text-white">
         <DetailCard
           details={{
-            name: "Sub Team 1",
+            name: "Project 1",
             leader: "Shahin123",
             guide: "Sindhiya",
-            nom: 30,
+            nom: 20,
           }}
         />
-        <div className="bg-[#141414] m-1 rounded-lg flex p-5 px-10 ">
-          <div className="relative flex items-center justify-center text-center">
-            <CircularStatusBar statusProgress={statusProgress} width="73%" />
-            <span
-              className={cn(
-                done === 0 ? "text-lg" : "text-xl bottom-[38%]",
-                "absolute"
-              )}
-            >
-              {done === 0 ? (
-                <span>
-                  <span>Nothing </span>
-                  <br />
-                  <span>To Show !!!</span>
-                </span>
-              ) : (
-                <span>
-                  {done} <br /> Complete
-                </span>
-              )}
-            </span>
-          </div>
-          <CircularProgress list={subTeams} />
-        </div>
+        <StatusCard list={tasks} renderList={renderList} />
       </div>
       <div className="bg-[#141414] mx-1 rounded-t-md text-white">
         <ListHeader
-          setShowAddPopUp={setShowAddPopUp}
-          setRenderList={setRenderList}
+          setList={setTasks}
           renderList={renderList}
+          resetList={resetTaskList}
+          leaderList={yourTasks}
+          setRenderList={setRenderList}
+          initialList={initialTasks}
+          setShowAddPopUp={setShowAddPopUp}
+          filterBtnTxt={taskFilterBtnTxt}
+          switchList={listOnlyYourTasks}
+          setSwitchList={setListOnlyYourTasks}
+          listNameSearchTxt={taskNameSearchTxt}
+          setFilterBtnTxt={setTaskFilterBtnTxt}
+          setListNameSearchTxt={setTaskNameSearchTxt}
         />
       </div>
       <div
@@ -72,7 +61,11 @@ export default function TaskDash({
         className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
       >
         <ListSubHeader renderList={renderList} />
-        <ListBody renderList={renderList} />
+        <ListBody
+          list={tasks}
+          renderList={renderList}
+          listNameSearchTxt={taskNameSearchTxt}
+        />
       </div>
     </>
   );
