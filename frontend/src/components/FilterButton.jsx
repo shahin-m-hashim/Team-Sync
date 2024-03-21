@@ -2,18 +2,15 @@
 import filter from "../assets/images/Filter.png";
 import dropArrow from "../assets/images/Expand Arrow.png";
 import FilterDropDownMenu from "./FilterDropDownMenu";
-import { useContext, useEffect, useRef, useState } from "react";
-import { projectContext } from "@/contexts/projectContext";
-import { teamContext } from "@/contexts/teamContext";
-import { subTeamContext } from "@/contexts/subTeamContext";
-import { taskContext } from "@/contexts/taskContext";
+import { useEffect, useRef, useState } from "react";
 
-export default function FilterButton({ renderList }) {
+export default function FilterButton({
+  setList,
+  renderList,
+  filterBtnTxt,
+  setFilterBtnTxt,
+}) {
   const filterDropDownRef = useRef();
-  const { teamFilterBtnTxt } = useContext(teamContext);
-  const { projectFilterBtnTxt } = useContext(projectContext);
-  const { subTeamFilterBtnTxt } = useContext(subTeamContext);
-  const { taskFilterBtnTxt } = useContext(taskContext);
   const [showFilterDropDownMenu, setShowFilterDropDownMenu] = useState(false);
 
   useEffect(() => {
@@ -43,10 +40,7 @@ export default function FilterButton({ renderList }) {
       ref={filterDropDownRef}
     >
       <img src={filter} alt="filter" className="size-5" />
-      {renderList === "Project" && <span>{projectFilterBtnTxt}</span>}
-      {renderList === "Team" && <span>{teamFilterBtnTxt}</span>}
-      {renderList === "Sub Team" && <span>{subTeamFilterBtnTxt}</span>}
-      {renderList === "Task" && <span>{taskFilterBtnTxt}</span>}
+      <span>{filterBtnTxt}</span>
       <button
         onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
       >
@@ -54,7 +48,9 @@ export default function FilterButton({ renderList }) {
       </button>
       {showFilterDropDownMenu && (
         <FilterDropDownMenu
+          setList={setList}
           renderList={renderList}
+          setFilterBtnTxt={setFilterBtnTxt}
           setShowFilterDropDownMenu={setShowFilterDropDownMenu}
         />
       )}

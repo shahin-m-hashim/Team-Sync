@@ -1,30 +1,26 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
 
-export default function StatusBarChart({ statusProgress }) {
-  const [progress, setProgress] = useState({
-    notStarted: 0,
-    pending: 0,
-    stopped: 0,
-    done: 0,
-  });
+const ProgressBar = ({ percentage, color }) => {
+  return (
+    <div className="inline-block w-8 text-center">
+      <div className="w-full h-[90%] bg-inherit relative">
+        <div
+          className="absolute bottom-0 left-0 w-full h-full ease-in transition-height"
+          style={{ height: `${percentage}%`, backgroundColor: color }}
+        />
+      </div>
+      <p className="text-xs font-medium">{Math.round(percentage)}%</p>
+    </div>
+  );
+};
 
-  useEffect(() => {
-    const totalTasks = Object.values(statusProgress).reduce(
-      (acc, val) => acc + val,
-      0
-    );
+const StatusBarChart = ({ statusCount }) => {
+  const totalTasks = Object.values(statusCount).reduce(
+    (acc, val) => acc + val,
+    0
+  );
 
-    const calculatePercentage = (value) =>
-      Math.round((value / totalTasks) * 100);
-
-    setProgress({
-      notStarted: calculatePercentage(statusProgress.notStarted),
-      pending: calculatePercentage(statusProgress.pending),
-      stopped: calculatePercentage(statusProgress.stopped),
-      done: calculatePercentage(statusProgress.done),
-    });
-  }, [statusProgress]);
+  const getPercentage = (value) => (value / totalTasks) * 100;
 
   const getColor = (status) => {
     switch (status) {
@@ -41,49 +37,20 @@ export default function StatusBarChart({ statusProgress }) {
     }
   };
 
-  const ProgressBar = ({ percentage, color }) => {
-    const [width, setWidth] = useState(0);
-
-    useEffect(() => {
-      const id = setInterval(() => {
-        if (width < percentage) {
-          setWidth((prevWidth) => prevWidth + 1);
-        }
-      }, 10);
-      return () => clearInterval(id);
-    }, [width, percentage]);
-
-    return (
-      <div className="inline-block w-8 text-center">
-        <div className="w-full h-[90%] bg-inherit relative">
-          <div
-            className="absolute bottom-0 left-0 w-full h-full ease-in transition-height"
-            style={{ height: `${width}%`, backgroundColor: `${color}` }}
-          />
-        </div>
-        <p className="text-xs font-medium">{percentage || 0}%</p>
-      </div>
-    );
-  };
-
   return (
     <div className="flex flex-col gap-2">
       <div className="flex w-full h-full gap-6">
-        <ProgressBar
-          percentage={progress.notStarted}
-          color={getColor("notStarted")}
-        />
-        <ProgressBar
-          percentage={progress.pending}
-          color={getColor("pending")}
-        />
-        <ProgressBar
-          percentage={progress.stopped}
-          color={getColor("stopped")}
-        />
-        <ProgressBar percentage={progress.done} color={getColor("done")} />
+        {Object.entries(statusCount).map(([status, count]) => (
+          <ProgressBar
+            key={status}
+            percentage={getPercentage(count)}
+            color={getColor(status)}
+          />
+        ))}
       </div>
       <div className="w-full h-1 gap-0 bg-red-500" />
     </div>
   );
-}
+};
+
+export default StatusBarChart;

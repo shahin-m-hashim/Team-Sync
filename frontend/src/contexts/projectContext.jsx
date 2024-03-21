@@ -1,16 +1,15 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useReducer, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import google from "../assets/images/project icons/Google.png";
 import facebook from "../assets/images/project icons/Facebook.png";
 import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
-import { filterList } from "@/helpers/filterList";
-import calcStatusProgress from "@/helpers/calcStatusProgress";
+import { listReducer } from "@/helpers/listReducer";
 
 export const projectContext = createContext();
 
-let projects = [
+const initialProjects = [
   {
     name: "Project 1",
     createdDate: "01/02/2024",
@@ -39,7 +38,7 @@ let projects = [
     name: "Team 5",
     createdDate: "18/06/2024",
     icon: youtube,
-    progress: 50,
+    progress: 30,
     status: "Stopped",
     role: "Leader",
   },
@@ -89,171 +88,13 @@ let projects = [
     icon: youtube,
     progress: 50,
     status: "Pending",
-    role: "Leader",
-  },
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Project 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Project 2",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Project 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Project 2",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Pending",
-    role: "Leader",
-  },
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Project 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Project 2",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Project 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Done",
-    role: "Leader",
-  },
-  {
-    name: "Project 2",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
     role: "Leader",
   },
 ];
 
-const initialState = projects;
+const leaderProjects = initialProjects.filter(
+  (project) => project.role === "Leader"
+);
 
 const ProjectProvider = ({ children }) => {
   const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
@@ -261,32 +102,45 @@ const ProjectProvider = ({ children }) => {
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
 
   const resetProjectList = () => {
-    filterProjects({
+    setProjectNameSearchTxt("");
+    setListOnlyAdminProjects(false);
+    setProjectFilterBtnTxt("Filter");
+    setProjects({
       type: "RESET",
-      initialState,
+      initialState: initialProjects,
     });
   };
 
-  const [filteredProjects, dispatch] = useReducer(filterList, [...projects]);
+  const [projects, dispatch] = useReducer(listReducer, initialProjects);
+  const setProjects = (action) => dispatch(action);
 
-  const filterProjects = (action) => dispatch(action);
-
-  projects = listOnlyAdminProjects
-    ? filteredProjects.filter((project) => project.role === "Leader")
-    : filteredProjects;
-
-  const statusProgress = calcStatusProgress(projects);
+  useEffect(() => {
+    setProjectNameSearchTxt("");
+    setProjectFilterBtnTxt("Filter");
+    if (listOnlyAdminProjects) {
+      setProjects({
+        type: "SWITCH",
+        payload: leaderProjects,
+      });
+    } else {
+      setProjects({
+        type: "SWITCH",
+        payload: initialProjects,
+      });
+    }
+  }, [listOnlyAdminProjects]);
 
   return (
     <projectContext.Provider
       value={{
         projects,
-        statusProgress,
-        listOnlyAdminProjects,
-        projectNameSearchTxt,
-        projectFilterBtnTxt,
-        filterProjects,
+        setProjects,
+        leaderProjects,
+        initialProjects,
         resetProjectList,
+        projectFilterBtnTxt,
+        projectNameSearchTxt,
+        listOnlyAdminProjects,
         setProjectFilterBtnTxt,
         setProjectNameSearchTxt,
         setListOnlyAdminProjects,

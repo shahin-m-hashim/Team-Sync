@@ -1,46 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useContext } from "react";
-import { projectContext } from "@/contexts/projectContext";
-import { teamContext } from "@/contexts/teamContext";
-import { subTeamContext } from "@/contexts/subTeamContext";
-import { taskContext } from "@/contexts/taskContext";
 
 export default function FilterDropDownMenu({
+  setList,
   renderList,
+  setFilterBtnTxt,
   setShowFilterDropDownMenu,
 }) {
-  const { filterTeams, setTeamFilterBtnTxt } = useContext(teamContext);
-  const { filterProjects, setProjectFilterBtnTxt } = useContext(projectContext);
-  const { filterSubTeams, setSubTeamFilterBtnTxt } = useContext(subTeamContext);
-  const { filterTasks, setTaskFilterBtnTxt } = useContext(taskContext);
-
   const handleFilterClick = (filterBy, order) => {
     setShowFilterDropDownMenu(false);
     setFilterBtnTxt(`${filterBy} : ${order}`);
-    setFilter({ type: `${filterBy}_${order}`.toUpperCase() });
+    setList({ type: `${filterBy}_${order}`.toUpperCase() });
   };
-
-  let setFilter, setFilterBtnTxt;
-
-  if (renderList === "Project") {
-    setFilter = filterProjects;
-  } else if (renderList === "Team") {
-    setFilter = filterTeams;
-  } else if (renderList === "Sub Team") {
-    setFilter = filterSubTeams;
-  } else {
-    setFilter = filterTasks;
-  }
-
-  if (renderList === "Project") {
-    setFilterBtnTxt = setProjectFilterBtnTxt;
-  } else if (renderList === "Team") {
-    setFilterBtnTxt = setTeamFilterBtnTxt;
-  } else if (renderList === "Sub Team") {
-    setFilterBtnTxt = setSubTeamFilterBtnTxt;
-  } else {
-    setFilterBtnTxt = setTaskFilterBtnTxt;
-  }
 
   const FilterButtons = ({ filterBy }) => (
     <>

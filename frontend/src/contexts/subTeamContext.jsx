@@ -1,16 +1,15 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useReducer, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import google from "../assets/images/project icons/Google.png";
 import facebook from "../assets/images/project icons/Facebook.png";
 import instagram from "../assets/images/project icons/Instagram.png";
 import youtube from "../assets/images/project icons/Youtube.png";
-import { filterList } from "@/helpers/filterList";
-import calcStatusProgress from "@/helpers/calcStatusProgress";
+import { listReducer } from "@/helpers/listReducer";
 
 export const subTeamContext = createContext();
 
-let subTeams = [
+const initialSubTeams = [
   {
     name: "Project 1",
     createdDate: "01/02/2024",
@@ -93,7 +92,9 @@ let subTeams = [
   },
 ];
 
-const initialState = subTeams;
+const leaderSubTeams = initialSubTeams.filter(
+  (subTeam) => subTeam.role === "Leader"
+);
 
 const SubTeamProvider = ({ children }) => {
   const [subTeamNameSearchTxt, setSubTeamNameSearchTxt] = useState("");
@@ -101,31 +102,44 @@ const SubTeamProvider = ({ children }) => {
   const [listOnlyAdminSubTeams, setListOnlyAdminSubTeams] = useState(false);
 
   const resetSubTeamList = () => {
-    filterSubTeams({
+    setSubTeamNameSearchTxt("");
+    setListOnlyAdminSubTeams(false);
+    setSubTeamFilterBtnTxt("Filter");
+    setSubTeams({
       type: "RESET",
-      initialState,
+      initialState: initialSubTeams,
     });
   };
 
-  const [filteredSubTeams, dispatch] = useReducer(filterList, [...subTeams]);
+  const [subTeams, dispatch] = useReducer(listReducer, [...initialSubTeams]);
+  const setSubTeams = (action) => dispatch(action);
 
-  const filterSubTeams = (action) => dispatch(action);
-
-  subTeams = listOnlyAdminSubTeams
-    ? filteredSubTeams.filter((project) => project.role === "Leader")
-    : filteredSubTeams;
-
-  const statusProgress = calcStatusProgress(subTeams);
+  useEffect(() => {
+    setSubTeamNameSearchTxt("");
+    setSubTeamFilterBtnTxt("Filter");
+    if (listOnlyAdminSubTeams) {
+      setSubTeams({
+        type: "SWITCH",
+        payload: leaderSubTeams,
+      });
+    } else {
+      setSubTeams({
+        type: "SWITCH",
+        payload: initialSubTeams,
+      });
+    }
+  }, [listOnlyAdminSubTeams]);
 
   return (
     <subTeamContext.Provider
       value={{
         subTeams,
-        statusProgress,
+        initialSubTeams,
+        leaderSubTeams,
         listOnlyAdminSubTeams,
         subTeamNameSearchTxt,
         subTeamFilterBtnTxt,
-        filterSubTeams,
+        setSubTeams,
         resetSubTeamList,
         setSubTeamFilterBtnTxt,
         setSubTeamNameSearchTxt,

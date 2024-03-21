@@ -1,9 +1,18 @@
 import moment from "moment";
 
-export const filterList = (state, action) => {
+export const listReducer = (state, action) => {
   switch (action.type) {
     case "RESET":
       return action.initialState;
+    case "SWITCH":
+      return action.payload;
+    case "SEARCH": {
+      const originalList = action.initialList;
+      const searchResults = originalList.filter((item) =>
+        item.name.toLowerCase().includes(action.listNameSearchTxt.toLowerCase())
+      );
+      return searchResults <= 0 ? [] : searchResults;
+    }
     case "PROGRESS_ASC":
       return [...state].sort((a, b) => a.progress - b.progress);
     case "PROGRESS_DESC":
