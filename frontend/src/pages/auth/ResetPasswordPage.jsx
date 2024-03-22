@@ -6,9 +6,13 @@ import ResetPassword from "@/components/auth/ResetPassword";
 
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
+  const authState = localStorage.getItem("authState");
   const [showInput, setShowInput] = useState("requestOtp");
 
   useEffect(() => {
+    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
+      navigate("/user/projects");
+
     if (showInput === "success") {
       const timeoutId = setTimeout(() => {
         navigate("/login", { replace: true });

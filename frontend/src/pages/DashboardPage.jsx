@@ -21,7 +21,7 @@ export default function DashboardPage({ tab = "Project" }) {
   useEffect(() => {
     const path =
       renderList[0].toLowerCase() + renderList.substring(1).replace(/\s/g, "");
-    navigate(`/${path}s`);
+    navigate(`/user/${path}s`);
   }, [renderList, navigate]);
 
   const props = { renderList, setRenderList, showAddPopUp, setShowAddPopUp };

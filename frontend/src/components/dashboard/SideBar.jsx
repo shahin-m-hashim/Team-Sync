@@ -6,7 +6,10 @@ import teams from "../../assets/images/teams.png";
 import subTeams from "../../assets/images/subTeams.png";
 import tasks from "../../assets/images/tasks.png";
 import techSupport from "../../assets/images/Technical Support.png";
-import logout from "../../assets/images/logout.png";
+import logoutIcon from "../../assets/images/logout.png";
+import { useContext } from "react";
+import { authContext } from "@/contexts/authContext";
+import { useNavigate } from "react-router-dom";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -16,6 +19,10 @@ const MenuItem = ({ icon, text }) => (
 );
 
 export default function SideBar() {
+  const { logout } = useContext(authContext);
+
+  const navigate = useNavigate();
+
   return (
     <div
       id="sidebar"
@@ -36,7 +43,14 @@ export default function SideBar() {
         className="inline-flex flex-col items-start gap-5 justify-evenly"
       >
         <MenuItem icon={techSupport} text="Support" />
-        <MenuItem icon={logout} text="Logout" />
+        <button
+          onClick={() => {
+            navigate("/loggedOut");
+            logout();
+          }}
+        >
+          <MenuItem icon={logoutIcon} text="Logout" />
+        </button>
       </div>
       <div
         id="userCard"

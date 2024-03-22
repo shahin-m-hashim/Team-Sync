@@ -93,7 +93,7 @@ const AuthProvider = ({ children }) => {
       await axios.get(base_url + "auth/logout", { withCredentials: true });
       setUser(null);
       setAuthState("LOGGED_OUT");
-      localStorage.setItem("authState", "LOGGED_OUT");
+      localStorage.removeItem("authState");
     } catch (error) {
       console.error(error);
     }
