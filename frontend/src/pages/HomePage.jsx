@@ -9,7 +9,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
-      navigate("/user/dashboard");
+      navigate("/user/projects");
     setRender(true);
   }, []);
 

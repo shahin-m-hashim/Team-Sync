@@ -16,8 +16,6 @@ const AuthWrapper = ({ children }) => {
       authorize();
       const interval = setInterval(authorize, 15 * 60 * 1000);
       return () => clearInterval(interval);
-    } else if (localAuthState === "LOGGED_OUT") {
-      navigate("/", { replace: true });
     } else {
       navigate("/reLogin", { replace: true });
     }

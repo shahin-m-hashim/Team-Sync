@@ -9,6 +9,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AuthWrapper from "./components/auth/AuthWrapper";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
+import LogOutPage from "./pages/LogOutPage";
 
 const router = createBrowserRouter([
   {
@@ -36,8 +37,20 @@ const router = createBrowserRouter([
         element: <ErrorPage />,
       },
       {
-        path: "dashboard",
-        element: <DashboardPage />,
+        path: "projects",
+        element: <DashboardPage tab="Project" />,
+      },
+      {
+        path: "teams",
+        element: <DashboardPage tab="Team" />,
+      },
+      {
+        path: "subTeams",
+        element: <DashboardPage tab="Sub Team" />,
+      },
+      {
+        path: "tasks",
+        element: <DashboardPage tab="Task" />,
       },
     ],
   },
@@ -46,24 +59,12 @@ const router = createBrowserRouter([
     element: <ResetPasswordPage />,
   },
   {
-    path: "projects",
-    element: <DashboardPage tab="Project" />,
-  },
-  {
-    path: "teams",
-    element: <DashboardPage tab="Team" />,
-  },
-  {
-    path: "subTeams",
-    element: <DashboardPage tab="Sub Team" />,
-  },
-  {
-    path: "tasks",
-    element: <DashboardPage tab="Task" />,
-  },
-  {
     path: "reLogin",
     element: <ReLoginPage />,
+  },
+  {
+    path: "loggedOut",
+    element: <LogOutPage />,
   },
   {
     path: "serverError",

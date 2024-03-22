@@ -14,7 +14,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
-      navigate("/user/dashboard");
+      navigate("/user/projects", { replace: true });
     setRender(true);
   }, [authState]);
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
   const onSubmit = async (values) => {
     try {
       await login(values);
-      navigate("/user/dashboard", { replace: true });
+      navigate("/user/projects", { replace: true });
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
