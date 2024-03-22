@@ -77,8 +77,8 @@ export default function ListItem({
           <div
             className={cn(
               {
-                "bg-[#e8be34]": priority === "Medium",
                 "bg-[#069843]": priority === "Low",
+                "bg-[#e8be34]": priority === "Medium",
                 "bg-[#B10F0F]": priority === "High",
               },
               "text-xs inline-flex items-center justify-center text-black h-[25px] w-[80px] font-semibold rounded-xl"

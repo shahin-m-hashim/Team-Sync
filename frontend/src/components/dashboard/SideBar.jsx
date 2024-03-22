@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import ajmalDp from "../../assets/images/ajmalDp.png";
 import teamSyncLogo from "../../assets/images/Team Sync Logo.png";
 import projects from "../../assets/images/projects.png";
 import teams from "../../assets/images/teams.png";
@@ -10,6 +9,7 @@ import logoutIcon from "../../assets/images/logout.png";
 import { useContext } from "react";
 import { authContext } from "@/contexts/authContext";
 import { useNavigate } from "react-router-dom";
+import defaultDp from "../../assets/images/emptyDp.png";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -19,10 +19,8 @@ const MenuItem = ({ icon, text }) => (
 );
 
 export default function SideBar() {
-  const { logout } = useContext(authContext);
-
+  const { logout, user } = useContext(authContext);
   const navigate = useNavigate();
-
   return (
     <div
       id="sidebar"
@@ -45,7 +43,7 @@ export default function SideBar() {
         <MenuItem icon={techSupport} text="Support" />
         <button
           onClick={() => {
-            navigate("/loggedOut");
+            navigate("/loggedOut", { replace: true });
             logout();
           }}
         >
@@ -56,7 +54,11 @@ export default function SideBar() {
         id="userCard"
         className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
       >
-        <img src={ajmalDp} alt="userDP" className="size-10" />
+        <img
+          src={(user && user.dp) || defaultDp}
+          alt="userDP"
+          className="size-10"
+        />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Ajmal Sajeev</span>
           <span className="text-[#BDBDBD] text-xs">Front-End Developer</span>

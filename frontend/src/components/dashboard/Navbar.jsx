@@ -1,5 +1,9 @@
-import ajmalDp from "../../assets/images/ajmalDp.png";
+import { useContext } from "react";
+import defaultDp from "../../assets/images/emptyDp.png";
+import { authContext } from "@/contexts/authContext";
 export default function Navbar() {
+  const { user } = useContext(authContext);
+
   return (
     <div
       id="dashNavbar"
@@ -41,7 +45,11 @@ export default function Navbar() {
             />
           </defs>
         </svg>
-        <img src={ajmalDp} alt="userDP" className="size-7" />
+        <img
+          src={(user && user.dp) || defaultDp}
+          alt="userDP"
+          className="size-7"
+        />
       </div>
     </div>
   );
