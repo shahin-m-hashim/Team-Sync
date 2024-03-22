@@ -1,15 +1,19 @@
 import HomePage from "./pages/HomePage";
+import ErrorPage from "./pages/ErrorPage";
+import LogOutPage from "./pages/LogOutPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
-import ErrorPage from "./pages/ErrorPage";
 import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
 import ReLoginPage from "./pages/auth/ReLoginPage";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import AuthWrapper from "./components/auth/AuthWrapper";
-import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
-import LogOutPage from "./pages/LogOutPage";
+import TeamDash from "./components/dashboard/TeamDash";
+import TaskDash from "./components/dashboard/TaskDash";
+import AuthWrapper from "./components/auth/AuthWrapper";
+import SubTeamDash from "./components/dashboard/SubTeamDash";
+import ProjectDash from "./components/dashboard/ProjectDash";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +32,9 @@ const router = createBrowserRouter([
     path: "user",
     element: (
       <AuthWrapper>
-        <Outlet />
+        <DashboardPage>
+          <Outlet />
+        </DashboardPage>
       </AuthWrapper>
     ),
     children: [
@@ -38,19 +44,45 @@ const router = createBrowserRouter([
       },
       {
         path: "projects",
-        element: <DashboardPage tab="Project" />,
+        element: <ProjectDash />,
       },
       {
         path: "teams",
-        element: <DashboardPage tab="Team" />,
+        element: <TeamDash />,
       },
       {
         path: "subTeams",
-        element: <DashboardPage tab="Sub Team" />,
+        element: <SubTeamDash />,
       },
       {
         path: "tasks",
-        element: <DashboardPage tab="Task" />,
+        element: <TaskDash />,
+      },
+    ],
+  },
+  {
+    path: "dashboard",
+    element: (
+      <DashboardPage>
+        <Outlet />
+      </DashboardPage>
+    ),
+    children: [
+      {
+        path: "projects",
+        element: <ProjectDash />,
+      },
+      {
+        path: "teams",
+        element: <TeamDash />,
+      },
+      {
+        path: "subTeams",
+        element: <SubTeamDash />,
+      },
+      {
+        path: "tasks",
+        element: <TaskDash />,
       },
     ],
   },

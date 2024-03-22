@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { Link } from "react-router-dom";
 import add from "../../assets/images/Add.png";
 import FilterButton from "../FilterButton";
 import SearchInput from "../SearchInput";
@@ -10,7 +11,6 @@ export default function ListHeader({
   renderList,
   resetList,
   leaderList,
-  setRenderList,
   initialList,
   setShowAddPopUp,
   filterBtnTxt,
@@ -48,10 +48,10 @@ export default function ListHeader({
         />
       </div>
       <div className="flex gap-10 text-[#828282]">
-        <button onClick={() => setRenderList("Project")}>Projects</button>
-        <button onClick={() => setRenderList("Team")}>Teams</button>
-        <button onClick={() => setRenderList("Sub Team")}>Sub Teams</button>
-        <button onClick={() => setRenderList("Task")}>Tasks</button>
+        <Link to="/dashboard/projects">Projects</Link>
+        <Link to="/dashboard/teams">Teams</Link>
+        <Link to="/dashboard/subTeams">Sub Teams</Link>
+        <Link to="/dashboard/tasks">Tasks</Link>
       </div>
       <div className="inline-flex gap-5">
         <ResetListBtn resetList={resetList} />
