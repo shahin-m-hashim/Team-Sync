@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { resetPasswordValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useContext, useEffect, useRef } from "react";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 
 const ResetPassword = ({ setShowInput }) => {
   const navigate = useNavigate();

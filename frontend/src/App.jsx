@@ -1,8 +1,8 @@
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
+import LogOutPage from "./pages/LogOutPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
-import AuthProvider from "./contexts/authContext";
 import DashboardPage from "./pages/DashboardPage";
 import ReLoginPage from "./pages/auth/ReLoginPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
@@ -12,7 +12,7 @@ import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import LogOutPage from "./pages/LogOutPage";
+import AuthProvider from "./providers/AuthProvider";
 
 const router = createBrowserRouter([
   {

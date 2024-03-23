@@ -3,7 +3,7 @@ import { loginValidationSchema as validationSchema } from "../../validations/aut
 import { Link, useNavigate } from "react-router-dom";
 import rocket from "../../assets/images/rocket.png";
 import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 
 export default function LoginPage() {
   const navigate = useNavigate();
