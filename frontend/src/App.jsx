@@ -1,6 +1,5 @@
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
-import LogOutPage from "./pages/LogOutPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
 import AuthProvider from "./contexts/authContext";
@@ -9,11 +8,11 @@ import ReLoginPage from "./pages/auth/ReLoginPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
 import TeamDash from "./components/dashboard/TeamDash";
 import TaskDash from "./components/dashboard/TaskDash";
-import AuthWrapper from "./components/auth/AuthWrapper";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import LogOutPage from "./pages/LogOutPage";
 
 const router = createBrowserRouter([
   {
@@ -31,43 +30,15 @@ const router = createBrowserRouter([
   {
     path: "user",
     element: (
-      <AuthWrapper>
-        <DashboardPage>
-          <Outlet />
-        </DashboardPage>
-      </AuthWrapper>
+      <DashboardPage>
+        <Outlet />
+      </DashboardPage>
     ),
     children: [
       {
         index: true,
         element: <ErrorPage />,
       },
-      {
-        path: "projects",
-        element: <ProjectDash />,
-      },
-      {
-        path: "teams",
-        element: <TeamDash />,
-      },
-      {
-        path: "subTeams",
-        element: <SubTeamDash />,
-      },
-      {
-        path: "tasks",
-        element: <TaskDash />,
-      },
-    ],
-  },
-  {
-    path: "dashboard",
-    element: (
-      <DashboardPage>
-        <Outlet />
-      </DashboardPage>
-    ),
-    children: [
       {
         path: "projects",
         element: <ProjectDash />,

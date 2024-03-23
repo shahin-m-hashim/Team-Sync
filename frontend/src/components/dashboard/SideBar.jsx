@@ -19,8 +19,19 @@ const MenuItem = ({ icon, text }) => (
 );
 
 export default function SideBar() {
-  const { logout, user } = useContext(authContext);
   const navigate = useNavigate();
+  const { logout, user } = useContext(authContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/loggedOut", { replace: true });
+    } catch (e) {
+      console.log(e);
+      navigate("/serverError", { replace: true });
+    }
+  };
+
   return (
     <div
       id="sidebar"
@@ -41,12 +52,7 @@ export default function SideBar() {
         className="inline-flex flex-col items-start gap-5 justify-evenly"
       >
         <MenuItem icon={techSupport} text="Support" />
-        <button
-          onClick={() => {
-            navigate("/loggedOut", { replace: true });
-            logout();
-          }}
-        >
+        <button onClick={() => handleLogout()}>
           <MenuItem icon={logoutIcon} text="Logout" />
         </button>
       </div>
