@@ -1,8 +1,9 @@
-import { useContext } from "react";
+import { getLocalSecureItem } from "@/lib/utils";
 import defaultDp from "../../assets/images/emptyDp.png";
-import { authContext } from "@/providers/AuthProvider";
+
 export default function Navbar() {
-  const { user } = useContext(authContext);
+  const user = getLocalSecureItem("primary-user", "medium");
+  console.log(user);
 
   return (
     <div
@@ -45,11 +46,7 @@ export default function Navbar() {
             />
           </defs>
         </svg>
-        <img
-          src={(user && user.dp) || defaultDp}
-          alt="userDP"
-          className="size-7"
-        />
+        <img src={defaultDp} alt="userDP" className="size-7" />
       </div>
     </div>
   );

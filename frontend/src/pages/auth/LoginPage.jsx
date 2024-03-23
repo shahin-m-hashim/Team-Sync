@@ -4,13 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import rocket from "../../assets/images/rocket.png";
 import { useContext, useEffect, useRef, useState } from "react";
 import { authContext } from "@/providers/AuthProvider";
+import { getLocalSecureItem } from "@/lib/utils";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const errorRef = useRef();
 
   const [render, setRender] = useState(false);
-  const authState = localStorage.getItem("authState");
+  const authState = getLocalSecureItem("auth", "low");
 
   useEffect(() => {
     if (authState === "LOGGED_IN" || authState === "AUTHORIZED")

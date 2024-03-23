@@ -1,13 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 
+import { setLocalSecureItem } from "@/lib/utils";
 import axios from "axios";
 import { createContext, useState } from "react";
 const base_url = import.meta.env.VITE_APP_BASE_URL;
 export const authContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
   const [authState, setAuthState] = useState("LOADING");
 
   const signup = async (credentials) =>
@@ -16,21 +16,23 @@ const AuthProvider = ({ children }) => {
     });
 
   const login = async (credentials) => {
+    console.log("login");
     const response = await axios.post(base_url + "auth/login", credentials, {
       withCredentials: true,
     });
-    localStorage.setItem("authState", "LOGGED_IN");
+    setLocalSecureItem("auth", "LOGGED_IN", "low");
     setAuthState("LOGGED_IN");
     return response;
   };
 
   const authorize = async () => {
+    console.log("authorize");
     try {
       const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
       });
-      setUser(data.user);
-      localStorage.setItem("authState", "AUTHORIZED");
+      setLocalSecureItem("primary-user", data.user, "medium");
+      setLocalSecureItem("auth", "AUTHORIZED", "low");
       setAuthState("AUTHORIZED");
     } catch (error) {
       reAuthorize();
@@ -38,13 +40,13 @@ const AuthProvider = ({ children }) => {
   };
 
   const reAuthorize = async () => {
+    console.log("re authorize");
     try {
       await axios.get(base_url + "refresh", { withCredentials: true });
       authorize();
     } catch (error) {
-      setUser(null);
       setAuthState("UNAUTHORIZED");
-      localStorage.setItem("authState", "UNAUTHORIZED");
+      setLocalSecureItem("auth", "UNAUTHORIZED", "low");
     }
   };
 
@@ -82,8 +84,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    setUser(null);
-    localStorage.removeItem("authState");
+    localStorage.clear();
     await axios.get(base_url + "auth/logout", { withCredentials: true });
     setAuthState("LOGGED_OUT");
   };
@@ -91,7 +92,6 @@ const AuthProvider = ({ children }) => {
   return (
     <authContext.Provider
       value={{
-        user,
         authState,
         signup,
         login,
