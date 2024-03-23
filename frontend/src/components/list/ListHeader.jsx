@@ -48,10 +48,10 @@ export default function ListHeader({
         />
       </div>
       <div className="flex gap-10 text-[#828282]">
-        <Link to="/dashboard/projects">Projects</Link>
-        <Link to="/dashboard/teams">Teams</Link>
-        <Link to="/dashboard/subTeams">Sub Teams</Link>
-        <Link to="/dashboard/tasks">Tasks</Link>
+        <Link to="/user/projects">Projects</Link>
+        <Link to="/user/teams">Teams</Link>
+        <Link to="/user/subTeams">Sub Teams</Link>
+        <Link to="/user/tasks">Tasks</Link>
       </div>
       <div className="inline-flex gap-5">
         <ResetListBtn resetList={resetList} />

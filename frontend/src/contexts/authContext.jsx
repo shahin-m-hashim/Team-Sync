@@ -16,7 +16,6 @@ const AuthProvider = ({ children }) => {
     });
 
   const login = async (credentials) => {
-    console.log("Logging In");
     const response = await axios.post(base_url + "auth/login", credentials, {
       withCredentials: true,
     });
@@ -26,7 +25,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const authorize = async () => {
-    console.log("Authorizing");
     try {
       const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
@@ -40,7 +38,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const reAuthorize = async () => {
-    console.log("Reauthorizing");
     try {
       await axios.get(base_url + "refresh", { withCredentials: true });
       authorize();
@@ -59,7 +56,6 @@ const AuthProvider = ({ children }) => {
         withCredentials: true,
       }
     );
-    console.log("Password Request OTP Send");
     return response;
   };
 
@@ -71,7 +67,6 @@ const AuthProvider = ({ children }) => {
         withCredentials: true,
       }
     );
-    console.log("OTP verified successfully");
     return response;
   };
 
@@ -83,20 +78,14 @@ const AuthProvider = ({ children }) => {
         withCredentials: true,
       }
     );
-    console.log("Password Reset Successfully");
     return response;
   };
 
   const logout = async () => {
-    console.log("Logging out");
-    try {
-      await axios.get(base_url + "auth/logout", { withCredentials: true });
-      setUser(null);
-      setAuthState("LOGGED_OUT");
-      localStorage.removeItem("authState");
-    } catch (error) {
-      console.error(error);
-    }
+    setUser(null);
+    localStorage.removeItem("authState");
+    await axios.get(base_url + "auth/logout", { withCredentials: true });
+    setAuthState("LOGGED_OUT");
   };
 
   return (
