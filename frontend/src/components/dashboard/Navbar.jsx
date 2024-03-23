@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import defaultDp from "../../assets/images/emptyDp.png";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 export default function Navbar() {
   const { user } = useContext(authContext);
 

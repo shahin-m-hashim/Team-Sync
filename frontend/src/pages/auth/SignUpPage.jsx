@@ -3,7 +3,7 @@ import rocket from "../../assets/images/rocket.png";
 import { Link, useNavigate } from "react-router-dom";
 import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 
 export default function SignupPage() {
   const navigate = useNavigate();

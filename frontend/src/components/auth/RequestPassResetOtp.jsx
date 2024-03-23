@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { forgotPasswordEmailValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useContext, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 import VerifyOTP from "./VerifyOTP";
 
 const RequestPassResetOTP = ({ setShowInput }) => {
