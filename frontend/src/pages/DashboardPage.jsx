@@ -2,10 +2,10 @@ import SideBar from "@/components/dashboard/SideBar";
 import Navbar from "@/components/dashboard/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect } from "react";
-import { authContext } from "@/contexts/authContext";
 import ReLoginPage from "./auth/ReLoginPage";
-import HomePage from "./HomePage";
 import LoadingComponent from "@/components/Loading";
+import { authContext } from "@/providers/AuthProvider";
+import HomePage from "./HomePage";
 
 // eslint-disable-next-line react/prop-types
 export default function DashboardPage({ children }) {

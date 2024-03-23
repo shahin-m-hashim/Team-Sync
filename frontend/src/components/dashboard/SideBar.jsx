@@ -7,7 +7,7 @@ import tasks from "../../assets/images/tasks.png";
 import techSupport from "../../assets/images/Technical Support.png";
 import logoutIcon from "../../assets/images/logout.png";
 import { useContext } from "react";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import defaultDp from "../../assets/images/emptyDp.png";
 

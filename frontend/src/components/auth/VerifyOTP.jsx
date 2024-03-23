@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useContext, useRef, useState } from "react";
-import { authContext } from "@/contexts/authContext";
+import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 const VerifyOTP = ({ setShowInput }) => {
