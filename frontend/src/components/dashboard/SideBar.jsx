@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import defaultDp from "../../assets/images/emptyDp.png";
+import { getLocalSecureItem } from "@/lib/utils";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -20,7 +21,11 @@ const MenuItem = ({ icon, text }) => (
 
 export default function SideBar() {
   const navigate = useNavigate();
-  const { logout, user } = useContext(authContext);
+  const { logout } = useContext(authContext);
+
+  const user = getLocalSecureItem("primary-user", "medium");
+
+  console.log(user);
 
   const handleLogout = async () => {
     try {
@@ -60,11 +65,7 @@ export default function SideBar() {
         id="userCard"
         className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
       >
-        <img
-          src={(user && user.dp) || defaultDp}
-          alt="userDP"
-          className="size-10"
-        />
+        <img src={defaultDp} alt="userDP" className="size-10" />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">Ajmal Sajeev</span>
           <span className="text-[#BDBDBD] text-xs">Front-End Developer</span>

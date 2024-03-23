@@ -6,15 +6,16 @@ import ReLoginPage from "./auth/ReLoginPage";
 import LoadingComponent from "@/components/Loading";
 import { authContext } from "@/providers/AuthProvider";
 import HomePage from "./HomePage";
+import { getLocalSecureItem } from "@/lib/utils";
 
 // eslint-disable-next-line react/prop-types
 export default function DashboardPage({ children }) {
   const navigate = useNavigate();
-  const localAuthState = localStorage.getItem("authState");
+  const localAuth = getLocalSecureItem("auth", "low");
   const { authState, authorize } = useContext(authContext);
 
   useEffect(() => {
-    if (localAuthState === "LOGGED_IN" || localAuthState === "AUTHORIZED") {
+    if (localAuth === "LOGGED_IN" || localAuth === "AUTHORIZED") {
       authorize();
       const interval = setInterval(authorize, 15 * 60 * 1000);
       return () => clearInterval(interval);

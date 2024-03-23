@@ -13,6 +13,7 @@ import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AuthProvider from "./providers/AuthProvider";
+import Test from "./pages/Test";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
         element: <TaskDash />,
       },
     ],
+  },
+  {
+    path: "test",
+    element: <Test />,
   },
   {
     path: "resetPass",
