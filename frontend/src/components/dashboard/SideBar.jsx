@@ -10,7 +10,6 @@ import { useContext } from "react";
 import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import defaultDp from "../../assets/images/emptyDp.png";
-import { getLocalSecureItem } from "@/lib/utils";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -23,9 +22,7 @@ export default function SideBar() {
   const navigate = useNavigate();
   const { logout } = useContext(authContext);
 
-  const user = getLocalSecureItem("primary-user", "medium");
-
-  console.log(user);
+  // const user = getLocalSecureItem("primary-user", "medium");
 
   const handleLogout = async () => {
     try {

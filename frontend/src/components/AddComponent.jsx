@@ -257,11 +257,12 @@ export default function AddComponent({
             <div className="flex flex-col p-3">
               <span>{renderList} Icon</span>
               <div className="flex justify-center">
-                <label className="rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2 cursor-pointer">
+                <label className="rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2">
                   <input
                     type="file"
                     accept="image/*"
-                    className="hidden"
+                    disabled={doc.icon && true}
+                    className={cn(doc.icon && "cursor-pointer", "hidden")}
                     onChange={(e) => {
                       setDoc({ ...doc, icon: e.target.files[0] });
                       e.target.value = null;
@@ -269,7 +270,11 @@ export default function AddComponent({
                   />
                   <img
                     src={doc.icon ? URL.createObjectURL(doc.icon) : uploadIcon}
-                    className={doc.icon ? "w-full rounded-[50%]" : "w-[30%]"}
+                    className={
+                      doc.icon
+                        ? "size-full object-cover object-center rounded-[50%]"
+                        : "w-[30%]"
+                    }
                     alt="Upload"
                   />
                   {!doc.icon && <span className="text-xs">UPLOAD</span>}

@@ -14,6 +14,8 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AuthProvider from "./providers/AuthProvider";
 import Test from "./pages/Test";
+import UserSettingsPage from "./pages/user/UserSettingsPage";
+import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +59,14 @@ const router = createBrowserRouter([
         element: <TaskDash />,
       },
     ],
+  },
+  {
+    path: "settings/general",
+    element: <UserSettingsPage />,
+  },
+  {
+    path: "settings/security",
+    element: <SecuritySettingsPage />,
   },
   {
     path: "test",
