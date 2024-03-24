@@ -1,14 +1,17 @@
-import { getLocalSecureItem } from "@/lib/utils";
+/* eslint-disable react/prop-types */
+import { cn } from "@/lib/utils";
 import defaultDp from "../../assets/images/emptyDp.png";
 
-export default function Navbar() {
-  const user = getLocalSecureItem("primary-user", "medium");
-  console.log(user);
+export default function Navbar({ settings }) {
+  // const user = getLocalSecureItem("primary-user", "medium");
 
   return (
     <div
       id="dashNavbar"
-      className="bg-[#141414] min-h-10 m-1 mb-0 rounded-lg flex justify-between items-center"
+      className={cn(
+        settings ? settings : "min-h-10 m-1 mb-0 rounded-lg",
+        "bg-[#141414] flex justify-between items-center"
+      )}
     >
       <span className="text-[#9685FF] font-semibold pl-3">TeamSync</span>
       <div className="inline-flex items-center gap-3 pr-3">
