@@ -1,14 +1,6 @@
 import * as Yup from "yup";
 
 const userValidationSchema = Yup.object({
-  profilePicture: Yup.mixed().test(
-    "fileSize",
-    "Profile picture size must be less than 2MB",
-    (value) => {
-      if (!value) return true; // No file uploaded, validation passed
-      return value.size <= 2000000; // 2MB in bytes
-    }
-  ),
   fname: Yup.string()
     .min(3, "Full name must be at least 3 characters long")
     .max(50, "Full name cannot exceed 50 characters"),

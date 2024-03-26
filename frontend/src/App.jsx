@@ -13,9 +13,10 @@ import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AuthProvider from "./providers/AuthProvider";
-import Test from "./pages/Test";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
+import ChangeUserDp from "./components/ChangeUserDp";
+import Test from "./pages/Test";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
   {
     path: "settings/security",
     element: <SecuritySettingsPage />,
+  },
+  {
+    path: "dp",
+    element: <ChangeUserDp />,
   },
   {
     path: "test",
