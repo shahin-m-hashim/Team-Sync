@@ -16,7 +16,6 @@ const AuthProvider = ({ children }) => {
     });
 
   const login = async (credentials) => {
-    console.log("login");
     const response = await axios.post(base_url + "auth/login", credentials, {
       withCredentials: true,
     });
@@ -26,7 +25,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const authorize = async () => {
-    console.log("authorize");
     try {
       const { data } = await axios.get(base_url + "api/primaryUser", {
         withCredentials: true,
@@ -40,7 +38,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const reAuthorize = async () => {
-    console.log("re authorize");
     try {
       await axios.get(base_url + "refresh", { withCredentials: true });
       authorize();

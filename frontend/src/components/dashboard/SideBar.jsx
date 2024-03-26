@@ -9,7 +9,7 @@ import logoutIcon from "../../assets/images/logout.png";
 import { useContext } from "react";
 import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import defaultDp from "../../assets/images/emptyDp.png";
+import defaultDp from "../../assets/images/defaultDp.png";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
