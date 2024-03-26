@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
-import { useRef, useState } from "react";
-import defaultDp from "../../assets/images/emptyDp.png";
+import { useState } from "react";
 import { userValidationSchema as validationSchema } from "@/validations/userValidations";
 import Navbar from "@/components/dashboard/Navbar";
 import { useFormik } from "formik";
 import { cn } from "@/lib/utils";
+import ChangeUserDp from "@/components/ChangeUserDp";
 
 const InputField = ({
   variety,
@@ -42,11 +42,8 @@ const ErrorTxt = ({ text }) => (
 );
 
 export default function UserSettingsPage() {
-  const [userDp, setUserDp] = useState(defaultDp);
-
   const initialValues = {
     fname: "",
-    profilePicture: "",
     username: "",
     pronoun: "",
     tag: "",
@@ -72,20 +69,14 @@ export default function UserSettingsPage() {
     setEnableEdit(false);
   };
 
-  const {
-    errors,
-    handleSubmit,
-    touched,
-    getFieldProps,
-    resetForm,
-    setFieldValue,
-  } = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit,
-  });
+  const { errors, handleSubmit, touched, getFieldProps, resetForm } = useFormik(
+    {
+      initialValues,
+      validationSchema,
+      onSubmit,
+    }
+  );
 
-  const dpInputRef = useRef(null);
   const [enableEdit, setEnableEdit] = useState(false);
 
   return (
@@ -97,45 +88,7 @@ export default function UserSettingsPage() {
       >
         <div className="flex flex-col gap-4 px-10 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
-          <div className="relative">
-            <img
-              src={userDp || defaultDp}
-              className="mx-auto rounded-[50%] size-[150px] object-cover object-center"
-              alt="profile-picture"
-            />
-            {enableEdit && (
-              <div className="absolute bottom-0 flex flex-col gap-1 p-1 text-xs left-10 bg-slate-400">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    setUserDp(URL.createObjectURL(file));
-                    setFieldValue("profilePicture", file);
-                  }}
-                  ref={dpInputRef}
-                />
-                <button
-                  type="button"
-                  className="p-1 rounded-md bg-slate-800"
-                  onClick={() => dpInputRef.current.click()}
-                >
-                  Change
-                </button>
-                <button
-                  type="button"
-                  className="p-1 rounded-md bg-slate-800"
-                  onClick={() => {
-                    setUserDp(defaultDp);
-                    setFieldValue("profilePicture", "");
-                  }}
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
+          <ChangeUserDp />
           <div className="flex flex-col gap-2">
             {!enableEdit ? (
               <span className="text-xl font-semibold text-slate-800">
@@ -410,10 +363,7 @@ export default function UserSettingsPage() {
                     <input
                       type="reset"
                       value="Reset Form"
-                      onClick={() => {
-                        resetForm();
-                        setUserDp(defaultDp);
-                      }}
+                      onClick={() => resetForm()}
                       className="w-full p-2 text-white bg-blue-500 rounded-sm hover:bg-blue-600"
                     />
                     <input
@@ -421,7 +371,6 @@ export default function UserSettingsPage() {
                       value="Cancel"
                       onClick={() => {
                         resetForm();
-                        setUserDp(defaultDp);
                         setEnableEdit(false);
                       }}
                       className="w-full p-2 text-white bg-red-500 rounded-sm hover:bg-red-600"

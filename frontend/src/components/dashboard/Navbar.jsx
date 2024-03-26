@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { cn } from "@/lib/utils";
-import defaultDp from "../../assets/images/emptyDp.png";
+import defaultDp from "../../assets/images/defaultDp.png";
 
 export default function Navbar({ settings }) {
   // const user = getLocalSecureItem("primary-user", "medium");
