@@ -2,17 +2,13 @@ const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const requestLoger = require("./middlewares/logger");
+const requestLogger = require("./middlewares/logger");
 
 // Custom middlewares
 const errorHandler = require("./middlewares/errorHandler");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
-const {
-  verifyAccessToken,
-  verifyRefreshToken,
-  refreshToken,
-} = require("./middlewares/token");
+const { verifyAccessToken } = require("./middlewares/token");
 
 // custom routes
 const authRoutes = require("./routes/authRoute");
@@ -34,16 +30,13 @@ app.use(cookieParser());
 app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 
 // Custom middleware for logging request paths
-app.use(requestLoger);
+app.use(requestLogger);
 
 // Authentication Routes
-app.use("/auth", authRoutes);
+app.use("/api/auth/", authRoutes);
 
 // Protected Routes
-app.use("/api", verifyAccessToken, userRoutes);
-
-// Request a new access token
-app.use("/refresh", verifyRefreshToken, refreshToken);
+app.use("/api/user/:userId", verifyAccessToken, userRoutes);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);

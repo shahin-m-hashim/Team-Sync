@@ -22,21 +22,17 @@ const loginUser = async (email, password) => {
     throw new Error("InvalidPassword");
   }
 
-  const { id, username } = user;
+  const { id } = user;
 
-  const accessToken = jwt.sign(
-    { userId: id, username },
-    process.env.JWT_ACCESS_KEY,
-    { expiresIn: "1m" }
-  );
+  const accessToken = jwt.sign({ id }, process.env.JWT_ACCESS_KEY, {
+    expiresIn: "1m",
+  });
 
-  const refreshToken = jwt.sign(
-    { userId: id, username },
-    process.env.JWT_REFRESH_KEY,
-    { expiresIn: "1d" }
-  );
+  const refreshToken = jwt.sign({ id }, process.env.JWT_REFRESH_KEY, {
+    expiresIn: "1d",
+  });
 
-  return { accessToken, refreshToken };
+  return { id, accessToken, refreshToken };
 };
 
 const sendPassResetOtp = async (email) => {
