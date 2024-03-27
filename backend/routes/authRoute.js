@@ -2,6 +2,7 @@ const authRouter = require("express").Router();
 const {
   signUpController,
   loginController,
+  refreshTokensController,
   logoutController,
   reqPassResetOtpController,
   verifyOtpController,
@@ -11,6 +12,8 @@ const {
 authRouter.post("/signup", signUpController);
 
 authRouter.post("/login", loginController);
+
+authRouter.get("/refresh", refreshTokensController);
 
 authRouter.post("/reqPassResetOtp", reqPassResetOtpController);
 

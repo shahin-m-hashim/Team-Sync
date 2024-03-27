@@ -1,6 +1,6 @@
 const moment = require("moment/moment");
 
-const requestLoger = (req, res, next) => {
+const requestLogger = (req, res, next) => {
   const details = {
     method: req.method,
     date: moment().format("DD-MM-YYYY"),
@@ -11,4 +11,4 @@ const requestLoger = (req, res, next) => {
   next();
 };
 
-module.exports = requestLoger;
+module.exports = requestLogger;

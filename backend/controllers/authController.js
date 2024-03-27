@@ -10,18 +10,22 @@ const {
 
 const signUpController = async (req, res, next) => {
   try {
-    const { id, username, createdAt } = await signUpUser(req.body);
-
+    await signUpUser(req.body);
     res.status(201).json({
       success: true,
-      result: { username, userId: id, createdAt },
-      message: `User ${id} signed up successfully`,
+      message: `Sign up successful`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
+      const validationErrors = Object.values(e.errors).map((error) => ({
+        field: error.path,
+        message: error.message,
+      }));
+
       res.status(422).json({
         success: false,
-        error: "Validations failed, please check your input and try again",
+        error: "Validation failed",
+        validationErrors: validationErrors,
       });
     } else if (e.name === "MongoServerError") {
       res.status(400).json({
@@ -42,7 +46,7 @@ const loginController = async (req, res, next) => {
     res.clearCookie("refJwt");
 
     const { email, password } = req.body;
-    const { accessToken, refreshToken } = await loginUser(email, password);
+    const { id, accessToken, refreshToken } = await loginUser(email, password);
 
     if (accessToken && refreshToken) {
       res.cookie("accJwt", accessToken, {
@@ -59,6 +63,7 @@ const loginController = async (req, res, next) => {
 
       return res.status(200).json({
         success: true,
+        data: { userId: id },
         message: "Login Successful",
       });
     } else throw new Error("Failed to create tokens");
@@ -79,17 +84,63 @@ const loginController = async (req, res, next) => {
   }
 };
 
-const logoutController = async (req, res, next) => {
+const refreshTokensController = (req, res, next) => {
+  console.log("Verifying refresh token");
   try {
-    res.clearCookie("accJwt");
-    res.clearCookie("refJwt");
+    const refreshToken = req.cookies.refJwt;
 
-    res.status(200).json({
-      success: true,
-      message: "Logged out successfully",
-    });
-  } catch (e) {
-    next(e);
+    if (!refreshToken) {
+      return res.status(401).json({
+        status: false,
+        error: "Access Denied. Refresh token doesn't exist",
+      });
+    }
+
+    const { userId } = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+    console.log("Refresh token verified successfully");
+
+    console.log("Refreshing tokens");
+
+    // Generate new access token
+    const newAccessToken = jwt.sign(
+      { userId },
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: "1m" } // 1 min
+    );
+
+    // Generate new refresh token
+    const newRefreshToken = jwt.sign(
+      { userId },
+      process.env.JWT_REFRESH_KEY,
+      { expiresIn: "1d" } // 1 day
+    );
+
+    console.log("Tokens refreshed successfully");
+
+    if (newAccessToken && newRefreshToken) {
+      res.cookie("accJwt", newAccessToken, {
+        httpOnly: true,
+        withCredentials: true,
+        expires: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+      });
+
+      res.cookie("refJwt", newRefreshToken, {
+        httpOnly: true,
+        withCredentials: true,
+        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Tokens Refreshed",
+      });
+    } else throw new Error("Failed to refresh tokens");
+  } catch (err) {
+    res.clearCookie("refJwt");
+    console.log("Invalid Refresh token:", err.message);
+    return res
+      .status(401)
+      .json({ status: false, error: "Access Denied. Invalid Refresh token." });
   }
 };
 
@@ -174,9 +225,24 @@ const resetPassController = async (req, res) => {
   }
 };
 
+const logoutController = async (req, res, next) => {
+  try {
+    res.clearCookie("accJwt");
+    res.clearCookie("refJwt");
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   signUpController,
   loginController,
+  refreshTokensController,
   logoutController,
   reqPassResetOtpController,
   verifyOtpController,
