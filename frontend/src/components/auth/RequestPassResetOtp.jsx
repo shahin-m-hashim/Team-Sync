@@ -2,25 +2,18 @@
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { forgotPasswordEmailValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { authContext } from "@/providers/AuthProvider";
 import VerifyOTP from "./VerifyOTP";
+import { reqPassResetOTP } from "@/services/auth";
 
 const RequestPassResetOTP = ({ setShowInput }) => {
   const navigate = useNavigate();
   const errorRef = useRef();
 
-  const authState = localStorage.getItem("authState");
-  const { reqPassResetOTP } = useContext(authContext);
-
   const [time, setTime] = useState(60);
   const [retry, setRetry] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
-
-  useEffect(() => {
-    authState === "LOGGED_IN" && navigate("/user/dashboard");
-  }, []);
 
   const initialValues = { email: "" };
 

@@ -1,44 +1,31 @@
-import SideBar from "@/components/dashboard/SideBar";
-import Navbar from "@/components/dashboard/Navbar";
-import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
-import ReLoginPage from "./auth/ReLoginPage";
-import LoadingComponent from "@/components/Loading";
-import { authContext } from "@/providers/AuthProvider";
-import HomePage from "./HomePage";
 import { getLocalSecureItem } from "@/lib/utils";
+import Navbar from "@/components/dashboard/Navbar";
+import SideBar from "@/components/dashboard/SideBar";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import LoadingComponent from "@/components/Loading";
 
 // eslint-disable-next-line react/prop-types
 export default function DashboardPage({ children }) {
   const navigate = useNavigate();
-  const localAuth = getLocalSecureItem("auth", "low");
-  const { authState, authorize } = useContext(authContext);
+  const [render, setRender] = useState(false);
+  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
-    if (localAuth === "LOGGED_IN" || localAuth === "AUTHORIZED") {
-      authorize();
-      const interval = setInterval(authorize, 15 * 60 * 1000);
-      return () => clearInterval(interval);
-    } else {
-      navigate("/reLogin", { replace: true });
-    }
-  }, [authState]);
+    if (user?.status === "LOGGED_IN") {
+      setRender(true);
+    } else navigate("/", { replace: true });
+  }, [navigate, user?.status]);
 
-  if (authState === "AUTHORIZED") {
-    return (
-      <>
-        <SideBar />
-        <div className="flex pl-[235px] flex-col h-screen">
-          <Navbar />
-          {children}
-        </div>
-      </>
-    );
-  } else if (authState === "UNAUTHORIZED") {
-    return <ReLoginPage />;
-  } else if (authState === "LOGGED_OUT") {
-    return <HomePage />;
-  } else {
-    return <LoadingComponent />;
-  }
+  return render ? (
+    <>
+      <SideBar />
+      <div className="flex pl-[235px] flex-col h-screen">
+        <Navbar />
+        {children}
+      </div>
+    </>
+  ) : (
+    <LoadingComponent />
+  );
 }

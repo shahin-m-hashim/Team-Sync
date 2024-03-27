@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { useContext, useRef, useState } from "react";
-import { authContext } from "@/providers/AuthProvider";
+import { verifyOTP } from "@/services/auth";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const VerifyOTP = ({ setShowInput }) => {
@@ -8,8 +8,6 @@ const VerifyOTP = ({ setShowInput }) => {
   const otpInputRefs = [];
   const navigate = useNavigate();
   const [otp, setOtp] = useState(new Array(6).fill(""));
-
-  const { verifyOTP } = useContext(authContext);
 
   const handleOtpError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {

@@ -1,20 +1,11 @@
 /* eslint-disable react/prop-types */
+import { useRef } from "react";
 import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
 import { resetPasswordValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useContext, useEffect, useRef } from "react";
-import { authContext } from "@/providers/AuthProvider";
+import { resetPassword } from "@/services/auth";
 
 const ResetPassword = ({ setShowInput }) => {
-  const navigate = useNavigate();
   const errorRef = useRef();
-
-  const authState = localStorage.getItem("authState");
-  const { resetPassword } = useContext(authContext);
-
-  useEffect(() => {
-    authState === "LOGGED_IN" && navigate("/user/dashboard");
-  }, []);
 
   const initialValues = {
     password: "",

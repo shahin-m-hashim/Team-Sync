@@ -6,10 +6,12 @@ import subTeams from "../../assets/images/subTeams.png";
 import tasks from "../../assets/images/tasks.png";
 import techSupport from "../../assets/images/Technical Support.png";
 import logoutIcon from "../../assets/images/logout.png";
-import { useContext } from "react";
-import { authContext } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import defaultDp from "../../assets/images/defaultDp.png";
+import { getLocalSecureItem } from "@/lib/utils";
+import { logout } from "@/services/auth";
+
+const user = getLocalSecureItem("user", "medium");
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -20,10 +22,6 @@ const MenuItem = ({ icon, text }) => (
 
 export default function SideBar() {
   const navigate = useNavigate();
-  const { logout } = useContext(authContext);
-
-  // const user = getLocalSecureItem("primary-user", "medium");
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -62,10 +60,14 @@ export default function SideBar() {
         id="userCard"
         className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
       >
-        <img src={defaultDp} alt="userDP" className="size-10" />
+        <img
+          src={user?.profilePic || defaultDp}
+          alt="userDP"
+          className="size-10"
+        />
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Ajmal Sajeev</span>
-          <span className="text-[#BDBDBD] text-xs">Front-End Developer</span>
+          <span className="text-sm font-medium">{user.username}</span>
+          <span className="text-[#BDBDBD] text-xs">{user.tag}</span>
         </div>
       </div>
     </div>

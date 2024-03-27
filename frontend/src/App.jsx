@@ -12,7 +12,6 @@ import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import AuthProvider from "./providers/AuthProvider";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import ChangeUserDp from "./components/ChangeUserDp";
@@ -100,11 +99,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
