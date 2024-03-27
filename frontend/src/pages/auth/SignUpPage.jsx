@@ -2,22 +2,22 @@ import { useFormik } from "formik";
 import rocket from "../../assets/images/rocket.png";
 import { Link, useNavigate } from "react-router-dom";
 import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "@/providers/AuthProvider";
+import { useEffect, useRef, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
+import { signup } from "@/services/auth";
 
 export default function SignupPage() {
-  const navigate = useNavigate();
   const errorRef = useRef();
+  const navigate = useNavigate();
 
   const [render, setRender] = useState(false);
-  const authState = getLocalSecureItem("auth", "low");
+  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
-    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
-      navigate("/user/projects");
-    setRender(true);
-  }, []);
+    if (user?.status === "LOGGED_IN") {
+      navigate("/user/projects", { replace: true });
+    } else setRender(true);
+  }, [navigate, user?.status]);
 
   const initialValues = {
     username: "",
@@ -25,8 +25,6 @@ export default function SignupPage() {
     password: "",
     cPassword: "",
   };
-
-  const { signup } = useContext(authContext);
 
   const handleSignUpError = (event) => {
     if (errorRef.current && !errorRef.current.contains(event.target)) {
