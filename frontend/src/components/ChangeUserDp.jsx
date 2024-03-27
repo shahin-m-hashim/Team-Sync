@@ -2,7 +2,7 @@
 import addDp from "../assets/images/addDp.png";
 import editDp from "../assets/images/editDp.png";
 import defaultDp from "../assets/images/defaultDp.png";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
 
 import {
@@ -14,7 +14,6 @@ import {
 } from "firebase/storage";
 import app from "@/lib/firebase";
 import axios from "axios";
-import { authContext } from "@/providers/AuthProvider";
 
 const MAX_DP_SIZE = 2 * 1024 * 1024;
 // const base_url = import.meta.env.VITE_APP_BASE_URL;
@@ -84,7 +83,6 @@ const LoadingSvg = () => (
 );
 
 export default function ChangeUserDp() {
-  const { authorize } = useContext(authContext);
   const { userId, userDp = "" } = getLocalSecureItem("primary-user", "medium");
 
   const dpInputRef = useRef();
@@ -123,7 +121,6 @@ export default function ChangeUserDp() {
         userId,
         profilePicture: downloadURL,
       });
-      await authorize();
       setDp(downloadURL); // Assuming the server returns the updated dp URL
     } catch (error) {
       setDp("");
@@ -142,7 +139,6 @@ export default function ChangeUserDp() {
     try {
       await deleteObject(storageRef);
       await axios.post("/user/uploadDp", { userId, profilePicture: "" });
-      await authorize();
       setDp(""); // Clear the dp
     } catch (error) {
       dpInputRef.current.value = "";
@@ -154,60 +150,54 @@ export default function ChangeUserDp() {
   };
 
   return (
-    <div className="text-white h-screen w-screen overflow-auto grid grid-cols-[300px,1fr] pt-14 bg-[#2b2a2a]">
-      <div className="flex flex-col gap-4 px-10 py-5 bg-gray-500 size-full">
-        <div className="relative">
-          <div className="flex items-center justify-center">
-            <img
-              src={dp || defaultDp}
-              alt="display-picture"
-              className="mx-auto rounded-[50%] size-[150px] object-cover object-center"
-            />
-            {showLoading && <LoadingSvg />}
-          </div>
-          <div
-            ref={dpErrorRef}
-            className="absolute hidden top-[-20px] bg-black left-[40px] text-xs p-2 font-semibold m-2 text-red-500"
-          >
-            Max file size is 2MB
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            ref={dpInputRef}
-            className="hidden"
-            onChange={handleDpChange}
+    <div className="relative">
+      <div className="flex items-center justify-center">
+        <img
+          src={dp || defaultDp}
+          alt="display-picture"
+          className="mx-auto rounded-[50%] size-[150px] object-cover object-center"
+        />
+        {showLoading && <LoadingSvg />}
+      </div>
+      <div
+        ref={dpErrorRef}
+        className="absolute hidden top-[-20px] bg-black left-[40px] text-xs p-2 font-semibold m-2 text-red-500"
+      >
+        Max file size is 2MB
+      </div>
+      <input
+        type="file"
+        accept="image/*"
+        ref={dpInputRef}
+        className="hidden"
+        onChange={handleDpChange}
+      />
+      {!dp ? (
+        <img
+          src={addDp}
+          alt="addDp"
+          onClick={() => dpInputRef.current.click()}
+          className="absolute p-2 ml-1 bg-slate-800 bottom-4 right-8 rounded-3xl size-10 hover:cursor-pointer"
+        />
+      ) : (
+        <div className="absolute bottom-4 right-8">
+          <img
+            src={editDp}
+            alt="editDp"
+            onClick={() => setShowDropDown(!showDropDown)}
+            className="p-2 ml-1 bg-slate-800 rounded-3xl size-10 hover:cursor-pointer"
           />
-          {!dp ? (
-            <button onClick={() => dpInputRef.current.click()}>
-              <img
-                src={addDp}
-                alt="addDp"
-                className="absolute p-2 ml-1 bg-slate-800 bottom-10 right-8 rounded-3xl size-10"
-              />
-            </button>
-          ) : (
-            <div className="absolute bottom-4 right-8">
-              <img
-                src={editDp}
-                alt="editDp"
-                onClick={() => setShowDropDown(!showDropDown)}
-                className="p-2 ml-1 bg-slate-800 rounded-3xl size-10"
-              />
-              {showDropDown && (
-                <DropUpMenu
-                  userDp={userDp}
-                  dpInputRef={dpInputRef}
-                  handleSaveDp={handleSaveDp}
-                  handleCancelDp={handleCancelDp}
-                  handleDeleteDp={handleDeleteDp}
-                />
-              )}
-            </div>
+          {showDropDown && (
+            <DropUpMenu
+              userDp={userDp}
+              dpInputRef={dpInputRef}
+              handleSaveDp={handleSaveDp}
+              handleCancelDp={handleCancelDp}
+              handleDeleteDp={handleDeleteDp}
+            />
           )}
         </div>
-      </div>
-      <main className="flex flex-col gap-8 px-10 py-4 bg-gray-600 size-full " />
+      )}
     </div>
   );
 }

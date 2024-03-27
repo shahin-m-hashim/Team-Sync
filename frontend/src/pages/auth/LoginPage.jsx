@@ -1,25 +1,23 @@
+import { useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
-import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
-import { Link, useNavigate } from "react-router-dom";
-import rocket from "../../assets/images/rocket.png";
-import { useContext, useEffect, useRef, useState } from "react";
-import { authContext } from "@/providers/AuthProvider";
+import { login } from "@/services/auth";
 import { getLocalSecureItem } from "@/lib/utils";
+import rocket from "../../assets/images/rocket.png";
+import { Link, useNavigate } from "react-router-dom";
+import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const errorRef = useRef();
 
   const [render, setRender] = useState(false);
-  const authState = getLocalSecureItem("auth", "low");
+  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
-    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
+    if (user?.status === "LOGGED_IN") {
       navigate("/user/projects", { replace: true });
-    setRender(true);
-  }, [authState]);
-
-  const { login } = useContext(authContext);
+    } else setRender(true);
+  }, [navigate, user?.status]);
 
   const initialValues = {
     email: "",

@@ -1,18 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import rocket from "../assets/images/rocket.png";
 import NavbarComponent from "@/components/Navbar";
-import { useEffect, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
+import { useEffect, useState } from "react";
 export default function HomePage() {
   const navigate = useNavigate();
   const [render, setRender] = useState(false);
-  const authState = getLocalSecureItem("auth");
+  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
-    if (authState === "LOGGED_IN" || authState === "AUTHORIZED")
-      navigate("/user/projects");
-    setRender(true);
-  }, []);
+    if (user?.status === "LOGGED_IN") {
+      navigate("/user/projects", { replace: true });
+    } else setRender(true);
+  }, [navigate, user?.status]);
 
   return (
     render && (
