@@ -9,13 +9,15 @@ import LoadingComponent from "@/components/Loading";
 export default function DashboardPage({ children }) {
   const navigate = useNavigate();
   const [render, setRender] = useState(false);
-  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
+    const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
       setRender(true);
-    } else navigate("/", { replace: true });
-  }, [navigate, user?.status]);
+    } else {
+      navigate("/reLogin", { replace: true });
+    }
+  }, [navigate]);
 
   return render ? (
     <>

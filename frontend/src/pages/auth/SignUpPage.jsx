@@ -1,23 +1,27 @@
 import { useFormik } from "formik";
 import rocket from "../../assets/images/rocket.png";
+import showPass from "../../assets/images/ShowPass.png";
+import hidePass from "../../assets/images/HidePass.png";
 import { Link, useNavigate } from "react-router-dom";
 import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
 import { useEffect, useRef, useState } from "react";
-import { getLocalSecureItem } from "@/lib/utils";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import { signup } from "@/services/auth";
 
 export default function SignupPage() {
   const errorRef = useRef();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCPassword, setShowCPassword] = useState(false);
 
   const [render, setRender] = useState(false);
-  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
+    const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate("/user/projects", { replace: true });
+      navigate(`/user/${user?.id}/projects`, { replace: true });
     } else setRender(true);
-  }, [navigate, user?.status]);
+  }, [navigate]);
 
   const initialValues = {
     username: "",
@@ -37,13 +41,12 @@ export default function SignupPage() {
     const { username, email, password } = values;
 
     try {
-      const res = await signup({
+      await signup({
         username,
         email,
         password,
       });
-      console.log(res);
-      res && navigate("/login", { replace: true });
+      navigate("/login", { replace: true });
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
@@ -141,14 +144,26 @@ export default function SignupPage() {
                 >
                   Password
                 </label>
-                <input
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="Enter a secure password"
-                  {...getFieldProps("password")}
-                />
+                <div className="relative flex items-center">
+                  <input
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    placeholder="Enter a secure password"
+                    {...getFieldProps("password")}
+                  />
+                  <img
+                    className={cn(
+                      showPassword ? "size-8" : "size-9 pb-1",
+                      " size-8 absolute right-3 cursor-pointer"
+                    )}
+                    onClick={() => {
+                      setShowPassword(!showPassword);
+                    }}
+                    src={showPassword ? showPass : hidePass}
+                  />
+                </div>
                 {errors.password && touched.password ? (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                     {errors.password}
@@ -157,19 +172,31 @@ export default function SignupPage() {
               </div>
               <div className="mb-3">
                 <label
-                  className="block mb-2 text-sm font-bold text-gray-700"
+                  className="flex mb-2 text-sm font-bold text-gray-700"
                   htmlFor="cPassword"
                 >
                   Confirm Password
                 </label>
-                <input
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-                  type="password"
-                  id="cPassword"
-                  name="cPassword"
-                  placeholder="Confirm Your Password"
-                  {...getFieldProps("cPassword")}
-                />
+                <div className="relative flex items-center gap-3">
+                  <input
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                    type={showCPassword ? "text" : "password"}
+                    id="cPassword"
+                    name="cPassword"
+                    placeholder="Confirm Your Password"
+                    {...getFieldProps("cPassword")}
+                  />
+                  <img
+                    className={cn(
+                      showCPassword ? "size-8" : "size-9 pb-1",
+                      " size-8 absolute right-3 cursor-pointer"
+                    )}
+                    onClick={() => {
+                      setShowCPassword(!showCPassword);
+                    }}
+                    src={showCPassword ? showPass : hidePass}
+                  />
+                </div>
                 {errors.cPassword && touched.cPassword ? (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                     {errors.cPassword}
@@ -190,7 +217,11 @@ export default function SignupPage() {
               <button
                 className="w-full px-4 py-2 mt-3 text-sm font-bold text-white transition duration-300 bg-red-500 rounded-md hover:bg-red-600"
                 type="reset"
-                onClick={resetForm}
+                onClick={() => {
+                  setShowPassword(false);
+                  setShowCPassword(false);
+                  resetForm();
+                }}
               >
                 Reset Form
               </button>

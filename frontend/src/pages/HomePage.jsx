@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
   const navigate = useNavigate();
   const [render, setRender] = useState(false);
-  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
+    const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate("/user/projects", { replace: true });
+      navigate(`/user/${user?.id}/projects`, { replace: true });
     } else setRender(true);
-  }, [navigate, user?.status]);
+  }, [navigate]);
 
   return (
     render && (

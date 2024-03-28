@@ -11,7 +11,7 @@ import defaultDp from "../../assets/images/defaultDp.png";
 import { getLocalSecureItem } from "@/lib/utils";
 import { logout } from "@/services/auth";
 
-const user = getLocalSecureItem("user", "medium");
+const user = getLocalSecureItem("user", "low");
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -66,8 +66,8 @@ export default function SideBar() {
           className="size-10"
         />
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{user.username}</span>
-          <span className="text-[#BDBDBD] text-xs">{user.tag}</span>
+          <span className="text-sm font-medium">{user?.username}</span>
+          <span className="text-[#BDBDBD] text-xs">{user?.tag}</span>
         </div>
       </div>
     </div>
