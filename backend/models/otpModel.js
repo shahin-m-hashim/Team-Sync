@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const otpSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "users",
     required: true,
   },
   otp: {
@@ -16,9 +16,8 @@ const otpSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
-    expires: 2 * 60,
-    // OTP expires after 2 min, 1 min is too short and may expire too quick sometime
-    // remember to delete the otps collection incase any change is made to expiry time
+    expires: 200, // 3 minutes + 20s
+    // this ensures consistency with the frontend timer coz of asynchronous mail sending
   },
 });
 

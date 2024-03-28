@@ -1,23 +1,35 @@
 const {
-  getProfilePic,
+  removeAccount,
   setProfilePic,
   removeProfilePic,
-  getBasicDetails,
-  setBasicDetails,
-  getPublicDetails,
-  setPublicDetails,
+  getPrimaryDetails,
+  setPrimaryDetails,
+  getSecondaryDetails,
+  setSecondaryDetails,
 } = require("../services/userService");
 
-const fetchProfilePic = async (req, res, next) => {
+// FETCH REQUESTS
+const fetchPrimaryDetails = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const profilePic = await getProfilePic(userId);
-    res.status(200).json({ success: true, data: profilePic });
+    const PrimaryDetails = await getPrimaryDetails(userId);
+    res.status(200).json({ success: true, data: PrimaryDetails });
   } catch (e) {
     next(e);
   }
 };
 
+const fetchSecondaryDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const SecondaryDetails = await getSecondaryDetails(userId);
+    res.status(200).json({ success: true, data: SecondaryDetails });
+  } catch (e) {
+    next(e);
+  }
+};
+
+// PATCH REQUESTS
 const updateProfilePic = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -33,6 +45,55 @@ const updateProfilePic = async (req, res, next) => {
   }
 };
 
+const updatePrimaryDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { newPrimaryDetails } = req.body;
+    const updatedPrimaryDetails = await setPrimaryDetails(
+      userId,
+      newPrimaryDetails
+    );
+    res.status(200).json({
+      success: true,
+      data: { updatedPrimaryDetails },
+      message: "Basic details updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    }
+    next(e);
+  }
+};
+
+const updateSecondaryDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { newSecondaryDetails } = req.body;
+    const updatedSecondaryDetails = await setSecondaryDetails(
+      userId,
+      newSecondaryDetails
+    );
+    res.status(200).json({
+      success: true,
+      data: {
+        updatedSecondaryDetails,
+      },
+      message: "Secondary details updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    }
+    next(e);
+  }
+};
+
+// DELETE REQUESTS
 const deleteProfilePic = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -46,55 +107,15 @@ const deleteProfilePic = async (req, res, next) => {
   }
 };
 
-const fetchBasicDetails = async (req, res, next) => {
+const deleteAccount = async (req, res, next) => {
   try {
+    res.clearCookie("accJwt");
+    res.clearCookie("refJwt");
     const { userId } = req.user;
-    const basicDetails = await getBasicDetails(userId);
-    res.status(200).json({ success: true, data: basicDetails });
-  } catch (e) {
-    next(e);
-  }
-};
-
-const updateBasicDetails = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { newBasicDetails } = req.body;
-    const updatedBasicDetails = await setBasicDetails(userId, newBasicDetails);
+    await removeAccount(userId);
     res.status(200).json({
       success: true,
-      data: { updatedBasicDetails },
-      message: "Basic details updated successfully",
-    });
-  } catch (e) {
-    next(e);
-  }
-};
-
-const fetchPublicDetails = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const publicDetails = await getPublicDetails(userId);
-    res.status(200).json({ success: true, data: publicDetails });
-  } catch (e) {
-    next(e);
-  }
-};
-
-const updatePublicDetails = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { newPublicDetails } = req.body;
-    const updatedPublicDetails = await setPublicDetails(
-      userId,
-      newPublicDetails
-    );
-    res.status(200).json({
-      success: true,
-      data: {
-        updatedPublicDetails,
-      },
-      message: "Public details updated successfully",
+      message: "Account deleted successfully",
     });
   } catch (e) {
     next(e);
@@ -102,11 +123,11 @@ const updatePublicDetails = async (req, res, next) => {
 };
 
 module.exports = {
-  fetchProfilePic,
+  deleteAccount,
   updateProfilePic,
   deleteProfilePic,
-  fetchBasicDetails,
-  updateBasicDetails,
-  fetchPublicDetails,
-  updatePublicDetails,
+  fetchPrimaryDetails,
+  updatePrimaryDetails,
+  fetchSecondaryDetails,
+  updateSecondaryDetails,
 };
