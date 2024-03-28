@@ -10,17 +10,16 @@ const login = async (credentials) => {
   const { data } = await axios.post(base_url + "auth/login", credentials, {
     withCredentials: true,
   });
+
   setLocalSecureItem(
     "user",
     {
-      tag: data.tag,
-      id: data.userId,
+      id: data.data.userId,
       status: "LOGGED_IN",
-      username: data.username || "",
-      profilePic: data.profilePic || "",
     },
-    "medium"
+    "low"
   );
+  return data.data.userId;
 };
 
 const reAuthorize = async () => {

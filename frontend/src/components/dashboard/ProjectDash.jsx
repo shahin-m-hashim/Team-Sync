@@ -9,9 +9,6 @@ import { useEffect, useReducer, useState } from "react";
 import { listReducer } from "@/helpers/listReducer";
 import ListSubHeader from "../list/ListSubHeader";
 
-// import axios from "axios";
-// const base_url = import.meta.env.VITE_APP_BASE_URL;
-
 const initialProjects = [];
 
 const leaderProjects = initialProjects.filter(

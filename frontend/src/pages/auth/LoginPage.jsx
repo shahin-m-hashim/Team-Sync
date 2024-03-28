@@ -1,23 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { login } from "@/services/auth";
-import { getLocalSecureItem } from "@/lib/utils";
+import { cn, getLocalSecureItem } from "@/lib/utils";
+import showPass from "../../assets/images/ShowPass.png";
 import rocket from "../../assets/images/rocket.png";
+import hidePass from "../../assets/images/HidePass.png";
 import { Link, useNavigate } from "react-router-dom";
 import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const errorRef = useRef();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [render, setRender] = useState(false);
-  const user = getLocalSecureItem("user", "medium");
 
   useEffect(() => {
+    const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate("/user/projects", { replace: true });
+      navigate(`/user/${user?.id}/projects`, { replace: true });
     } else setRender(true);
-  }, [navigate, user?.status]);
+  }, [navigate]);
 
   const initialValues = {
     email: "",
@@ -33,8 +36,8 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
-      await login(values);
-      navigate("/user/projects", { replace: true });
+      const userId = await login(values);
+      navigate(`/user/${userId}/projects`, { replace: true });
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
@@ -113,15 +116,25 @@ export default function LoginPage() {
                       <Link to="/resetPass">Forgot password?</Link>
                     </div>
                   </div>
-                  <div className="mt-2">
+                  <div className="relative flex items-center gap-3 mt-3">
                     <input
                       id="password"
                       name="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={formik.values.password}
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                    />
+                    <img
+                      className={cn(
+                        showPassword ? "size-8" : "size-9 pb-1",
+                        " size-8 absolute right-3 cursor-pointer"
+                      )}
+                      onClick={() => {
+                        setShowPassword(!showPassword);
+                      }}
+                      src={showPassword ? showPass : hidePass}
                     />
                   </div>
                   {formik.errors.password && formik.touched.password ? (

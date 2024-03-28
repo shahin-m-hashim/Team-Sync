@@ -5,6 +5,7 @@ import FilterButton from "../FilterButton";
 import SearchInput from "../SearchInput";
 import ResetListBtn from "./ResetListBtn";
 import SwitchListBtn from "./SwitchListBtn";
+import { getLocalSecureItem } from "@/lib/utils";
 
 export default function ListHeader({
   setList,
@@ -20,6 +21,8 @@ export default function ListHeader({
   listNameSearchTxt,
   setListNameSearchTxt,
 }) {
+  const user = getLocalSecureItem("user", "low");
+
   return (
     <div className="flex items-center justify-between py-3 text-sm px-7">
       <div className="flex flex-col gap-1">
@@ -48,10 +51,10 @@ export default function ListHeader({
         />
       </div>
       <div className="flex gap-10 text-[#828282]">
-        <Link to="/user/projects">Projects</Link>
-        <Link to="/user/teams">Teams</Link>
-        <Link to="/user/subTeams">Sub Teams</Link>
-        <Link to="/user/tasks">Tasks</Link>
+        <Link to={`/user/${user?.id}/projects`}>Projects</Link>
+        <Link to={`/user/${user?.id}/teams`}>Teams</Link>
+        <Link to={`/user/${user?.id}/subTeams`}>Sub Teams</Link>
+        <Link to={`/user/${user?.id}/tasks`}>Tasks</Link>
       </div>
       <div className="inline-flex gap-5">
         <ResetListBtn resetList={resetList} />

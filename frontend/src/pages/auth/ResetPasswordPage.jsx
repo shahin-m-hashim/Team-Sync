@@ -8,7 +8,7 @@ import { getLocalSecureItem } from "@/lib/utils";
 const ResetPasswordPage = () => {
   const navigate = useNavigate();
   const [render, setRender] = useState(false);
-  const user = getLocalSecureItem("user", "medium");
+  const user = getLocalSecureItem("user", "low");
   const [showInput, setShowInput] = useState("requestOtp");
 
   useEffect(() => {
