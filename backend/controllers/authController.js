@@ -4,7 +4,7 @@ const {
   signUpUser,
   loginUser,
   sendPassResetOtp,
-  verifyOTP,
+  verifyPassResetOtp,
   resetUserPassword,
 } = require("../services/authService");
 
@@ -13,40 +13,35 @@ const signUpController = async (req, res, next) => {
     await signUpUser(req.body);
     res.status(201).json({
       success: true,
-      message: `Sign up successful`,
+      message: "Sign up successful",
     });
   } catch (e) {
     if (e.name === "ValidationError") {
-      const validationErrors = Object.values(e.errors).map((error) => ({
-        field: error.path,
-        message: error.message,
-      }));
-
-      res.status(422).json({
-        success: false,
-        error: "Validation failed",
-        validationErrors: validationErrors,
-      });
-    } else if (e.name === "MongoServerError") {
-      res.status(400).json({
-        success: false,
-        error:
-          "A user with the given email or username already exists, please login instead",
-      });
-    } else {
-      next(e);
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("UserAlreadyExists"));
     }
+    next(e);
   }
 };
 
 const loginController = async (req, res, next) => {
-  // console.log("Inside login controller");
   try {
     res.clearCookie("accJwt");
     res.clearCookie("refJwt");
 
     const { email, password } = req.body;
-    const { id, accessToken, refreshToken } = await loginUser(email, password);
+    const id = await loginUser(email, password);
+
+    const accessToken = jwt.sign({ id }, process.env.JWT_ACCESS_KEY, {
+      expiresIn: "1m",
+    });
+
+    const refreshToken = jwt.sign({ id }, process.env.JWT_REFRESH_KEY, {
+      expiresIn: "1d",
+    });
 
     if (accessToken && refreshToken) {
       res.cookie("accJwt", accessToken, {
@@ -60,46 +55,30 @@ const loginController = async (req, res, next) => {
         withCredentials: true,
         expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
       });
+    } else throw new Error("TokenCreationFailure");
 
-      return res.status(200).json({
-        success: true,
-        data: { userId: id },
-        message: "Login Successful",
-      });
-    } else throw new Error("Failed to create tokens");
+    return res.status(200).json({
+      success: true,
+      message: "Login Successful",
+    });
   } catch (e) {
-    if (e.message === "UnknownUser") {
-      return res.status(401).json({
-        success: false,
-        error: "User not found, Please sign up first",
-      });
-    } else if (e.message === "InvalidPassword") {
-      return res.status(401).json({
-        success: false,
-        error: "Invalid password, Please try again",
-      });
-    } else {
-      next(e);
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
     }
+    next(e);
   }
 };
 
 const refreshTokensController = (req, res, next) => {
-  console.log("Verifying refresh token");
   try {
     const refreshToken = req.cookies.refJwt;
 
-    if (!refreshToken) {
-      return res.status(401).json({
-        status: false,
-        error: "Access Denied. Refresh token doesn't exist",
-      });
-    }
+    if (!refreshToken) throw new Error("InvalidRefreshToken");
 
     const { userId } = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
     console.log("Refresh token verified successfully");
-
-    console.log("Refreshing tokens");
 
     // Generate new access token
     const newAccessToken = jwt.sign(
@@ -129,99 +108,77 @@ const refreshTokensController = (req, res, next) => {
         withCredentials: true,
         expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
       });
+    } else throw new Error("TokenCreationFailure");
 
-      return res.status(200).json({
-        success: true,
-        message: "Tokens Refreshed",
-      });
-    } else throw new Error("Failed to refresh tokens");
-  } catch (err) {
-    res.clearCookie("refJwt");
-    console.log("Invalid Refresh token:", err.message);
-    return res
-      .status(401)
-      .json({ status: false, error: "Access Denied. Invalid Refresh token." });
+    return res.status(200).json({
+      success: true,
+      message: "Tokens Refreshed",
+    });
+  } catch (e) {
+    next(e);
   }
 };
 
 const reqPassResetOtpController = async (req, res, next) => {
   const { email } = req.body;
   try {
-    const mail = await sendPassResetOtp(email);
+    await sendPassResetOtp(email);
     res.status(200).json({
       success: true,
       message: "OTP sent successfully, Please check your email for the OTP",
-      mail,
     });
   } catch (e) {
-    if (e.message === "UnknownUser") {
-      return res.status(404).json({
-        success: false,
-        error: "User not found, Please sign up first",
-      });
-    }
     next(e);
   }
 };
 
-const verifyOtpController = async (req, res, next) => {
+const verifyPassResetOtpController = async (req, res, next) => {
   const { otp } = req.body;
   try {
-    const otpToken = await verifyOTP(otp);
+    const user = await verifyPassResetOtp(otp);
 
-    res.cookie("otpJwt", otpToken, {
-      httpOnly: true,
-      withCredentials: true,
-      expires: new Date(Date.now() + 3 * 60 * 1000), // 3 min
+    const otpToken = jwt.sign({ user }, process.env.JWT_OTP_KEY, {
+      expiresIn: "5m",
     });
 
-    res.status(200).json({ success: true });
-  } catch (e) {
-    if (e.message === "InvalidOTP") {
-      return res.status(401).json({
-        success: false,
-        error:
-          "Oops, looks like the OTP has expired,\nkindly request a new one",
+    if (otpToken) {
+      res.cookie("otpJwt", otpToken, {
+        httpOnly: true,
+        withCredentials: true,
+        expires: new Date(Date.now() + 5 * 60 * 1000), // 5 min
       });
-    }
+    } else throw new Error("TokenCreationFailure");
+
+    res
+      .status(200)
+      .json({ success: true, message: "OTP verified successfully" });
+  } catch (e) {
     next(e);
   }
 };
 
-const resetPassController = async (req, res) => {
+const resetPassController = async (req, res, next) => {
   try {
     const otpToken = req.cookies.otpJwt;
-
-    if (!otpToken) {
-      return res
-        .status(401)
-        .json({ status: false, error: "Access Denied. No token provided." });
-    }
+    if (!otpToken) throw new Error("InvalidOtpToken");
 
     const { password } = req.body;
-    const { userId } = jwt.verify(otpToken, process.env.JWT_OTP_KEY);
+    const { user } = jwt.verify(otpToken, process.env.JWT_OTP_KEY);
 
-    const username = await resetUserPassword({ userId, password });
+    await resetUserPassword(user, password);
 
     res.clearCookie("otpJwt");
     res.status(201).json({
       success: true,
-      message: `User ${username} password updated successfully`,
+      message: "Password reset successful",
     });
-  } catch (err) {
-    if (err.name === "ValidationError") {
-      res.clearCookie("otpJwt");
-      res.status(422).json({
-        success: false,
-        error: "Validations failed, please check your input and try again",
-      });
-    } else {
-      console.log("Invalid token:", err.message);
-      res.clearCookie("otpJwt");
-      return res
-        .status(401)
-        .json({ status: false, error: "Access Denied. Invalid token." });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
     }
+    next(e);
   }
 };
 
@@ -245,6 +202,6 @@ module.exports = {
   refreshTokensController,
   logoutController,
   reqPassResetOtpController,
-  verifyOtpController,
+  verifyPassResetOtpController,
   resetPassController,
 };
