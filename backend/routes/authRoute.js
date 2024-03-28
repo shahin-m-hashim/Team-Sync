@@ -5,7 +5,7 @@ const {
   refreshTokensController,
   logoutController,
   reqPassResetOtpController,
-  verifyOtpController,
+  verifyPassResetOtpController,
   resetPassController,
 } = require("../controllers/authController");
 
@@ -17,7 +17,7 @@ authRouter.get("/refresh", refreshTokensController);
 
 authRouter.post("/reqPassResetOtp", reqPassResetOtpController);
 
-authRouter.post("/verifyOTP", verifyOtpController);
+authRouter.post("/verifyPassResetOtp", verifyPassResetOtpController);
 
 authRouter.post("/resetPass", resetPassController);
 

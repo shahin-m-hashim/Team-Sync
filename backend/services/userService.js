@@ -1,37 +1,33 @@
 const users = require("../models/userModel");
 
-const getProfilePic = async (userId) => {
+// GET
+const getPrimaryDetails = async (userId) => {
   const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-  return user.profilePic;
+  if (!user) throw new Error("UnknownUser");
+  const { profilePic, username, fname, tag, bio, socialLinks } = user;
+  return { profilePic, username, fname, tag, bio, socialLinks };
 };
 
+const getSecondaryDetails = async (userId) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+  const { phone, email, occupation, address, organization } = user;
+  return { phone, email, address, occupation, organization };
+};
+
+// SET
 const setProfilePic = async (userId, newProfilePic) => {
   const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
+  if (!user) throw new Error("UnknownUser");
   user.profilePic = newProfilePic;
   await user.save();
   return user.profilePic;
 };
 
-const removeProfilePic = async (userId) => {
+const setPrimaryDetails = async (userId, newPrimaryDetails) => {
   const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-  user.profilePic = "";
-  await user.save();
-};
-
-const getBasicDetails = async (userId) => {
-  const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-  const { profilePic, username, fname, tag, bio, socialLinks } = user;
-  return { profilePic, username, fname, tag, bio, socialLinks };
-};
-
-const setBasicDetails = async (userId, newBasicDetails) => {
-  const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-  const { fname, tag, bio, socialLinks } = newBasicDetails;
+  if (!user) throw new Error("UnknownUser");
+  const { fname, tag, bio, socialLinks } = newPrimaryDetails;
   user.tag = tag;
   user.bio = bio;
   user.fname = fname;
@@ -45,18 +41,11 @@ const setBasicDetails = async (userId, newBasicDetails) => {
   };
 };
 
-const getPublicDetails = async (userId) => {
+const setSecondaryDetails = async (userId, newSecondaryDetails) => {
   const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-  const { phone, email, occupation, address, organization } = user;
-  return { phone, email, address, occupation, organization };
-};
+  if (!user) throw new Error("UnknownUser");
 
-const setPublicDetails = async (userId, newPublicDetails) => {
-  const user = await users.findById(userId);
-  if (!user) throw new Error("UserNotFound");
-
-  const { address, phone, occupation, organization } = newPublicDetails;
+  const { address, phone, occupation, organization } = newSecondaryDetails;
 
   user.phone = phone;
   user.occupation = occupation;
@@ -72,12 +61,27 @@ const setPublicDetails = async (userId, newPublicDetails) => {
   };
 };
 
+// DELETE
+const removeProfilePic = async (userId) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+  user.profilePic = "";
+  await user.save();
+};
+
+const removeAccount = async (userId) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+  if (user.role === "ADMIN") await users.findByIdAndDelete(userId);
+  else throw new Error("AccountDeletionError");
+};
+
 module.exports = {
-  getProfilePic,
+  removeAccount,
   setProfilePic,
   removeProfilePic,
-  getBasicDetails,
-  setBasicDetails,
-  getPublicDetails,
-  setPublicDetails,
+  getPrimaryDetails,
+  setPrimaryDetails,
+  getSecondaryDetails,
+  setSecondaryDetails,
 };

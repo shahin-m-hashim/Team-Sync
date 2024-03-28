@@ -3,9 +3,6 @@ const moment = require("moment");
 const mongoose = require("mongoose");
 const { isEmail, isURL, isStrongPassword } = require("validator");
 
-// Define the validator module
-const validator = require("validator");
-
 const userSchema = new mongoose.Schema({
   role: {
     type: String,
@@ -34,7 +31,7 @@ const userSchema = new mongoose.Schema({
     maxLength: [20, "Maximum length is 20 characters"],
     match: [
       /^[a-z0-9_]+$/,
-      "Username can only contain lowercase letters, numbers, and underscores",
+      "Username can only contain letters, numbers, and underscores",
     ],
   },
   pronoun: {
@@ -119,24 +116,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     lowercase: true,
-    validate: {
-      validator: (value) => !value || isEmail(value),
-      message: "Please enter a valid email",
-    },
-    default: "",
+    validate: [isEmail, "Please enter a valid email"],
+    default: "example@gmail.com",
   },
   phone: {
     countryCode: {
       type: String,
       match: [/^\+\d{1,4}$/, "Invalid country code"],
-      maxlength: [5, "Invalid country code"],
+      maxlength: [5, "A country code cannot exceed 5 characters"],
       default: "+91",
     },
     number: {
       type: String,
-      maxLength: 15,
+      maxlength: [15, "A phone no. cannot exceed 15 characters"],
       match: [/^\d{10,}$/, "Invalid Phone No."],
-      default: "",
+      default: "0000000000",
     },
   },
   password: {
@@ -144,34 +138,38 @@ const userSchema = new mongoose.Schema({
     required: [true, "Password is required"],
     validate: [isStrongPassword, "Please enter a strong password"],
   },
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+    },
+  ],
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+    },
+  ],
+  used_otps: {
+    type: Array,
+  },
   createdAt: {
     type: String,
     default: () => moment().format("DD-MM-YYYY hh:mm:ss A"),
   },
-  used_otps: [
-    {
-      otp: {
-        type: String,
-        required: true,
-        minlength: 6,
-        maxlength: 6,
-      },
-      createdAt: {
-        type: String,
-        default: () => moment().format("DD-MM-YYYY hh:mm:ss A"),
-      },
-    },
-  ],
 });
 
 userSchema.pre("save", async function (next) {
+  this.secondaryEmail = this.secondaryEmail || "example@gmail.com";
   this.password = await bcrypt.hash(this.password, 12);
+  this.phone.countryCode = this.phone.countryCode || "+91";
+  this.phone.number = this.phone.number || "0000000000";
   this.wasNew = this.isNew;
   next();
 });
 
 userSchema.post("save", async function (userDoc, next) {
-  if (this.wasNew) console.log(`User ${userDoc.id} is successfully registered`);
+  if (this.wasNew) console.log(`User ${userDoc.id} saved successfully`);
   next();
 });
 

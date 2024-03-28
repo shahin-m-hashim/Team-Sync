@@ -1,23 +1,26 @@
 const userRouter = require("express").Router();
 
 const {
-  fetchProfilePic,
+  deleteAccount,
   updateProfilePic,
   deleteProfilePic,
-  fetchBasicDetails,
-  updateBasicDetails,
-  fetchPublicDetails,
-  updatePublicDetails,
+  fetchPrimaryDetails,
+  updatePrimaryDetails,
+  fetchSecondaryDetails,
+  updateSecondaryDetails,
 } = require("../controllers/userController");
 
-userRouter.get("/profilePic", fetchProfilePic);
+// GET Requests
+userRouter.get("/primaryDetails", fetchPrimaryDetails);
+userRouter.get("/SecondaryDetails", fetchSecondaryDetails);
+
+// PATCH Requests
 userRouter.patch("/profilePic", updateProfilePic);
+userRouter.patch("/primaryDetails", updatePrimaryDetails);
+userRouter.patch("/secondaryDetails", updateSecondaryDetails);
+
+// DELETE Requests
+userRouter.delete("/", deleteAccount);
 userRouter.delete("/profilePic", deleteProfilePic);
-
-userRouter.get("/basicDetails", fetchBasicDetails);
-userRouter.patch("/basicDetails", updateBasicDetails);
-
-userRouter.get("/publicDetails", fetchPublicDetails);
-userRouter.patch("/publicDetails", updatePublicDetails);
 
 module.exports = userRouter;
