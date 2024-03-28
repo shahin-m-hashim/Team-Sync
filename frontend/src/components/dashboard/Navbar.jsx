@@ -3,7 +3,7 @@ import { cn, getLocalSecureItem } from "@/lib/utils";
 import defaultDp from "../../assets/images/defaultDp.png";
 
 export default function Navbar({ settings }) {
-  const user = getLocalSecureItem("user", "medium");
+  const user = getLocalSecureItem("user", "low");
 
   return (
     <div
@@ -50,7 +50,7 @@ export default function Navbar({ settings }) {
           </defs>
         </svg>
         <img
-          src={user.profilePic || defaultDp}
+          src={user?.profilePic || defaultDp}
           alt="userDP"
           className="size-7"
         />
