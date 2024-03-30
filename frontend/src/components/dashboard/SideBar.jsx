@@ -6,12 +6,10 @@ import subTeams from "../../assets/images/subTeams.png";
 import tasks from "../../assets/images/tasks.png";
 import techSupport from "../../assets/images/Technical Support.png";
 import logoutIcon from "../../assets/images/logout.png";
-import { useNavigate } from "react-router-dom";
 import defaultDp from "../../assets/images/defaultDp.png";
-import { getLocalSecureItem } from "@/lib/utils";
+import { useContext } from "react";
+import { UserContext } from "@/providers/UserProvider";
 import { logout } from "@/services/auth";
-
-const user = getLocalSecureItem("user", "low");
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -20,17 +18,8 @@ const MenuItem = ({ icon, text }) => (
   </div>
 );
 
-export default function SideBar() {
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/loggedOut", { replace: true });
-    } catch (e) {
-      console.log(e);
-      navigate("/serverError", { replace: true });
-    }
-  };
+export default function SideBar({ setShowLoggedOut }) {
+  const { primaryData } = useContext(UserContext);
 
   return (
     <div
@@ -52,7 +41,12 @@ export default function SideBar() {
         className="inline-flex flex-col items-start gap-5 justify-evenly"
       >
         <MenuItem icon={techSupport} text="Support" />
-        <button onClick={() => handleLogout()}>
+        <button
+          onClick={() => {
+            logout();
+            setShowLoggedOut(true);
+          }}
+        >
           <MenuItem icon={logoutIcon} text="Logout" />
         </button>
       </div>
@@ -61,13 +55,17 @@ export default function SideBar() {
         className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
       >
         <img
-          src={user?.profilePic || defaultDp}
+          src={primaryData?.profilePic || defaultDp}
           alt="userDP"
           className="size-10"
         />
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{user?.username}</span>
-          <span className="text-[#BDBDBD] text-xs">{user?.tag}</span>
+          <span className="text-sm font-medium">
+            {primaryData?.username || "loading..."}
+          </span>
+          <span className="text-[#BDBDBD] text-xs">
+            {primaryData?.tag || "random user"}
+          </span>
         </div>
       </div>
     </div>

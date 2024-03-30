@@ -1,9 +1,8 @@
 import * as Yup from "yup";
+import { usernameValidation } from "./userValidations";
 
-// Regular expression for email validation
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-// Common password validation rules
 const passwordValidation = Yup.string()
   .min(8, "Password must be at least 8 characters long")
   .max(20, "Password cannot exceed 20 characters")
@@ -19,18 +18,12 @@ const emailValidation = Yup.string()
 
 const cPasswordValidation = Yup.string()
   .oneOf([Yup.ref("password"), null], "Passwords do not match")
-  .required("Required");
+  .required("Password is required");
 
 const signupValidationSchema = Yup.object({
-  username: Yup.string()
-    .min(5, "Username must be at least 5 characters long")
-    .max(20, "Username cannot exceed 20 characters")
-    .required("Username is required"),
-
+  username: usernameValidation,
   email: emailValidation,
-
   password: passwordValidation,
-
   cPassword: cPasswordValidation,
 });
 
@@ -49,6 +42,8 @@ const resetPasswordValidationSchema = Yup.object({
 });
 
 export {
+  emailValidation,
+  passwordValidation,
   signupValidationSchema,
   loginValidationSchema,
   forgotPasswordEmailValidationSchema,

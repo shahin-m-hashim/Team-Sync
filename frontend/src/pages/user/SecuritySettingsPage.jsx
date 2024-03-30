@@ -66,8 +66,6 @@ export default function SecuritySettingsPage() {
       <form
         className="h-svh w-svw overflow-auto my-10 text-white rounded-md shadow-md py-14 bg-[#2b2a2a]"
         onSubmit={handleSubmit}
-        method="post"
-        action="/api/login"
       >
         <h1 className="max-w-6xl mx-auto text-3xl">Sign In And Security</h1>
         <div className="grid max-w-6xl grid-cols-2 mx-auto mt-8 w gap-y-5 gap-x-10">

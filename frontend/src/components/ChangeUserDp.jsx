@@ -82,13 +82,13 @@ const LoadingSvg = () => (
   </svg>
 );
 
-export default function ChangeUserDp() {
-  const { userId, userDp = "" } = getLocalSecureItem("primary-user", "medium");
+export default function ChangeUserDp({ userDp }) {
+  const { id } = getLocalSecureItem("user", "low");
 
   const dpInputRef = useRef();
   const dpErrorRef = useRef();
   const storage = getStorage(app);
-  const storageRef = ref(storage, `users/${userId}/images/${userDp.name}`);
+  const storageRef = ref(storage, `users/${id}/images/${userDp}`);
 
   const [dp, setDp] = useState(userDp);
   const [showLoading, setShowLoading] = useState(false);
@@ -118,7 +118,7 @@ export default function ChangeUserDp() {
       await uploadBytes(storageRef, dp);
       const downloadURL = await getDownloadURL(storageRef);
       await axios.post("/user/uploadDp", {
-        userId,
+        id,
         profilePicture: downloadURL,
       });
       setDp(downloadURL); // Assuming the server returns the updated dp URL
@@ -138,7 +138,7 @@ export default function ChangeUserDp() {
     setShowLoading(true);
     try {
       await deleteObject(storageRef);
-      await axios.post("/user/uploadDp", { userId, profilePicture: "" });
+      await axios.post("/user/uploadDp", { id, profilePicture: "" });
       setDp(""); // Clear the dp
     } catch (error) {
       dpInputRef.current.value = "";
