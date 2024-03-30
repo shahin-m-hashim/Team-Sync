@@ -1,14 +1,42 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
+import Loading from "@/components/Loading";
 import useFetch from "@/hooks/useFetch";
-import { createContext, useEffect } from "react";
+import ReLoginPage from "@/pages/ReLoginPage";
+import { createContext } from "react";
 
-export default function UserProvider({ children }) {
-  const userContext = createContext();
-  const res = useFetch("/profile");
+export const UserContext = createContext();
 
-  useEffect(() => {
-    console.log(res);
-  });
+const UserProvider = ({ children }) => {
+  const primaryDetails = useFetch("primaryDetails");
+  const secondaryDetails = useFetch("secondaryDetails");
 
-  return <userContext.Provider>{children}</userContext.Provider>;
-}
+  console.log(
+    "primaryDetails: ",
+    primaryDetails,
+    "\nsecondaryDetails: ",
+    secondaryDetails
+  );
+
+  const primaryData = primaryDetails.apiData;
+  const secondaryData = secondaryDetails.apiData;
+
+  if (
+    primaryDetails.error === "Unauthorized" ||
+    secondaryDetails.error === "Unauthorized"
+  ) {
+    return <ReLoginPage />;
+  }
+
+  if (primaryDetails.isLoading && secondaryDetails.isLoading) {
+    return <Loading />;
+  }
+
+  return (
+    <UserContext.Provider value={{ primaryData, secondaryData }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+export default UserProvider;

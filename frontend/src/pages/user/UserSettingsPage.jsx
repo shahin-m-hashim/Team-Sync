@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { userValidationSchema as validationSchema } from "@/validations/userValidations";
 import Navbar from "@/components/dashboard/Navbar";
 import { useFormik } from "formik";
 import { cn } from "@/lib/utils";
 import ChangeUserDp from "@/components/ChangeUserDp";
+import { UserContext } from "@/providers/UserProvider";
 
 const InputField = ({
   variety,
@@ -42,25 +43,9 @@ const ErrorTxt = ({ text }) => (
 );
 
 export default function UserSettingsPage() {
-  const initialValues = {
-    fname: "",
-    username: "",
-    pronoun: "",
-    tag: "",
-    bio: "",
-    address: {
-      district: "",
-      state: "",
-      country: "",
-    },
-    occupation: "",
-    organization: "",
-    socialLinks: {
-      website: "",
-      linkedIn: "",
-      twitter: "",
-    },
-  };
+  const { primaryData } = useContext(UserContext);
+
+  const initialValues = primaryData;
 
   const onSubmit = async (values) => {
     resetForm();
@@ -88,7 +73,7 @@ export default function UserSettingsPage() {
       >
         <div className="flex flex-col gap-4 px-10 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
-          <ChangeUserDp />
+          <ChangeUserDp userDp={primaryData?.profilePic} />
           <div className="flex flex-col gap-2">
             {!enableEdit ? (
               <span className="text-xl font-semibold text-slate-800">

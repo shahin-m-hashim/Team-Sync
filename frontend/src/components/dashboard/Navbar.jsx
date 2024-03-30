@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
-import { cn, getLocalSecureItem } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import defaultDp from "../../assets/images/defaultDp.png";
+import { useContext } from "react";
+import { UserContext } from "@/providers/UserProvider";
 
 export default function Navbar({ settings }) {
-  const user = getLocalSecureItem("user", "low");
+  const { primaryData } = useContext(UserContext);
 
   return (
     <div
@@ -50,7 +52,7 @@ export default function Navbar({ settings }) {
           </defs>
         </svg>
         <img
-          src={user?.profilePic || defaultDp}
+          src={primaryData?.profilePic || defaultDp}
           alt="userDP"
           className="size-7"
         />

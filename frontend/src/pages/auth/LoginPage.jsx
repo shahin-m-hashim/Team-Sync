@@ -41,6 +41,9 @@ export default function LoginPage() {
     } catch (e) {
       if (e.code !== "ERR_NETWORK") {
         errorRef.current.innerText = e.response.data.error;
+        if (e.response.data.validationErrors) {
+          alert(JSON.stringify(e.response.data.validationErrors));
+        }
         document.body.addEventListener("click", handleLoginError);
       } else {
         console.log(e);
