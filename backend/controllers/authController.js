@@ -59,6 +59,7 @@ const loginController = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
+      data: { userId: id },
       message: "Login Successful",
     });
   } catch (e) {

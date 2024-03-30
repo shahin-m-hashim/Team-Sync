@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const verifyAccessToken = (req, res, next) => {
   console.log("Verifying access token");
   try {
-    const accessToken = req.headers.authorization.split(" ")[1];
+    const accessToken = req.cookies.accJwt;
     if (!accessToken) {
       return res
         .status(401)
@@ -13,12 +13,8 @@ const verifyAccessToken = (req, res, next) => {
     console.log("Access token verified successfully");
     req.user = req.params;
     next();
-  } catch (err) {
-    console.log("Invalid token:", err.message);
-    res.clearCookie("accJwt");
-    return res
-      .status(401)
-      .json({ status: false, error: "Access Denied. Invalid token." });
+  } catch (e) {
+    next(e);
   }
 };
 
