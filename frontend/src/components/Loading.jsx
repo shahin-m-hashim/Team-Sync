@@ -1,4 +1,4 @@
-export default function LoadingComponent() {
+export default function Loading() {
   return (
     <div
       role="status"

@@ -1,11 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFormik } from "formik";
+import showPass from "../../assets/images/ShowPass.png";
+import hidePass from "../../assets/images/HidePass.png";
 import { resetPasswordValidationSchema as validationSchema } from "../../validations/authValidations";
 import { resetPassword } from "@/services/auth";
+import { cn } from "@/lib/utils";
 
 const ResetPassword = ({ setShowInput }) => {
   const errorRef = useRef();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCPassword, setShowCPassword] = useState(false);
 
   const initialValues = {
     password: "",
@@ -48,8 +53,6 @@ const ResetPassword = ({ setShowInput }) => {
     <form
       className="w-full max-w-sm p-8 mx-auto space-y-6 bg-white rounded-md shadow-md"
       onSubmit={handleSubmit}
-      method="post"
-      action="/api/login"
     >
       <div className="mb-4">
         <label
@@ -58,14 +61,26 @@ const ResetPassword = ({ setShowInput }) => {
         >
           New Password
         </label>
-        <input
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Enter a secure password"
-          {...getFieldProps("password")}
-        />
+        <div className="relative flex items-center">
+          <input
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+            type={showPassword ? "text" : "password"}
+            id="password"
+            name="password"
+            placeholder="Enter a secure password"
+            {...getFieldProps("password")}
+          />
+          <img
+            className={cn(
+              showPassword ? "size-8" : "size-9 pb-1",
+              " size-8 absolute right-3 cursor-pointer"
+            )}
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+            src={showPassword ? showPass : hidePass}
+          />
+        </div>
         {errors.password && touched.password ? (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
             {errors.password}
@@ -79,14 +94,26 @@ const ResetPassword = ({ setShowInput }) => {
         >
           Confirm New Password
         </label>
-        <input
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-          type="password"
-          id="cPassword"
-          name="cPassword"
-          placeholder="Confirm Your Password"
-          {...getFieldProps("cPassword")}
-        />
+        <div className="relative flex items-center gap-3">
+          <input
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+            type={showCPassword ? "text" : "password"}
+            id="cPassword"
+            name="cPassword"
+            placeholder="Confirm Your Password"
+            {...getFieldProps("cPassword")}
+          />
+          <img
+            className={cn(
+              showCPassword ? "size-8" : "size-9 pb-1",
+              " size-8 absolute right-3 cursor-pointer"
+            )}
+            onClick={() => {
+              setShowCPassword(!showCPassword);
+            }}
+            src={showCPassword ? showPass : hidePass}
+          />
+        </div>
         {errors.cPassword && touched.cPassword ? (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
             {errors.cPassword}

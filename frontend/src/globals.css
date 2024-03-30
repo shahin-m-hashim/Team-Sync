@@ -55,11 +55,7 @@
   }
   html,
   body {
-    @apply w-screen h-screen overflow-hidden bg-background text-foreground;
-  }
-
-  root {
-    size: inherit;
+    @apply w-screen h-screen bg-background text-foreground;
   }
 }
 
@@ -68,7 +64,7 @@
     @apply w-2 h-full bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-md bg-[#94a3b8];
+    @apply rounded-md bg-[#307ae2];
   }
   ::-webkit-scrollbar-track {
     @apply bg-transparent;

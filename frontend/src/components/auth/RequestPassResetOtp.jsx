@@ -70,8 +70,6 @@ const RequestPassResetOTP = ({ setShowInput }) => {
       <form
         className="w-full max-w-sm p-8 mx-auto space-y-6 bg-white rounded-md shadow-md"
         onSubmit={handleSubmit}
-        method="post"
-        action="/api/login"
       >
         <div>
           <label
