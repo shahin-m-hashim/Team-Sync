@@ -37,6 +37,7 @@ const errorHandler = (error, req, res, next) => {
       });
 
     case "InvalidAccessToken":
+      res.clearCookie("accJwt");
       return res.status(401).json({
         success: false,
         error: "Access Denied. Invalid Access token.",
@@ -69,6 +70,13 @@ const errorHandler = (error, req, res, next) => {
 
     default:
       console.error("Error stack:", error.stack);
+      if (
+        error.message === "jwt malformed" ||
+        error.message === "invalid token"
+      ) {
+        res.clearCookie("accJwt");
+        res.clearCookie("refJwt");
+      }
       return res.status(500).json({
         success: false,
         error: "Internal Server Error",
