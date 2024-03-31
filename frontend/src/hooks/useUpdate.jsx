@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
-const useFetch = (url, reFetch) => {
+const useUpdate = (url, newData) => {
   const navigate = useNavigate();
   const user = getLocalSecureItem("user", "low");
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
@@ -16,13 +16,13 @@ const useFetch = (url, reFetch) => {
   });
 
   useEffect(() => {
-    // console.log("Fetching data...");
-
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
-          withCredentials: true,
-        });
+        const response = await axios.patch(
+          `${baseURL}/user/${user.id}/${url}`,
+          newData,
+          { withCredentials: true }
+        );
         setData({ apiData: response.data.data, error: null, isLoading: false });
       } catch (error) {
         handleFetchError(error);
@@ -34,8 +34,7 @@ const useFetch = (url, reFetch) => {
         await reAuthorize();
       } else if (
         error.code === "ERR_NETWORK" ||
-        error.message === "Network Error" ||
-        error.response.status === 500
+        error.message === "Network Error"
       ) {
         setData({
           apiData: null,
@@ -79,9 +78,9 @@ const useFetch = (url, reFetch) => {
     }
 
     return () => {};
-  }, [url, reFetch]);
+  }, [url]);
 
   return data;
 };
 
-export default useFetch;
+export default useUpdate;

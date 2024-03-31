@@ -83,12 +83,13 @@ const LoadingSvg = () => (
 );
 
 export default function ChangeUserDp({ userDp }) {
-  const { id } = getLocalSecureItem("user", "low");
+  const user = getLocalSecureItem("user", "low");
+  const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
   const dpInputRef = useRef();
   const dpErrorRef = useRef();
   const storage = getStorage(app);
-  const storageRef = ref(storage, `users/${id}/images/${userDp}`);
+  const storageRef = ref(storage, `users/${user?.id}/images/${userDp}`);
 
   const [dp, setDp] = useState(userDp);
   const [showLoading, setShowLoading] = useState(false);
@@ -117,11 +118,10 @@ export default function ChangeUserDp({ userDp }) {
     try {
       await uploadBytes(storageRef, dp);
       const downloadURL = await getDownloadURL(storageRef);
-      await axios.post("/user/uploadDp", {
-        id,
-        profilePicture: downloadURL,
+      const res = await axios.post(`${baseURL}/user/${user.id}/profilePic}`, {
+        newProfilePicture: downloadURL,
       });
-      setDp(downloadURL); // Assuming the server returns the updated dp URL
+      setDp(res.data.data.updatedProfilePic);
     } catch (error) {
       setDp("");
       dpInputRef.current.value = "";
@@ -138,8 +138,8 @@ export default function ChangeUserDp({ userDp }) {
     setShowLoading(true);
     try {
       await deleteObject(storageRef);
-      await axios.post("/user/uploadDp", { id, profilePicture: "" });
-      setDp(""); // Clear the dp
+      await axios.delete(`${baseURL}/user/${user.id}/profilePic}`);
+      setDp("");
     } catch (error) {
       dpInputRef.current.value = "";
       alert("Error deleting your Dp, try again later");
@@ -177,15 +177,15 @@ export default function ChangeUserDp({ userDp }) {
           src={addDp}
           alt="addDp"
           onClick={() => dpInputRef.current.click()}
-          className="absolute p-2 ml-1 bg-slate-800 bottom-4 right-8 rounded-3xl size-10 hover:cursor-pointer"
+          className="absolute p-1 bg-slate-800 bottom-4 right-12 rounded-3xl size-10 hover:cursor-pointer"
         />
       ) : (
-        <div className="absolute bottom-4 right-8">
+        <div className="absolute bottom-4 right-12">
           <img
             src={editDp}
             alt="editDp"
             onClick={() => setShowDropDown(!showDropDown)}
-            className="p-2 ml-1 bg-slate-800 rounded-3xl size-10 hover:cursor-pointer"
+            className="p-2 bg-slate-800 rounded-3xl size-10 hover:cursor-pointer"
           />
           {showDropDown && (
             <DropUpMenu

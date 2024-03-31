@@ -9,7 +9,7 @@ export default function ErrorPage() {
   useEffect(() => {
     const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate(`/user/${user?.id}/projects`, { replace: true });
+      navigate(`/user/${user?.id}/dashboard/projects`, { replace: true });
     }
     setRender(true);
     const timeoutId = setTimeout(() => navigate(-1, { replace: true }), 3000);
