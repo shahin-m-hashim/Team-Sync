@@ -5,16 +5,19 @@ import SignupPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
 import ServerErrorPage from "./pages/ServerErrorPage";
 import TaskDash from "./components/dashboard/TaskDash";
-import DummyUserPage from "./pages/user/DummyUserPage";
+import DummyUserPage from "./pages/DummyPage";
 import TeamDash from "./components/dashboard/TeamDash";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
+// import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import Test from "./pages/Test";
+import UserProvider from "./providers/UserProvider";
+import DummyPage from "./pages/DummyPage";
+import ReLoginPage from "./pages/ReLoginPage";
 
 const router = createBrowserRouter([
   {
@@ -32,9 +35,9 @@ const router = createBrowserRouter([
   {
     path: "user/:userId",
     element: (
-      <DashboardPage>
+      <UserProvider>
         <Outlet />
-      </DashboardPage>
+      </UserProvider>
     ),
     children: [
       {
@@ -42,30 +45,58 @@ const router = createBrowserRouter([
         element: <DummyUserPage />,
       },
       {
-        path: "projects",
-        element: <ProjectDash />,
+        path: "dashboard",
+        element: (
+          <DashboardPage>
+            <Outlet />
+          </DashboardPage>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DummyUserPage />,
+          },
+          {
+            path: "projects",
+            element: <ProjectDash />,
+          },
+          {
+            path: "teams",
+            element: <TeamDash />,
+          },
+          {
+            path: "subTeams",
+            element: <SubTeamDash />,
+          },
+          {
+            path: "tasks",
+            element: <TaskDash />,
+          },
+        ],
       },
       {
-        path: "teams",
-        element: <TeamDash />,
-      },
-      {
-        path: "subTeams",
-        element: <SubTeamDash />,
-      },
-      {
-        path: "tasks",
-        element: <TaskDash />,
-      },
-      {
-        path: "settings/general",
-        element: <UserSettingsPage />,
-      },
-      {
-        path: "settings/security",
-        element: <SecuritySettingsPage />,
+        path: "settings",
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            element: <DummyPage />,
+          },
+          {
+            path: "general",
+            element: <UserSettingsPage />,
+          },
+          // {
+          //   path: "security",
+          //   element: <SecuritySettingsPage />,
+          // },
+        ],
       },
     ],
+  },
+  {
+    path: "unauthorized",
+    element: <ReLoginPage />,
   },
   {
     path: "test",

@@ -54,7 +54,8 @@
     @apply p-0 m-0 border-border;
   }
   html,
-  body {
+  body,
+  #root {
     @apply w-screen h-screen bg-background text-foreground;
   }
 }
@@ -75,5 +76,22 @@
       scrollbar-width: thin;
       scrollbar-color: #94a3b8 transparent;
     }
+  }
+
+  /* react country select dropdown */
+  #country button {
+    @apply h-8 p-1 pr-3 bg-blue-300 border-none;
+  }
+
+  #country ul {
+    @apply text-black;
+  }
+
+  input:-webkit-autofill {
+    transition: background-color 1s 5000s;
+  }
+
+  .custom-toast {
+    width: 250px;
   }
 }
