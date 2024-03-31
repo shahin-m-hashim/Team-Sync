@@ -45,19 +45,17 @@ const setSecondaryDetails = async (userId, newSecondaryDetails) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
 
-  const { address, phone, occupation, organization } = newSecondaryDetails;
+  const { address, occupation, organization } = newSecondaryDetails;
 
-  user.phone = phone;
   user.occupation = occupation;
   user.organization = organization;
   user.address = { ...user.address, ...address };
 
   await user.save();
   return {
-    phone: user.phone,
+    address: user.address,
     occupation: user.occupation,
     organization: user.organization,
-    address: user.address,
   };
 };
 

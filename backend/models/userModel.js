@@ -160,10 +160,14 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
+
   this.secondaryEmail = this.secondaryEmail || "example@gmail.com";
-  this.password = await bcrypt.hash(this.password, 12);
   this.phone.countryCode = this.phone.countryCode || "+91";
   this.phone.number = this.phone.number || "0000000000";
+  this.address.country = this.address.country || "IN";
   this.wasNew = this.isNew;
   next();
 });
