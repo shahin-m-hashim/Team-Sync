@@ -1,9 +1,6 @@
 export default function Loading() {
   return (
-    <div
-      role="status"
-      className="flex flex-col items-center justify-center min-h-screen"
-    >
+    <div className="flex flex-col items-center justify-center size-full">
       <svg
         aria-hidden="true"
         className="text-gray-200 w-14 h-14 animate-spin dark:text-gray-600 fill-blue-600"
@@ -20,7 +17,6 @@ export default function Loading() {
           fill="currentFill"
         />
       </svg>
-      <span className="mt-3 text-lg font-medium text-blue-500">Loading...</span>
     </div>
   );
 }

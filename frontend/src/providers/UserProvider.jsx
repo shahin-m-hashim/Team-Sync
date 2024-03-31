@@ -1,22 +1,42 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import Loading from "@/components/Loading";
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import axios from "axios";
 import useFetch from "@/hooks/useFetch";
+import Loading from "@/components/Loading";
 import ReLoginPage from "@/pages/ReLoginPage";
-import { createContext } from "react";
+import { createContext, useState } from "react";
+import { getLocalSecureItem } from "@/lib/utils";
 
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const primaryDetails = useFetch("primaryDetails");
-  const secondaryDetails = useFetch("secondaryDetails");
+  const [reFetch, setReFetch] = useState(false);
+  const user = getLocalSecureItem("user", "low");
+  const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
-  console.log(
-    "primaryDetails: ",
-    primaryDetails,
-    "\nsecondaryDetails: ",
-    secondaryDetails
-  );
+  const updateData = async (url, newData) => {
+    try {
+      const response = await axios.patch(
+        `${baseURL}/user/${user.id}/${url}`,
+        newData,
+        { withCredentials: true }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (error.response?.status === 401) {
+        await reAuthorize(url, newData);
+      } else throw error;
+    }
+  };
+
+  const reAuthorize = async (url, newData) => {
+    await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+    await updateData(url, newData);
+  };
+
+  const primaryDetails = useFetch("primaryDetails", reFetch);
+  const secondaryDetails = useFetch("secondaryDetails", reFetch);
 
   const primaryData = primaryDetails.apiData;
   const secondaryData = secondaryDetails.apiData;
@@ -29,11 +49,22 @@ const UserProvider = ({ children }) => {
   }
 
   if (primaryDetails.isLoading && secondaryDetails.isLoading) {
-    return <Loading />;
+    return (
+      <div className="h-screen">
+        <Loading />
+      </div>
+    );
   }
 
   return (
-    <UserContext.Provider value={{ primaryData, secondaryData }}>
+    <UserContext.Provider
+      value={{
+        primaryData,
+        secondaryData,
+        updateData,
+        setReFetch,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

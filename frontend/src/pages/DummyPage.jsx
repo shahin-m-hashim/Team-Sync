@@ -8,7 +8,7 @@ const DummyUserPage = () => {
 
   useEffect(() => {
     if (user?.status === "LOGGED_IN")
-      navigate(`/user/${user?.id}/projects`, { replace: true });
+      navigate(`/user/${user?.id}/dashboard/projects`, { replace: true });
   });
 
   return <div className="bg-[#141414] h-full m-1">&nbsp;</div>;
