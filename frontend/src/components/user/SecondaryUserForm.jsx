@@ -73,17 +73,17 @@ export default function SecondaryUserForm({
   return (
     secondaryData && (
       <main className="relative px-10 py-5 bg-gray-600 size-full">
-        {isUpdateSuccess === "success" ? (
-          <SuccessfullUpdateAlert isUpdateSuccess={isUpdateSuccess} />
-        ) : (
-          isUpdateSuccess === "failed" && (
-            <FailedUpdateAlert isUpdateSuccess={isUpdateSuccess} />
-          )
-        )}
         {isLoading && (
           <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
             <Loading />
           </div>
+        )}
+        {isUpdateSuccess === "success" ? (
+          <SuccessfullUpdateAlert/>
+        ) : (
+          isUpdateSuccess === "failed" && (
+            <FailedUpdateAlert/>
+          )
         )}
         <span className="text-3xl">YOUR PUBLIC PROFILE</span>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5 mt-10">
@@ -247,15 +247,19 @@ export default function SecondaryUserForm({
                   <input
                     type="reset"
                     onClick={() => {
-                      setSelected(secondaryData?.address?.country);
                       resetForm();
+                      setSelected(secondaryData?.address?.country);
                     }}
                     className="w-full p-2 text-white bg-blue-500 rounded-sm hover:bg-blue-600"
                   />
                   <input
                     type="button"
                     value="Cancel"
-                    onClick={() => setEnableSecondaryEdit(false)}
+                    onClick={() => {
+                      resetForm();
+                      setSelected(secondaryData?.address?.country);
+                      setEnableSecondaryEdit(false);
+                    }}
                     className="w-full p-2 text-white bg-red-500 rounded-sm hover:bg-red-600"
                   />
                 </div>

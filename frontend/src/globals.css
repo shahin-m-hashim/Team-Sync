@@ -54,8 +54,7 @@
     @apply p-0 m-0 border-border;
   }
   html,
-  body,
-  #root {
+  body {
     @apply w-screen h-screen bg-background text-foreground;
   }
 }
