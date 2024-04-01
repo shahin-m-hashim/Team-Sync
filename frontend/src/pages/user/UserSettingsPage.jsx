@@ -17,7 +17,7 @@ export default function UserSettingsPage() {
     <>
       <Navbar settings={"min-h-10 py-2 m-0 z-10 fixed top-0 left-0 right-0"} />
       <div className=" text-white h-svh w-svw overflow-auto grid grid-cols-[300px,1fr] pt-10 bg-[#2b2a2a]">
-        <div className="flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
+        <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
           <ChangeUserDp />
           {!enablePrimaryEdit ? (
@@ -36,9 +36,7 @@ export default function UserSettingsPage() {
               </div>
               <hr />
               <div className="text-sm">
-                You have not specified anything for your bio. Click on the edit
-                button to add. Give a simple description about yourself in less
-                than 150 characters.
+                {primaryData?.bio || "Your Bio"}
               </div>
               <hr />
               <h3 className="text-xl font-semibold text text-slate-800">
@@ -47,15 +45,15 @@ export default function UserSettingsPage() {
               <div className="flex flex-col gap-2 text-base">
                 <div className="flex gap-2">
                   <img src={website} width={30} />
-                  <a>Website</a>
+                  <a href={primaryData?.socialLinks?.website}>{primaryData?.socialLinks?.website || "Website"}</a>
                 </div>
                 <div className="flex gap-2">
                   <img src={linkedIn} width={30} />
-                  <a>LinkedIn</a>
+                  <a href={primaryData?.socialLinks?.linkedIn}>{primaryData?.socialLinks?.linkedIn || "LinkedIn"}</a>
                 </div>
                 <div className="flex gap-2">
                   <img src={github} width={30} />
-                  <a>Github</a>
+                  <a href={primaryData?.socialLinks?.github}>{primaryData?.socialLinks?.github || "Github"}</a>
                 </div>
               </div>
               <div className="flex gap-2">
