@@ -2,17 +2,15 @@ const userRouter = require("express").Router();
 
 const {
   deleteAccount,
+  fetchUserDetails,
   updateProfilePic,
   deleteProfilePic,
-  fetchPrimaryDetails,
   updatePrimaryDetails,
-  fetchSecondaryDetails,
   updateSecondaryDetails,
 } = require("../controllers/userController");
 
 // GET Requests
-userRouter.get("/primaryDetails", fetchPrimaryDetails);
-userRouter.get("/SecondaryDetails", fetchSecondaryDetails);
+userRouter.get("/userDetails", fetchUserDetails);
 
 // PATCH Requests
 userRouter.patch("/profilePic", updateProfilePic);
