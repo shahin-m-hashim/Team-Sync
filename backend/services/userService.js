@@ -1,18 +1,11 @@
 const users = require("../models/userModel");
 
 // GET
-const getPrimaryDetails = async (userId) => {
+const getUserDetails = async (userId) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
-  const { fname, username, pronoun, tag, bio, socialLinks } = user;
-  return { fname, username, pronoun, tag, bio, socialLinks };
-};
-
-const getSecondaryDetails = async (userId) => {
-  const user = await users.findById(userId);
-  if (!user) throw new Error("UnknownUser");
-  const { phone, email, occupation, address, organization } = user;
-  return { phone, email, address, occupation, organization };
+  const { password, createdAt, usedOtps, __v, ...userData } = user._doc;
+  return userData;
 };
 
 // SET
@@ -81,9 +74,8 @@ const removeAccount = async (userId) => {
 module.exports = {
   removeAccount,
   setProfilePic,
+  getUserDetails,
   removeProfilePic,
-  getPrimaryDetails,
   setPrimaryDetails,
-  getSecondaryDetails,
   setSecondaryDetails,
 };

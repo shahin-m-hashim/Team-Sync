@@ -144,15 +144,35 @@ const userSchema = new mongoose.Schema({
       ref: "projects",
     },
   ],
+  teams: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "teams",
+    },
+  ],
+  subTeams: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "subTeams",
+    },
+  ],
+  tasks: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "tasks",
+    },
+  ],
   friends: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
   ],
-  used_otps: {
-    type: Array,
-  },
+  used_otps: [
+    {
+      type: Date,
+    },
+  ],
   createdAt: {
     type: String,
     default: () => moment().format("DD-MM-YYYY hh:mm:ss A"),

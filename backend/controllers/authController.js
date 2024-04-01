@@ -57,11 +57,7 @@ const loginController = async (req, res, next) => {
       });
     } else throw new Error("TokenCreationFailure");
 
-    return res.status(200).json({
-      success: true,
-      data: { userId: id },
-      message: "Login Successful",
-    });
+    return res.status(200).json({ userId: id });
   } catch (e) {
     if (e.name === "ValidationError") {
       const customError = new Error("ValidationError");
