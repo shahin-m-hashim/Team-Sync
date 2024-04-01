@@ -1,54 +1,33 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import axios from "axios";
 import useFetch from "@/hooks/useFetch";
 import Loading from "@/components/Loading";
 import ReLoginPage from "@/pages/ReLoginPage";
+import updateData from "@/utils/updateData";
 import { createContext, useState } from "react";
-import { getLocalSecureItem } from "@/lib/utils";
+import ServerErrorPage from "@/pages/ServerErrorPage";
 
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const [reFetch, setReFetch] = useState(false);
-  const user = getLocalSecureItem("user", "low");
-  const baseURL = import.meta.env.VITE_APP_BASE_URL;
+  const [reFetchUser, setReFetchUser] = useState(false);
+  const res = useFetch("userDetails", reFetchUser);
+  const userData = res?.apiData;
 
-  const updateData = async (url, newData) => {
-    try {
-      const response = await axios.patch(
-        `${baseURL}/user/${user.id}/${url}`,
-        newData,
-        { withCredentials: true }
-      );
-      return response.data.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        await reAuthorize(url, newData);
-      } else throw error;
-    }
-  };
-
-  const reAuthorize = async (url, newData) => {
-    await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  const updateUserDetails = async (url, newData) =>
     await updateData(url, newData);
-  };
 
-  const primaryDetails = useFetch("primaryDetails", reFetch);
-  const secondaryDetails = useFetch("secondaryDetails", reFetch);
-
-  const primaryData = primaryDetails.apiData;
-  const secondaryData = secondaryDetails.apiData;
-
-  if (
-    primaryDetails.error === "Unauthorized" ||
-    secondaryDetails.error === "Unauthorized"
-  ) {
+  if (res?.error === "unauthorized") {
+    localStorage.clear();
     return <ReLoginPage />;
   }
 
-  if (primaryDetails.isLoading && secondaryDetails.isLoading) {
+  if (res?.error === "serverError") {
+    return <ServerErrorPage />;
+  }
+
+  if (res?.isLoading) {
     return (
       <div className="h-screen">
         <Loading />
@@ -59,10 +38,9 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        primaryData,
-        secondaryData,
-        updateData,
-        setReFetch,
+        userData,
+        updateUserDetails,
+        setReFetchUser,
       }}
     >
       {children}

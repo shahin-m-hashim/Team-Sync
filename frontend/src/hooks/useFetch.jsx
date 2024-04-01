@@ -2,10 +2,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
 
 const useFetch = (url, reFetch) => {
-  const navigate = useNavigate();
   const user = getLocalSecureItem("user", "low");
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
@@ -16,14 +14,13 @@ const useFetch = (url, reFetch) => {
   });
 
   useEffect(() => {
-    // console.log("Fetching data...");
-
     const fetchData = async () => {
+      // console.log("Fetching data...");
       try {
-        const response = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
+        const { data } = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
           withCredentials: true,
         });
-        setData({ apiData: response.data.data, error: null, isLoading: false });
+        setData({ apiData: data, error: null, isLoading: false });
       } catch (error) {
         handleFetchError(error);
       }
@@ -39,10 +36,9 @@ const useFetch = (url, reFetch) => {
       ) {
         setData({
           apiData: null,
-          error: "Server Error",
+          error: "serverError",
           isLoading: false,
         });
-        navigate("/serverError", { replace: true });
       } else {
         setData({
           apiData: null,
@@ -60,10 +56,9 @@ const useFetch = (url, reFetch) => {
         {
           setData({
             apiData: null,
-            error: "Unauthorized",
+            error: "unauthorized",
             isLoading: false,
           });
-          localStorage.clear();
         }
       }
     };
@@ -73,7 +68,7 @@ const useFetch = (url, reFetch) => {
     } else {
       setData({
         apiData: null,
-        error: "Unauthorized",
+        error: "unauthorized",
         isLoading: false,
       });
     }
