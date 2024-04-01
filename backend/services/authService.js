@@ -5,7 +5,10 @@ const users = require("../models/userModel");
 const otps = require("../models/otpModel");
 const otpGenerator = require("otp-generator");
 
-const signUpUser = async (user) => await users.create(user);
+const signUpUser = async (user) => {
+  const { id } = await users.create(user);
+  console.log(`User registered with id: ${id}`);
+};
 
 const loginUser = async (email, password) => {
   const user = await users.findOne({ email });

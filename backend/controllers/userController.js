@@ -1,29 +1,18 @@
 const {
   removeAccount,
+  getUserDetails,
   setProfilePic,
   removeProfilePic,
-  getPrimaryDetails,
   setPrimaryDetails,
-  getSecondaryDetails,
   setSecondaryDetails,
 } = require("../services/userService");
 
 // FETCH REQUESTS
-const fetchPrimaryDetails = async (req, res, next) => {
+const fetchUserDetails = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const PrimaryDetails = await getPrimaryDetails(userId);
-    res.status(200).json({ success: true, data: PrimaryDetails });
-  } catch (e) {
-    next(e);
-  }
-};
-
-const fetchSecondaryDetails = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const SecondaryDetails = await getSecondaryDetails(userId);
-    res.status(200).json({ success: true, data: SecondaryDetails });
+    const userDetails = await getUserDetails(userId);
+    res.status(200).json(userDetails);
   } catch (e) {
     next(e);
   }
@@ -35,11 +24,7 @@ const updateProfilePic = async (req, res, next) => {
     const { userId } = req.user;
     const { newProfilePic } = req.body;
     const updatedProfilePic = await setProfilePic(userId, newProfilePic);
-    res.status(200).json({
-      success: true,
-      data: { updatedProfilePic },
-      message: "Profile picture updated successfully",
-    });
+    res.status(200).json({ updatedProfilePic });
   } catch (e) {
     next(e);
   }
@@ -49,14 +34,10 @@ const updatePrimaryDetails = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { newPrimaryDetails } = req.body;
-    const updatedPrimaryDetails = await setPrimaryDetails(
-      userId,
-      newPrimaryDetails
-    );
+    await setPrimaryDetails(userId, newPrimaryDetails);
     res.status(200).json({
       success: true,
-      data: { updatedPrimaryDetails },
-      message: "Basic details updated successfully",
+      message: "Primary details updated successfully",
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -78,9 +59,6 @@ const updateSecondaryDetails = async (req, res, next) => {
     );
     res.status(200).json({
       success: true,
-      data: {
-        updatedSecondaryDetails,
-      },
       message: "Secondary details updated successfully",
     });
   } catch (e) {
@@ -126,8 +104,7 @@ module.exports = {
   deleteAccount,
   updateProfilePic,
   deleteProfilePic,
-  fetchPrimaryDetails,
+  fetchUserDetails,
   updatePrimaryDetails,
-  fetchSecondaryDetails,
   updateSecondaryDetails,
 };
