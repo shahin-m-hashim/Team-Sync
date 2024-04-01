@@ -19,7 +19,7 @@ const MenuItem = ({ icon, text }) => (
 );
 
 export default function SideBar({ setShowLoggedOut }) {
-  const { primaryData } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   return (
     <div
@@ -55,16 +55,16 @@ export default function SideBar({ setShowLoggedOut }) {
         className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
       >
         <img
-          src={primaryData?.profilePic || defaultDp}
+          src={userData?.profilePic || defaultDp}
           alt="userDP"
           className="size-10"
         />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">
-            {primaryData?.username || "loading..."}
+            {userData?.username || "loading..."}
           </span>
           <span className="text-[#BDBDBD] text-xs">
-            {primaryData?.tag || "random user"}
+            {userData?.tag || "random user"}
           </span>
         </div>
       </div>

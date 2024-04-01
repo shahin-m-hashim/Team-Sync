@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { UserContext } from "@/providers/UserProvider";
 
 export default function Navbar({ settings }) {
-  const { primaryData } = useContext(UserContext);
+  const { userData } = useContext(UserContext);
 
   return (
     <div
@@ -52,7 +52,7 @@ export default function Navbar({ settings }) {
           </defs>
         </svg>
         <img
-          src={primaryData?.profilePic || defaultDp}
+          src={userData?.profilePic || defaultDp}
           alt="userDP"
           className="size-7"
         />

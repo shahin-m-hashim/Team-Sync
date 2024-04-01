@@ -14,12 +14,12 @@ const login = async (credentials) => {
   setLocalSecureItem(
     "user",
     {
-      id: data.data.userId,
+      id: data.userId,
       status: "LOGGED_IN",
     },
     "low"
   );
-  return data.data.userId;
+  return data.userId;
 };
 
 const reqPassResetOTP = async (credentials) => {

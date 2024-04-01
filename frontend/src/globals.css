@@ -86,10 +86,6 @@
     @apply text-black;
   }
 
-  input:-webkit-autofill {
-    transition: background-color 1s 5000s;
-  }
-
   .custom-toast {
     width: 250px;
   }

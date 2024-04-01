@@ -12,8 +12,14 @@ import {
   deleteObject,
   getDownloadURL,
 } from "firebase/storage";
-import app from "@/lib/firebase";
+
+import {
+  notifyUpdateFailure,
+  notifyUpdateSuccess,
+} from "@/helpers/triggerUpdateToast";
+
 import axios from "axios";
+import app from "@/lib/firebase";
 
 const MAX_DP_SIZE = 2 * 1024 * 1024;
 // const base_url = import.meta.env.VITE_APP_BASE_URL;
@@ -82,7 +88,7 @@ const LoadingSvg = () => (
   </svg>
 );
 
-export default function ChangeUserDp({ userDp }) {
+export default function ChangeUserDp({ userDp, setError, updateUserDetails }) {
   const user = getLocalSecureItem("user", "low");
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
@@ -91,8 +97,8 @@ export default function ChangeUserDp({ userDp }) {
   const storage = getStorage(app);
   const storageRef = ref(storage, `users/${user?.id}/images/${userDp}`);
 
-  const [dp, setDp] = useState(userDp);
-  const [showLoading, setShowLoading] = useState(false);
+  const [dp, setDp] = useState(URL.createObjectURL(userDp));
+  const [isLoading, setIsLoading] = useState(false);
   const [showDropDown, setShowDropDown] = useState(false);
 
   const handleDpChange = (e) => {
@@ -113,39 +119,52 @@ export default function ChangeUserDp({ userDp }) {
 
   const handleSaveDp = async () => {
     if (!dp) return;
-    setShowLoading(true);
+    setIsLoading(true);
 
     try {
       await uploadBytes(storageRef, dp);
       const downloadURL = await getDownloadURL(storageRef);
-      const res = await axios.post(`${baseURL}/user/${user.id}/profilePic}`, {
-        newProfilePicture: downloadURL,
+
+      const { data } = await updateUserDetails("profilePic", {
+        newProfilePic: downloadURL,
       });
-      setDp(res.data.data.updatedProfilePic);
+
+      setDp(data.updatedProfilePic);
+      notifyUpdateSuccess();
     } catch (error) {
-      setDp("");
-      dpInputRef.current.value = "";
+      console.log("error");
       await deleteObject(storageRef);
-      alert("Error setting your Dp, try again later");
-      console.error("Error uploading file:", error);
+      if (error.response?.status === 401) {
+        setError("unauthorized");
+      } else if (
+        error.code === "ERR_NETWORK" ||
+        error.message === "Network Error" ||
+        error.response?.status === 500
+      ) {
+        setError("serverError");
+      } else {
+        setDp(userDp);
+        dpInputRef.current.value = "";
+        console.error("Error uploading file:", error);
+        notifyUpdateFailure();
+      }
     } finally {
-      setShowDropDown(false);
-      setShowLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleDeleteDp = async () => {
-    setShowLoading(true);
+    setIsLoading(true);
     try {
       await deleteObject(storageRef);
       await axios.delete(`${baseURL}/user/${user.id}/profilePic}`);
       setDp("");
     } catch (error) {
       dpInputRef.current.value = "";
-      alert("Error deleting your Dp, try again later");
       console.error("Error deleting file:", error);
+      notifyUpdateFailure();
     } finally {
-      setShowLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -157,7 +176,7 @@ export default function ChangeUserDp({ userDp }) {
           alt="display-picture"
           className="mx-auto rounded-[50%] size-[150px] object-cover object-center"
         />
-        {showLoading && <LoadingSvg />}
+        {isLoading && <LoadingSvg />}
       </div>
       <div
         ref={dpErrorRef}
