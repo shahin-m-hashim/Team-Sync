@@ -4,8 +4,8 @@ const users = require("../models/userModel");
 const getPrimaryDetails = async (userId) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
-  const { profilePic, username, fname, tag, bio, socialLinks } = user;
-  return { profilePic, username, fname, tag, bio, socialLinks };
+  const { fname, username, pronoun, tag, bio, socialLinks } = user;
+  return { fname, username, pronoun, tag, bio, socialLinks };
 };
 
 const getSecondaryDetails = async (userId) => {
@@ -27,14 +27,18 @@ const setProfilePic = async (userId, newProfilePic) => {
 const setPrimaryDetails = async (userId, newPrimaryDetails) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
-  const { fname, tag, bio, socialLinks } = newPrimaryDetails;
+  const { fname, username, pronoun, tag, bio, socialLinks } = newPrimaryDetails;
+  user.fname = fname;
+  user.username = username;
+  user.pronoun = pronoun;
   user.tag = tag;
   user.bio = bio;
-  user.fname = fname;
   user.socialLinks = { ...user.socialLinks, ...socialLinks };
   await user.save();
   return {
     fname: user.fname,
+    username: user.username,
+    pronoun: user.pronoun,
     tag: user.tag,
     bio: user.bio,
     socialLinks: user.socialLinks,
