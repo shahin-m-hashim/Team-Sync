@@ -1,11 +1,10 @@
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
+import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
-import ServerErrorPage from "./pages/ServerErrorPage";
 import TaskDash from "./components/dashboard/TaskDash";
-import DummyUserPage from "./pages/DummyPage";
 import TeamDash from "./components/dashboard/TeamDash";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
@@ -15,9 +14,8 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import Test from "./pages/Test";
-import UserProvider from "./providers/UserProvider";
 import DummyPage from "./pages/DummyPage";
-import ReLoginPage from "./pages/ReLoginPage";
+import UserProvider from "./providers/UserProvider";
 
 const router = createBrowserRouter([
   {
@@ -95,20 +93,12 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "unauthorized",
-    element: <ReLoginPage />,
-  },
-  {
     path: "test",
     element: <Test />,
   },
   {
     path: "resetPass",
     element: <ResetPasswordPage />,
-  },
-  {
-    path: "serverError",
-    element: <ServerErrorPage />,
   },
   {
     path: "*",

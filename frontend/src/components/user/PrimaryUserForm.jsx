@@ -1,55 +1,52 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from "react";
+import Loading from "../Loading";
 import { useFormik } from "formik";
+import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
 import { primaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
-import { useNavigate } from "react-router-dom";
-import SuccessfullUpdateAlert from "../toasts/SuccessfullUpdateAlert";
-import FailedUpdateAlert from "../toasts/FailedUpdateAlert";
-import Loading from "../Loading";
 
-export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
-  const navigate = useNavigate();
+import {
+  notifyUpdateFailure,
+  notifyUpdateSuccess,
+} from "@/helpers/triggerUpdateToast";
+
+export default function PrimaryUserForm({ setError, setEnablePrimaryEdit }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdateSuccess, setIsUpdateSuccess] = useState(null);
-
-  const { primaryData, updateData, setReFetch } = useContext(UserContext);
+  const { userData, updateUserDetails, setReFetchUser } =
+    useContext(UserContext);
 
   const initialValues = {
-    fname: primaryData?.fname,
-    username: primaryData?.username,
-    pronoun: primaryData?.pronoun,
-    tag: primaryData?.tag,
-    bio: primaryData?.bio,
-    socialLinks: primaryData?.socialLinks,
+    fname: userData?.fname,
+    username: userData?.username,
+    pronoun: userData?.pronoun,
+    tag: userData?.tag,
+    bio: userData?.bio,
+    socialLinks: userData?.socialLinks,
   };
 
   const onSubmit = async (values) => {
     setIsLoading(true);
     try {
-      await updateData("primaryDetails", { newPrimaryDetails: values });
-      setIsUpdateSuccess("success");
+      await updateUserDetails("primaryDetails", { newPrimaryDetails: values });
+      notifyUpdateSuccess();
     } catch (error) {
-      resetForm();
-      setIsUpdateSuccess("failed");
       if (error.response?.status === 401) {
-        {
-          localStorage.clear();
-          navigate("/unauthorized", { replace: true });
-        }
+        setError("unauthorized");
       } else if (
         error.code === "ERR_NETWORK" ||
         error.message === "Network Error" ||
         error.response?.status === 500
       ) {
-        navigate("/serverError", { replace: true });
+        setError("serverError");
       } else {
+        resetForm();
+        notifyUpdateFailure();
         console.error(error);
       }
     } finally {
-      setReFetch((prev) => !prev);
       setIsLoading(false);
       setEnablePrimaryEdit(false);
+      setReFetchUser((prev) => !prev);
     }
   };
 
@@ -67,11 +64,6 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
         <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
           <Loading />
         </div>
-      )}
-      {isUpdateSuccess === "success" ? (
-        <SuccessfullUpdateAlert />
-      ) : (
-        isUpdateSuccess === "failed" && <FailedUpdateAlert />
       )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
@@ -105,7 +97,7 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
               className="w-1/2 text-black"
               {...getFieldProps("pronoun")}
             >
-              {!primaryData?.pronoun && (
+              {!userData?.pronoun && (
                 <option value="" className="hidden">
                   Pronoun
                 </option>
@@ -188,20 +180,20 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
           )}
         </div>
         <div className="flex gap-2">
-          <button type="submit" className="px-2 bg-green-500">
+          <button type="submit" className="w-full px-2 bg-green-500">
             Save
           </button>
           <button
             type="reset"
-            onClick={() => resetForm}
-            className="px-2 bg-blue-500"
+            onClick={() => resetForm()}
+            className="w-full px-2 bg-blue-500"
           >
             Reset
           </button>
           <button
             type="button"
             onClick={() => setEnablePrimaryEdit(false)}
-            className="px-2 bg-red-500"
+            className="w-full px-2 bg-red-500"
           >
             Cancel
           </button>
