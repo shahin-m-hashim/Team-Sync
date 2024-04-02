@@ -9,10 +9,12 @@ import PrimaryUserForm from "@/components/user/PrimaryUserForm";
 import SecondaryUserForm from "@/components/user/SecondaryUserForm";
 import ReLoginPage from "../ReLoginPage";
 import ServerErrorPage from "../ServerErrorPage";
+import DeleteAccount from "@/components/auth/DeleteAccount";
 
 export default function UserSettingsPage() {
   const [error, setError] = useState();
   const { userData } = useContext(UserContext);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [enablePrimaryEdit, setEnablePrimaryEdit] = useState(false);
   const [enableSecondaryEdit, setEnableSecondaryEdit] = useState(false);
 
@@ -27,6 +29,12 @@ export default function UserSettingsPage() {
 
   return (
     <>
+      {showDeleteModal && (
+        <DeleteAccount
+          setError={setError}
+          setShowDeleteModal={setShowDeleteModal}
+        />
+      )}
       <Navbar settings={"min-h-10 py-2 m-0 z-10 fixed top-0 left-0 right-0"} />
       <div className=" text-white h-svh w-svw overflow-auto grid grid-cols-[300px,1fr] pt-10 bg-[#2b2a2a]">
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
@@ -105,6 +113,7 @@ export default function UserSettingsPage() {
             </div>
             <button
               type="button"
+              onClick={() => setShowDeleteModal(true)}
               className="p-2 bg-red-600 rounded-sm hover:bg-red-500"
             >
               Delete Your Account

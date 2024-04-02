@@ -165,7 +165,7 @@ export default function PrimaryUserForm({ setError, setEnablePrimaryEdit }) {
           <input
             type="text"
             name="socialLinks.github"
-            placeholder="Twitter"
+            placeholder="Github"
             {...getFieldProps("socialLinks.github")}
             className="p-1 text-slate-800"
           />
