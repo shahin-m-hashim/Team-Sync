@@ -86,11 +86,12 @@ const deleteProfilePic = async (req, res, next) => {
 };
 
 const deleteAccount = async (req, res, next) => {
+  const { userId } = req.user;
+  const { password } = req.body;
   try {
+    await removeAccount(userId, password);
     res.clearCookie("accJwt");
     res.clearCookie("refJwt");
-    const { userId } = req.user;
-    await removeAccount(userId);
     res.status(200).json({
       success: true,
       message: "Account deleted successfully",
