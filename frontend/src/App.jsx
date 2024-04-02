@@ -10,12 +10,12 @@ import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-// import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 import Test from "./pages/Test";
 import DummyPage from "./pages/DummyPage";
 import UserProvider from "./providers/UserProvider";
+import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 
 const router = createBrowserRouter([
   {
@@ -84,10 +84,10 @@ const router = createBrowserRouter([
             path: "general",
             element: <UserSettingsPage />,
           },
-          // {
-          //   path: "security",
-          //   element: <SecuritySettingsPage />,
-          // },
+          {
+            path: "security",
+            element: <SecuritySettingsPage />,
+          },
         ],
       },
     ],
