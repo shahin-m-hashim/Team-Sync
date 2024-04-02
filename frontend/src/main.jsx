@@ -13,7 +13,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       draggable={true}
       transition={Flip}
       theme="colored"
-      style={{ width: "250px" }}
+      style={{
+        width: "fit-content",
+        paddingRight: "1rem",
+        paddingLeft: "1rem",
+      }}
       limit={3}
     />
     <BreakPoint />

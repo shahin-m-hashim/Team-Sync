@@ -1,11 +1,67 @@
 /* eslint-disable react/prop-types */
-import { cn } from "@/lib/utils";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import defaultDp from "../../assets/images/defaultDp.png";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
+import { Link } from "react-router-dom";
+import { logout } from "@/services/auth";
 
-export default function Navbar({ settings }) {
+const DropDownMenu = ({ name, setShowLoggedOut }) => {
+  const user = getLocalSecureItem("user", "low");
+  return (
+    <div className="absolute z-10 bg-slate-300 divide-y divide-black rounded-lg shadow min-w-[10vw] right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
+      {name && (
+        <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
+          <div>{name}</div>
+        </div>
+      )}
+      <ul
+        className="py-2 text-sm text-gray-700 dark:text-gray-200"
+        aria-labelledby="dropdownUserAvatarButton"
+      >
+        <li>
+          <Link
+            to={`/user/${user?.id}/dashboard/projects`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link
+            to={`/user/${user?.id}/settings/general`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Settings
+          </Link>
+        </li>
+        <li>
+          <Link
+            to={`/user/${user?.id}/settings/general`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Security
+          </Link>
+        </li>
+      </ul>
+      <div className="py-2">
+        <button
+          onClick={() => {
+            logout();
+            setShowLoggedOut(true);
+          }}
+          className="w-full px-4 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default function Navbar({ settings, setShowLoggedOut }) {
   const { userData } = useContext(UserContext);
+  const [showDropDown, setShowDropDown] = useState(false);
 
   return (
     <div
@@ -51,11 +107,20 @@ export default function Navbar({ settings }) {
             />
           </defs>
         </svg>
-        <img
-          src={userData?.profilePic || defaultDp}
-          alt="userDP"
-          className="size-7 rounded-[50%] object-cover object-center"
-        />
+        <div className="relative">
+          <img
+            alt="userDP"
+            src={userData?.profilePic || defaultDp}
+            onClick={() => setShowDropDown(!showDropDown)}
+            className="size-7 rounded-[50%] object-cover object-center"
+          />
+          {showDropDown && (
+            <DropDownMenu
+              name={userData.fname}
+              setShowLoggedOut={setShowLoggedOut}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

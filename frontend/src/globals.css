@@ -57,10 +57,6 @@
   body {
     @apply w-screen h-screen bg-background text-foreground;
   }
-
-  #root {
-    height: inherit;
-  }
 }
 
 @layer components {
