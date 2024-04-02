@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import Loading from "../Loading";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import ReactFlagsSelect from "react-flags-select";
 import { UserContext } from "@/providers/UserProvider";
 import { secondaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
@@ -15,7 +14,6 @@ export default function SecondaryUserForm({
   enableSecondaryEdit,
   setEnableSecondaryEdit,
 }) {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { userData, updateUserDetails, setReFetchUser } =
     useContext(UserContext);
@@ -43,7 +41,7 @@ export default function SecondaryUserForm({
         error.message === "Network Error" ||
         error.response?.status === 500
       ) {
-        navigate("/serverError", { replace: true });
+        setError("serverError");
       } else {
         resetForm();
         toast.error("Update failed !!!");
