@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const users = require("../models/userModel");
 
 // GET
@@ -64,10 +65,15 @@ const removeProfilePic = async (userId) => {
   await user.save();
 };
 
-const removeAccount = async (userId) => {
+const removeAccount = async (userId, password) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
-  if (user.role === "ADMIN") await users.findByIdAndDelete(userId);
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) throw new Error("InvalidPassword");
+
+  if (user.role === "ADMIN" && isPasswordValid)
+    await users.findByIdAndDelete(userId);
   else throw new Error("AccountDeletionError");
 };
 
