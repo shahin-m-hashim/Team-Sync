@@ -20,6 +20,10 @@ const cPasswordValidation = Yup.string()
   .oneOf([Yup.ref("password"), null], "Passwords do not match")
   .required("Password is required");
 
+const cNewPasswordValidation = Yup.string()
+  .oneOf([Yup.ref("newPassword"), null], "Passwords do not match")
+  .required("Password is required");
+
 const signupValidationSchema = Yup.object({
   username: usernameValidation,
   email: emailValidation,
@@ -36,7 +40,8 @@ const forgotPasswordEmailValidationSchema = Yup.object({
   email: emailValidation,
 });
 
-const securitySettingsValidationSchema = Yup.object({
+const contactSettingsValidationSchema = Yup.object({
+  secondaryEmail: emailValidation,
   phone: Yup.object().shape({
     countryCode: Yup.string()
       .matches(/^\+\d{1,4}$/, "Invalid country code")
@@ -45,12 +50,17 @@ const securitySettingsValidationSchema = Yup.object({
       .matches(/^\d{10,}$/, "Invalid Phone No.")
       .max(15, "A phone no. cannot exceed 15 characters"),
   }),
-  secondaryEmail: emailValidation,
 });
 
 const resetPasswordValidationSchema = Yup.object({
   password: passwordValidation,
   cPassword: cPasswordValidation,
+});
+
+const securitySettingsValidationSchema = Yup.object({
+  currentPassword: passwordValidation,
+  newPassword: passwordValidation,
+  cNewPassword: cNewPasswordValidation,
 });
 
 export {
@@ -59,6 +69,7 @@ export {
   loginValidationSchema,
   signupValidationSchema,
   resetPasswordValidationSchema,
+  contactSettingsValidationSchema,
   securitySettingsValidationSchema,
   forgotPasswordEmailValidationSchema,
 };
