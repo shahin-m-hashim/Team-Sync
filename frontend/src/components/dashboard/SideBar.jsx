@@ -57,7 +57,7 @@ export default function SideBar({ setShowLoggedOut }) {
         <img
           src={userData?.profilePic || defaultDp}
           alt="userDP"
-          className="size-10"
+          className="rounded-[50%] object-cover object-center size-10"
         />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">
