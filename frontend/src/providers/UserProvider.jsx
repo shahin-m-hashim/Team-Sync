@@ -4,9 +4,9 @@
 import useFetch from "@/hooks/useFetch";
 import Loading from "@/components/Loading";
 import ReLoginPage from "@/pages/ReLoginPage";
-import updateData from "@/utils/updateData";
 import { createContext, useState } from "react";
 import ServerErrorPage from "@/pages/ServerErrorPage";
+import { deleteData, updateData } from "@/services/db";
 
 export const UserContext = createContext();
 
@@ -17,6 +17,10 @@ const UserProvider = ({ children }) => {
 
   const updateUserDetails = async (url, newData) =>
     await updateData(url, newData);
+
+  const deleteUserData = async (url) => {
+    await deleteData(url);
+  };
 
   if (res?.error === "unauthorized") {
     localStorage.clear();
@@ -40,6 +44,7 @@ const UserProvider = ({ children }) => {
       value={{
         userData,
         updateUserDetails,
+        deleteUserData,
         setReFetchUser,
       }}
     >

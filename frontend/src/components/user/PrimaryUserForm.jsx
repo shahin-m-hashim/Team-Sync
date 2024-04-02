@@ -4,11 +4,7 @@ import { useFormik } from "formik";
 import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
 import { primaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
-
-import {
-  notifyUpdateFailure,
-  notifyUpdateSuccess,
-} from "@/helpers/triggerUpdateToast";
+import { toast } from "react-toastify";
 
 export default function PrimaryUserForm({ setError, setEnablePrimaryEdit }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +24,7 @@ export default function PrimaryUserForm({ setError, setEnablePrimaryEdit }) {
     setIsLoading(true);
     try {
       await updateUserDetails("primaryDetails", { newPrimaryDetails: values });
-      notifyUpdateSuccess();
+      toast.success("Details Updated Successfully");
     } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");
@@ -40,8 +36,8 @@ export default function PrimaryUserForm({ setError, setEnablePrimaryEdit }) {
         setError("serverError");
       } else {
         resetForm();
-        notifyUpdateFailure();
         console.error(error);
+        toast.error("Update failed !!!");
       }
     } finally {
       setIsLoading(false);
