@@ -2,7 +2,7 @@
 import addDp from "../assets/images/addDp.png";
 import editDp from "../assets/images/editDp.png";
 import defaultDp from "../assets/images/defaultDp.png";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
 
 import {
@@ -13,13 +13,9 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
-import {
-  notifyUpdateFailure,
-  notifyUpdateSuccess,
-} from "@/helpers/triggerUpdateToast";
-
-import axios from "axios";
 import app from "@/lib/firebase";
+import { UserContext } from "@/providers/UserProvider";
+import { toast } from "react-toastify";
 
 const MAX_DP_SIZE = 2 * 1024 * 1024;
 // const base_url = import.meta.env.VITE_APP_BASE_URL;
@@ -88,52 +84,87 @@ const LoadingSvg = () => (
   </svg>
 );
 
-export default function ChangeUserDp({ userDp, setError, updateUserDetails }) {
+export default function ChangeUserDp({ setError }) {
   const user = getLocalSecureItem("user", "low");
-  const baseURL = import.meta.env.VITE_APP_BASE_URL;
+  const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
+    useContext(UserContext);
 
   const dpInputRef = useRef();
   const dpErrorRef = useRef();
   const storage = getStorage(app);
-  const storageRef = ref(storage, `users/${user?.id}/images/${userDp}`);
+  const storageRef = ref(storage, `users/${user?.id}/images/profilePic`);
 
-  const [dp, setDp] = useState(URL.createObjectURL(userDp));
+  const [dpFile, setDpFile] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [dp, setDp] = useState(userData?.profilePic);
   const [showDropDown, setShowDropDown] = useState(false);
 
   const handleDpChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > MAX_DP_SIZE) {
-      dpErrorRef.current.style.display = "block";
+      dpErrorRef.current.style.display = "flex";
       return;
+    } else {
+      dpErrorRef.current.style.display = "none";
     }
+    setDpFile(file);
     setDp(URL.createObjectURL(file));
+    setShowDropDown(true);
   };
 
   const handleCancelDp = () => {
-    setDp(userDp);
-    dpInputRef.current.value = "";
     setShowDropDown(false);
+    setDp(userData.profilePic);
+    dpInputRef.current.value = "";
+    dpErrorRef.current.style.display = "none";
   };
 
   const handleSaveDp = async () => {
-    if (!dp) return;
+    if (!dpFile) return;
+
     setIsLoading(true);
-
     try {
-      await uploadBytes(storageRef, dp);
+      await uploadBytes(storageRef, dpFile);
       const downloadURL = await getDownloadURL(storageRef);
-
-      const { data } = await updateUserDetails("profilePic", {
+      await updateUserDetails("profilePic", {
         newProfilePic: downloadURL,
       });
-
-      setDp(data.updatedProfilePic);
-      notifyUpdateSuccess();
+      toast.success("User dp updated !");
+      setReFetchUser((prev) => !prev);
     } catch (error) {
-      console.log("error");
+      if (error.response?.status === 401) {
+        setError("unauthorized");
+        await deleteObject(storageRef);
+      } else if (
+        error.code === "ERR_NETWORK" ||
+        error.message === "Network Error" ||
+        error.response?.status === 500
+      ) {
+        setError("serverError");
+        await deleteObject(storageRef);
+      } else {
+        toast.error("Update failed !!!");
+        setDp(userData?.profilePic);
+        dpInputRef.current.value = "";
+        console.error("Error uploading file:", error);
+      }
+    } finally {
+      setIsLoading(false);
+      setShowDropDown(false);
+      dpErrorRef.current.style.display = "none";
+    }
+  };
+
+  const handleDeleteDp = async () => {
+    setIsLoading(true);
+    try {
       await deleteObject(storageRef);
+      await deleteUserData("profilePic");
+      toast.success("Deletion sucessfull !!!");
+      setDp("");
+      setReFetchUser((prev) => !prev);
+    } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");
       } else if (
@@ -143,28 +174,14 @@ export default function ChangeUserDp({ userDp, setError, updateUserDetails }) {
       ) {
         setError("serverError");
       } else {
-        setDp(userDp);
-        dpInputRef.current.value = "";
-        console.error("Error uploading file:", error);
-        notifyUpdateFailure();
+        setDp(userData?.profilePic);
+        toast.error("Deletion Failed !!!");
+        console.error("Error deleting file:", error);
       }
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleDeleteDp = async () => {
-    setIsLoading(true);
-    try {
-      await deleteObject(storageRef);
-      await axios.delete(`${baseURL}/user/${user.id}/profilePic}`);
-      setDp("");
-    } catch (error) {
-      dpInputRef.current.value = "";
-      console.error("Error deleting file:", error);
-      notifyUpdateFailure();
-    } finally {
-      setIsLoading(false);
+      setShowDropDown(false);
+      dpErrorRef.current.style.display = "none";
     }
   };
 
@@ -180,9 +197,11 @@ export default function ChangeUserDp({ userDp, setError, updateUserDetails }) {
       </div>
       <div
         ref={dpErrorRef}
-        className="absolute hidden top-[-20px] bg-black left-[40px] text-xs p-2 font-semibold m-2 text-red-500"
+        className="absolute top-[-10px] hidden w-full pointer-events-none"
       >
-        Max file size is 2MB
+        <span className="p-1 mx-auto text-xs font-semibold text-red-500 bg-black">
+          Max file size is 2 MB
+        </span>
       </div>
       <input
         type="file"
@@ -208,7 +227,7 @@ export default function ChangeUserDp({ userDp, setError, updateUserDetails }) {
           />
           {showDropDown && (
             <DropUpMenu
-              userDp={userDp}
+              userDp={userData.profilePic}
               dpInputRef={dpInputRef}
               handleSaveDp={handleSaveDp}
               handleCancelDp={handleCancelDp}

@@ -54,7 +54,7 @@ export default function Navbar({ settings }) {
         <img
           src={userData?.profilePic || defaultDp}
           alt="userDP"
-          className="size-7"
+          className="size-7 rounded-[50%] object-cover object-center"
         />
       </div>
     </div>

@@ -8,12 +8,7 @@ import { useNavigate } from "react-router-dom";
 import ReactFlagsSelect from "react-flags-select";
 import { UserContext } from "@/providers/UserProvider";
 import { secondaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
-
-import {
-  notifyUpdateFailure,
-  notifyUpdateSuccess,
-} from "@/helpers/triggerUpdateToast";
-import UpdateAlert from "../toasts/UpdateAlert";
+import { toast } from "react-toastify";
 
 export default function SecondaryUserForm({
   setError,
@@ -39,7 +34,7 @@ export default function SecondaryUserForm({
       await updateUserDetails("secondaryDetails", {
         newSecondaryDetails: values,
       });
-      notifyUpdateSuccess();
+      toast.success("Details Updated Successfully");
     } catch (error) {
       console.log("error thrown");
       if (error.response?.status === 401) {
@@ -52,7 +47,7 @@ export default function SecondaryUserForm({
         navigate("/serverError", { replace: true });
       } else {
         resetForm();
-        notifyUpdateFailure();
+        toast.error("Update failed !!!");
         console.error(error);
       }
     } finally {
@@ -82,7 +77,6 @@ export default function SecondaryUserForm({
           <Loading />
         </div>
       )}
-      <UpdateAlert />
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5 mt-10">
         <div className="flex flex-col flex-1 gap-7">
           <h1 className="font-mono text-lg underline underline-offset-8">
