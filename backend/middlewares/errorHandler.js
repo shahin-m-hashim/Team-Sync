@@ -65,7 +65,7 @@ const errorHandler = (error, req, res, next) => {
     case "AccountDeletionError":
       return res.status(401).json({
         success: false,
-        error: "Account deletion failed, kindly contact support",
+        error: "Account deletion failed",
       });
 
     default:
