@@ -4,11 +4,23 @@ import Navbar from "@/components/dashboard/Navbar";
 import { UserContext } from "@/providers/UserProvider";
 import ContactUserForm from "@/components/user/ContactUserForm";
 import SecurityUserForm from "@/components/user/SecurityUserForm";
+import ReLoginPage from "../ReLoginPage";
+import ServerErrorPage from "../ServerErrorPage";
 
 export default function SecuritySettingsPage() {
+  const [error, setError] = useState();
   const { userData } = useContext(UserContext);
   const [enableContactEdit, setEnableContactEdit] = useState(false);
   const [enableSecurityEdit, setEnableSecurityEdit] = useState(false);
+
+  if (error === "unauthorized") {
+    localStorage.clear();
+    return <ReLoginPage />;
+  }
+
+  if (error === "serverError") {
+    return <ServerErrorPage />;
+  }
 
   return (
     <>
@@ -32,7 +44,11 @@ export default function SecuritySettingsPage() {
               </div>
             </div>
             {enableContactEdit ? (
-              <ContactUserForm setEnableContactEdit={setEnableContactEdit} />
+              <ContactUserForm
+                setError={setError}
+                enableContactEdit={enableContactEdit}
+                setEnableContactEdit={setEnableContactEdit}
+              />
             ) : (
               <>
                 <div className="mb-4">
@@ -43,12 +59,15 @@ export default function SecuritySettingsPage() {
                     {userData?.secondaryEmail || "Your secondary email"}
                   </div>
                 </div>
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-medium">
-                    Phone Number
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    0000000
+                <div className="flex flex-col gap-2">
+                  <span>Phone Number</span>
+                  <div className="flex gap-1">
+                    <div className="px-4 py-2 font-semibold text-black bg-blue-300 rounded-md">
+                      {userData?.phone?.countryCode || "+91"}
+                    </div>
+                    <div className="w-full p-2 text-black bg-blue-300 rounded-md">
+                      {userData?.phone?.number || "0000000000"}
+                    </div>
                   </div>
                 </div>
                 <button
@@ -82,14 +101,17 @@ export default function SecuritySettingsPage() {
               </p>
             </div>
             {enableSecurityEdit ? (
-              <SecurityUserForm setEnableSecurityEdit={setEnableSecurityEdit} />
+              <SecurityUserForm
+                setError={setError}
+                setEnableSecurityEdit={setEnableSecurityEdit}
+              />
             ) : (
               <>
                 <div className="mb-4">
                   <label className="block mb-2 text-sm font-medium">
                     Current Password
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-300 text-slate-600 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  <div className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md text-slate-600 focus:outline-none focus:border-indigo-500">
                     Enter your current password
                   </div>
                 </div>
@@ -97,7 +119,7 @@ export default function SecuritySettingsPage() {
                   <label className="block mb-2 text-sm font-medium">
                     New Password
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-300 text-slate-600 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  <div className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md text-slate-600 focus:outline-none focus:border-indigo-500">
                     Enter a new secure password
                   </div>
                 </div>
@@ -105,7 +127,7 @@ export default function SecuritySettingsPage() {
                   <label className="block mb-2 text-sm font-medium">
                     Confirm New Password
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-300 text-slate-600 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  <div className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md text-slate-600 focus:outline-none focus:border-indigo-500">
                     Enter your new password
                   </div>
                 </div>

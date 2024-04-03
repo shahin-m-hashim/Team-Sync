@@ -77,6 +77,23 @@
     }
   }
 
+  .PhoneInput input{
+    @apply h-full rounded-md pl-3 
+  }
+
+  .PhoneInput .PhoneInputCountry{
+    @apply bg-white px-2 rounded-md gap-1
+  }
+
+  .PhoneInput .PhoneInputCountry .PhoneInputCountryIcon svg{
+    @apply text-black
+  }
+  
+   .PhoneInput .PhoneInputCountry .PhoneInputCountrySelectArrow{
+    color: black
+  
+  }
+
   /* react country select dropdown */
   #country button {
     @apply h-8 p-1 pr-3 bg-blue-300 border-none;
