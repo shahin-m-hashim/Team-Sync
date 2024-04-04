@@ -77,21 +77,17 @@
     }
   }
 
-  .PhoneInput input{
-    @apply h-full rounded-md pl-3 
+  .phoneInp div button {
+    @apply h-10 px-2;
   }
 
-  .PhoneInput .PhoneInputCountry{
-    @apply bg-white px-2 rounded-md gap-1
+  .phoneInp input {
+    width: 100%;
+    height: 2.5rem !important;
   }
 
-  .PhoneInput .PhoneInputCountry .PhoneInputCountryIcon svg{
-    @apply text-black
-  }
-  
-   .PhoneInput .PhoneInputCountry .PhoneInputCountrySelectArrow{
-    color: black
-  
+  .phoneInp div ul {
+    height: 150px;
   }
 
   /* react country select dropdown */

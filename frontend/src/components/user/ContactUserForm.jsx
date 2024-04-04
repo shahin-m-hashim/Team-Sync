@@ -1,39 +1,94 @@
-import { useFormik } from "formik";
+/* eslint-disable react/prop-types */
 import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
-import { contactSettingsValidationSchema as validationSchema } from "@/validations/authValidations";
-import "react-phone-number-input/style.css";
-import PhoneInput from "react-phone-number-input";
+import "react-international-phone/style.css";
+import { PhoneInput } from "react-international-phone";
+import { PhoneNumberUtil } from "google-libphonenumber";
+import { toast } from "react-toastify";
 
-const ContactUserForm = ({ enableContactEdit, setEnableContactEdit }) => {
-  const [phone, setPhone] = useState();
+const phoneUtil = PhoneNumberUtil.getInstance();
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+const isPhoneValid = (phone) => {
+  try {
+    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
+  } catch (error) {
+    return false;
+  }
+};
+
+const ContactUserForm = ({
+  setError,
+  setIsContactLoading,
+  setEnableContactEdit,
+}) => {
   const { userData, updateUserDetails, setReFetchUser } =
     useContext(UserContext);
 
-  const initialValues = {
-    secondaryEmail: userData?.secondaryEmail || "",
-    phone: userData?.phone || { countryCode: "IN", number: "0000000000" },
+  const [phone, setPhone] = useState(
+    userData?.phone?.countryCode + userData?.phone?.number || ""
+  );
+  const [secondaryEmail, setSecondaryEmail] = useState(
+    userData?.secondaryEmail || ""
+  );
+
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isPhnValid, setIsPhnValid] = useState(true);
+
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setSecondaryEmail(email);
+    setIsEmailValid(!email || email.match(emailRegex));
   };
 
-  const onSubmit = async (values) => {
-    console.log(values);
-    const formData = {
-      secondaryEmail: values?.secondaryEmail,
-      phone: {
-        countryCode: formData?.phone?.countryCode,
-        number: formData?.phone?.number,
-      },
+  const handlePhoneChange = (value) => {
+    setPhone(value);
+    setIsPhnValid(!value || isPhoneValid(value));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let number = "";
+    let countryCode = "+91";
+
+    try {
+      countryCode = `+${phoneUtil.parse(phone).getCountryCode()}`;
+      number = phone.replace(countryCode, "");
+    } catch (e) {
+      // eslint-disable-next-line no-empty
+    }
+
+    const newContactDetails = {
+      secondaryEmail,
+      phone: { countryCode, number },
     };
-    console.log(formData);
 
-    setEnableContactEdit(false);
+    if (!isEmailValid || !isPhnValid) return;
+
+    try {
+      setIsContactLoading(true);
+      await updateUserDetails("contactDetails", { newContactDetails });
+      toast.success("Update Successfull");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        setError("Unauthorized");
+      } else if (
+        error.code === "ERR_NETWORK" ||
+        error.message === "Network Error" ||
+        error.response?.status === 500
+      ) {
+        setError("serverError");
+      } else {
+        toast.error("Update failed !!!");
+        console.error(error);
+      }
+    } finally {
+      setIsContactLoading(false);
+      setEnableContactEdit(false);
+      setReFetchUser((prev) => !prev);
+    }
   };
-
-  const { errors, handleSubmit, getFieldProps } = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit,
-  });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -45,16 +100,17 @@ const ContactUserForm = ({ enableContactEdit, setEnableContactEdit }) => {
           Secondary Email
         </label>
         <input
-          id="secondaryEmail"
           type="email"
+          id="secondaryEmail"
           name="secondaryEmail"
-          placeholder="Your secondary email"
-          {...getFieldProps("secondaryEmail")}
+          value={secondaryEmail}
+          onChange={handleEmailChange}
+          placeholder={"Your secondary email"}
           className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
         />
-        {errors.secondaryEmail && (
+        {secondaryEmail && !isEmailValid && (
           <span className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.secondaryEmail}
+            Invalid email address
           </span>
         )}
       </div>
@@ -65,26 +121,16 @@ const ContactUserForm = ({ enableContactEdit, setEnableContactEdit }) => {
         <PhoneInput
           id="phone"
           name="phone"
-          defaultCountry="IN"
+          defaultCountry="in"
           international
-          disabled={!enableContactEdit}
-          value={initialValues?.phone?.countryCode}
-          onChange={(value) => {
-            const countryCode = value?.slice(0, 3) || ""; // Ensure empty string if value is undefined
-            const number = value?.slice(3) || ""; // Ensure empty string if value is undefined
-            setPhone({ phone: { countryCode, number } });
-          }}
+          className="phoneInp"
+          value={phone}
+          onChange={handlePhoneChange}
           placeholder="Enter phone number"
-          className="h-10 text-black"
         />
-        {errors.phone?.countryCode && (
+        {phone && !isPhnValid && (
           <span className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.phone?.countryCode}
-          </span>
-        )}
-        {errors.phone?.number && (
-          <span className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.phone?.number}
+            Invalid phone number
           </span>
         )}
       </div>

@@ -40,25 +40,13 @@ const forgotPasswordEmailValidationSchema = Yup.object({
   email: emailValidation,
 });
 
-const contactSettingsValidationSchema = Yup.object({
-  secondaryEmail: emailValidation,
-  phone: Yup.object().shape({
-    countryCode: Yup.string()
-      .matches(/^\+\d{1,4}$/, "Invalid country code")
-      .max(5, "A country code cannot exceed 5 characters"),
-    number: Yup.string()
-      .matches(/^\d{10,}$/, "Invalid Phone No.")
-      .max(15, "A phone no. cannot exceed 15 characters"),
-  }),
-});
-
 const resetPasswordValidationSchema = Yup.object({
   password: passwordValidation,
   cPassword: cPasswordValidation,
 });
 
 const securitySettingsValidationSchema = Yup.object({
-  currentPassword: passwordValidation,
+  currentPassword: Yup.string().required("Password is required"),
   newPassword: passwordValidation,
   cNewPassword: cNewPasswordValidation,
 });
@@ -69,7 +57,6 @@ export {
   loginValidationSchema,
   signupValidationSchema,
   resetPasswordValidationSchema,
-  contactSettingsValidationSchema,
   securitySettingsValidationSchema,
   forgotPasswordEmailValidationSchema,
 };
