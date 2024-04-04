@@ -4,6 +4,8 @@ const {
   setProfilePic,
   removeProfilePic,
   setPrimaryDetails,
+  setContactDetails,
+  setSecurityDetails,
   setSecondaryDetails,
 } = require("../services/userService");
 
@@ -53,13 +55,48 @@ const updateSecondaryDetails = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { newSecondaryDetails } = req.body;
-    const updatedSecondaryDetails = await setSecondaryDetails(
-      userId,
-      newSecondaryDetails
-    );
+    await setSecondaryDetails(userId, newSecondaryDetails);
     res.status(200).json({
       success: true,
       message: "Secondary details updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    }
+    next(e);
+  }
+};
+
+const updateContactDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { newContactDetails } = req.body;
+    await setContactDetails(userId, newContactDetails);
+    res.status(200).json({
+      success: true,
+      message: "Contact details updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    }
+    next(e);
+  }
+};
+
+const updateSecurityDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { newSecurityDetails } = req.body;
+    await setSecurityDetails(userId, newSecurityDetails);
+    res.status(200).json({
+      success: true,
+      message: "Security details updated successfully",
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -107,5 +144,7 @@ module.exports = {
   deleteProfilePic,
   fetchUserDetails,
   updatePrimaryDetails,
+  updateContactDetails,
+  updateSecurityDetails,
   updateSecondaryDetails,
 };

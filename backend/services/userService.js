@@ -29,14 +29,6 @@ const setPrimaryDetails = async (userId, newPrimaryDetails) => {
   user.bio = bio;
   user.socialLinks = { ...user.socialLinks, ...socialLinks };
   await user.save();
-  return {
-    fname: user.fname,
-    username: user.username,
-    pronoun: user.pronoun,
-    tag: user.tag,
-    bio: user.bio,
-    socialLinks: user.socialLinks,
-  };
 };
 
 const setSecondaryDetails = async (userId, newSecondaryDetails) => {
@@ -50,11 +42,29 @@ const setSecondaryDetails = async (userId, newSecondaryDetails) => {
   user.address = { ...user.address, ...address };
 
   await user.save();
-  return {
-    address: user.address,
-    occupation: user.occupation,
-    organization: user.organization,
-  };
+};
+
+const setContactDetails = async (userId, newContactDetails) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+
+  const { secondaryEmail, phone } = newContactDetails;
+  user.secondaryEmail = secondaryEmail;
+  user.phone = { ...user.phone, ...phone };
+  await user.save();
+};
+
+const setSecurityDetails = async (userId, newSecurityDetails) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+
+  const { currentPassword, newPassword } = newSecurityDetails;
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) throw new Error("InvalidPassword");
+
+  user.password = newPassword;
+  await user.save();
 };
 
 // DELETE
@@ -83,5 +93,7 @@ module.exports = {
   getUserDetails,
   removeProfilePic,
   setPrimaryDetails,
+  setContactDetails,
+  setSecurityDetails,
   setSecondaryDetails,
 };

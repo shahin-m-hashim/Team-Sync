@@ -116,8 +116,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     lowercase: true,
-    validate: [isEmail, "Please enter a valid email"],
-    default: "example@gmail.com",
+    validate: {
+      validator: (value) => {
+        return value === "" || isEmail(value);
+      },
+      message: "Please enter a valid email or leave it empty",
+    },
+    default: "",
   },
   phone: {
     countryCode: {
@@ -129,8 +134,7 @@ const userSchema = new mongoose.Schema({
     number: {
       type: String,
       maxlength: [15, "A phone no. cannot exceed 15 characters"],
-      match: [/^\d{10,}$/, "Invalid Phone No."],
-      default: "0000000000",
+      default: "",
     },
   },
   password: {
@@ -184,9 +188,7 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
   }
 
-  this.secondaryEmail = this.secondaryEmail || "example@gmail.com";
   this.phone.countryCode = this.phone.countryCode || "+91";
-  this.phone.number = this.phone.number || "0000000000";
   this.address.country = this.address.country || "IN";
   this.wasNew = this.isNew;
   next();
