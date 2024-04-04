@@ -13,7 +13,9 @@ const updateData = async (url, newData) => {
     });
   } catch (error) {
     if (error.response?.status === 401) {
-      await reAuthorizeUpdate(url, newData);
+      if (error.response.data.error === "Invalid password, Please try again") {
+        throw new Error("Invalid password");
+      } else await reAuthorizeUpdate(url, newData);
     } else throw error;
   }
 };
@@ -62,7 +64,7 @@ const reAuthorizeDelete = async (url) => {
 };
 
 const reAuthorizeAccountDelete = async (password) => {
-  console.log("Reauthorizing account deletion...");
+  // console.log("Reauthorizing account deletion...");
   await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
   await deleteAccount(password);
 };

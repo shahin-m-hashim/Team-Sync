@@ -6,10 +6,13 @@ import ContactUserForm from "@/components/user/ContactUserForm";
 import SecurityUserForm from "@/components/user/SecurityUserForm";
 import ReLoginPage from "../ReLoginPage";
 import ServerErrorPage from "../ServerErrorPage";
+import Loading from "@/components/Loading";
 
 export default function SecuritySettingsPage() {
   const [error, setError] = useState();
   const { userData } = useContext(UserContext);
+  const [isContactLoading, setIsContactLoading] = useState(false);
+  const [isSecurityLoading, setIsSecurityLoading] = useState(false);
   const [enableContactEdit, setEnableContactEdit] = useState(false);
   const [enableSecurityEdit, setEnableSecurityEdit] = useState(false);
 
@@ -28,7 +31,12 @@ export default function SecuritySettingsPage() {
       <div className="w-svw h-svh overflow-auto pt-28 px-20 text-white shadow-md bg-[#2b2a2a]">
         <h1 className="max-w-6xl mx-auto text-3xl">Sign In And Security</h1>
         <div className="grid max-w-6xl grid-cols-2 mx-auto mt-8 w gap-y-5 gap-x-10">
-          <div className="p-10 rounded-md bg-slate-700">
+          <div className="relative p-10 rounded-md bg-slate-700">
+            {isContactLoading && (
+              <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
+                <Loading />
+              </div>
+            )}
             <div className="mb-8 space-y-2">
               <h1 className="text-xl font-semibold">Primary settings</h1>
               <p className="text-xs text-gray-400">
@@ -46,7 +54,7 @@ export default function SecuritySettingsPage() {
             {enableContactEdit ? (
               <ContactUserForm
                 setError={setError}
-                enableContactEdit={enableContactEdit}
+                setIsContactLoading={setIsContactLoading}
                 setEnableContactEdit={setEnableContactEdit}
               />
             ) : (
@@ -93,7 +101,12 @@ export default function SecuritySettingsPage() {
               </>
             )}
           </div>
-          <div className="p-10 rounded-md bg-slate-700">
+          <div className="relative p-10 rounded-md bg-slate-700">
+            {isSecurityLoading && (
+              <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
+                <Loading />
+              </div>
+            )}
             <div className="mb-8 space-y-2">
               <h1 className="text-xl font-semibold">Change Password</h1>
               <p className="text-xs text-gray-400">
@@ -103,6 +116,7 @@ export default function SecuritySettingsPage() {
             {enableSecurityEdit ? (
               <SecurityUserForm
                 setError={setError}
+                setIsSecurityLoading={setIsSecurityLoading}
                 setEnableSecurityEdit={setEnableSecurityEdit}
               />
             ) : (
@@ -128,7 +142,7 @@ export default function SecuritySettingsPage() {
                     Confirm New Password
                   </label>
                   <div className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md text-slate-600 focus:outline-none focus:border-indigo-500">
-                    Enter your new password
+                    Confirm your new password
                   </div>
                 </div>
                 <button
