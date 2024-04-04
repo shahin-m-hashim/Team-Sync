@@ -1,15 +1,14 @@
 /* eslint-disable react/prop-types */
-import teamSyncLogo from "../../assets/images/Team Sync Logo.png";
-import projects from "../../assets/images/projects.png";
-import teams from "../../assets/images/teams.png";
-import subTeams from "../../assets/images/subTeams.png";
-import tasks from "../../assets/images/tasks.png";
-import techSupport from "../../assets/images/Technical Support.png";
-import logoutIcon from "../../assets/images/logout.png";
-import defaultDp from "../../assets/images/defaultDp.png";
 import { useContext } from "react";
+import tasks from "../../assets/images/tasks.png";
+import teams from "../../assets/images/teams.png";
 import { UserContext } from "@/providers/UserProvider";
-import { logout } from "@/services/auth";
+import logoutIcon from "../../assets/images/logout.png";
+import projects from "../../assets/images/projects.png";
+import subTeams from "../../assets/images/subTeams.png";
+import defaultDp from "../../assets/images/defaultDp.png";
+import teamSyncLogo from "../../assets/images/Team Sync Logo.png";
+import techSupport from "../../assets/images/Technical Support.png";
 
 const MenuItem = ({ icon, text }) => (
   <div className="inline-flex items-center justify-around gap-3">
@@ -18,11 +17,11 @@ const MenuItem = ({ icon, text }) => (
   </div>
 );
 
-export default function SideBar({ setShowLoggedOut }) {
-  const { userData } = useContext(UserContext);
+export default function SideBar() {
+  const { userData, setUserStatus } = useContext(UserContext);
 
   return (
-    <div className="bg-[#141414] z-50 w-[232px] fixed left-0 top-0 bottom-0 m-1 mr-0 flex flex-col gap-20 justify-around items-start p-3 rounded-lg text-white">
+    <div className="bg-[#141414] z-10 w-[232px] fixed left-0 top-0 bottom-0 m-1 mr-0 flex flex-col gap-20 justify-around items-start p-3 rounded-lg text-white">
       <img src={teamSyncLogo} alt="teamSyncLogo" className="w-16 mt-5 h-14" />
       <div
         id="sidebarMenu"
@@ -38,12 +37,7 @@ export default function SideBar({ setShowLoggedOut }) {
         className="inline-flex flex-col items-start gap-5 justify-evenly"
       >
         <MenuItem icon={techSupport} text="Support" />
-        <button
-          onClick={() => {
-            logout();
-            setShowLoggedOut(true);
-          }}
-        >
+        <button onClick={() => setUserStatus("LOGGED_OUT")}>
           <MenuItem icon={logoutIcon} text="Logout" />
         </button>
       </div>

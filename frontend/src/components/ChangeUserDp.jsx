@@ -16,6 +16,7 @@ import {
 import app from "@/lib/firebase";
 import { UserContext } from "@/providers/UserProvider";
 import { toast } from "react-toastify";
+import { ErrorContext } from "@/providers/ErrorProvider";
 
 const MAX_DP_SIZE = 2 * 1024 * 1024;
 // const base_url = import.meta.env.VITE_APP_BASE_URL;
@@ -84,8 +85,9 @@ const LoadingSvg = () => (
   </svg>
 );
 
-export default function ChangeUserDp({ setError }) {
+export default function ChangeUserDp() {
   const user = getLocalSecureItem("user", "low");
+  const { setError } = useContext(ErrorContext);
   const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
     useContext(UserContext);
 
