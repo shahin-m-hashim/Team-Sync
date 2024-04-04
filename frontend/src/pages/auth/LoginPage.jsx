@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { login } from "@/services/auth";
 import { cn, getLocalSecureItem } from "@/lib/utils";
@@ -7,10 +7,13 @@ import rocket from "../../assets/images/rocket.png";
 import hidePass from "../../assets/images/HidePass.png";
 import { Link, useNavigate } from "react-router-dom";
 import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
+import { ErrorContext } from "@/providers/ErrorProvider";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
   const errorRef = useRef();
+  const navigate = useNavigate();
+
+  const { setError } = useContext(ErrorContext);
   const [showPassword, setShowPassword] = useState(false);
 
   const [render, setRender] = useState(false);
@@ -39,15 +42,14 @@ export default function LoginPage() {
       const userId = await login(values);
       navigate(`/user/${userId}/projects`, { replace: true });
     } catch (e) {
-      if (e.code !== "ERR_NETWORK") {
+      if (e.status === 500 || e.message === "Network Error") {
+        setError("serverError");
+      } else {
         errorRef.current.innerText = e.response.data.error;
         if (e.response.data.validationErrors) {
           alert(JSON.stringify(e.response.data.validationErrors));
-        }
+        } else console.log(e);
         document.body.addEventListener("click", handleLoginError);
-      } else {
-        console.log(e);
-        navigate("/serverError", { replace: true });
       }
     }
   };

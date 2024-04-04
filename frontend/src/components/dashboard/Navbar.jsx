@@ -1,15 +1,16 @@
 /* eslint-disable react/prop-types */
-import { cn, getLocalSecureItem } from "@/lib/utils";
-import defaultDp from "../../assets/images/defaultDp.png";
-import { useContext, useState } from "react";
-import { UserContext } from "@/providers/UserProvider";
 import { Link } from "react-router-dom";
-import { logout } from "@/services/auth";
+import { useContext, useState } from "react";
+import { cn, getLocalSecureItem } from "@/lib/utils";
+import { UserContext } from "@/providers/UserProvider";
+import defaultDp from "../../assets/images/defaultDp.png";
 
-const DropDownMenu = ({ name, setShowLoggedOut }) => {
+const DropDownMenu = ({ name }) => {
   const user = getLocalSecureItem("user", "low");
+  const { setUserStatus } = useContext(UserContext);
+
   return (
-    <div className="absolute z-10 bg-slate-300 divide-y divide-black rounded-lg shadow min-w-[10vw] right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
+    <div className="absolute w-max z-10 bg-slate-300 divide-y divide-black rounded-lg shadow min-w-[10vw] right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
       {name && (
         <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
           <div>{name}</div>
@@ -46,10 +47,7 @@ const DropDownMenu = ({ name, setShowLoggedOut }) => {
       </ul>
       <div className="py-2">
         <button
-          onClick={() => {
-            logout();
-            setShowLoggedOut(true);
-          }}
+          onClick={() => setUserStatus("LOGGED_OUT")}
           className="w-full px-4 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
         >
           Logout
@@ -59,7 +57,7 @@ const DropDownMenu = ({ name, setShowLoggedOut }) => {
   );
 };
 
-export default function Navbar({ settings, setShowLoggedOut }) {
+export default function Navbar({ settings }) {
   const { userData } = useContext(UserContext);
   const [showDropDown, setShowDropDown] = useState(false);
 
@@ -112,14 +110,9 @@ export default function Navbar({ settings, setShowLoggedOut }) {
             alt="userDP"
             src={userData?.profilePic || defaultDp}
             onClick={() => setShowDropDown(!showDropDown)}
-            className="size-7 rounded-[50%] object-cover object-center"
+            className="size-7 rounded-[50%] object-cover object-center cursor-pointer"
           />
-          {showDropDown && (
-            <DropDownMenu
-              name={userData.fname}
-              setShowLoggedOut={setShowLoggedOut}
-            />
-          )}
+          {showDropDown && <DropDownMenu name={userData.fname} />}
         </div>
       </div>
     </div>

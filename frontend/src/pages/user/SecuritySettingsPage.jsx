@@ -1,36 +1,26 @@
 /* eslint-disable react/prop-types */
+import Loading from "@/components/Loading";
 import { useContext, useState } from "react";
 import Navbar from "@/components/dashboard/Navbar";
 import { UserContext } from "@/providers/UserProvider";
-import ContactUserForm from "@/components/user/ContactUserForm";
-import SecurityUserForm from "@/components/user/SecurityUserForm";
-import ReLoginPage from "../ReLoginPage";
-import ServerErrorPage from "../ServerErrorPage";
-import Loading from "@/components/Loading";
+import ContactUserForm from "@/components/forms/user/ContactUserForm";
+import SecurityUserForm from "@/components/forms/user/SecurityUserForm";
 
 export default function SecuritySettingsPage() {
-  const [error, setError] = useState();
   const { userData } = useContext(UserContext);
   const [isContactLoading, setIsContactLoading] = useState(false);
   const [isSecurityLoading, setIsSecurityLoading] = useState(false);
   const [enableContactEdit, setEnableContactEdit] = useState(false);
   const [enableSecurityEdit, setEnableSecurityEdit] = useState(false);
 
-  if (error === "unauthorized") {
-    localStorage.clear();
-    return <ReLoginPage />;
-  }
-
-  if (error === "serverError") {
-    return <ServerErrorPage />;
-  }
-
   return (
     <>
       <Navbar settings={"min-h-14 m-0 z-10 fixed top-0 left-0 right-0"} />
-      <div className="w-svw h-svh overflow-auto pt-28 px-20 text-white shadow-md bg-[#2b2a2a]">
-        <h1 className="max-w-6xl mx-auto text-3xl">Sign In And Security</h1>
-        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-8 w gap-y-5 gap-x-10">
+      <div className="size-full overflow-auto p-14 text-white shadow-md bg-[#2b2a2a]">
+        <h1 className="max-w-6xl mx-auto text-3xl mt-14">
+          Sign In And Security
+        </h1>
+        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-10 w gap-y-5 gap-x-10">
           <div className="relative p-10 rounded-md bg-slate-700">
             {isContactLoading && (
               <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
@@ -53,7 +43,6 @@ export default function SecuritySettingsPage() {
             </div>
             {enableContactEdit ? (
               <ContactUserForm
-                setError={setError}
                 setIsContactLoading={setIsContactLoading}
                 setEnableContactEdit={setEnableContactEdit}
               />
@@ -115,7 +104,6 @@ export default function SecuritySettingsPage() {
             </div>
             {enableSecurityEdit ? (
               <SecurityUserForm
-                setError={setError}
                 setIsSecurityLoading={setIsSecurityLoading}
                 setEnableSecurityEdit={setEnableSecurityEdit}
               />

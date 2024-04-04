@@ -5,41 +5,26 @@ import ChangeUserDp from "@/components/ChangeUserDp";
 import website from "../../assets/images/website.png";
 import { UserContext } from "@/providers/UserProvider";
 import linkedIn from "../../assets/images/linkedIn.png";
-import PrimaryUserForm from "@/components/user/PrimaryUserForm";
-import SecondaryUserForm from "@/components/user/SecondaryUserForm";
-import ReLoginPage from "../ReLoginPage";
-import ServerErrorPage from "../ServerErrorPage";
 import DeleteAccount from "@/components/auth/DeleteAccount";
+import PrimaryUserForm from "@/components/forms/user/PrimaryUserForm";
+import SecondaryUserForm from "@/components/forms/user/SecondaryUserForm";
 
 export default function UserSettingsPage() {
-  const [error, setError] = useState();
   const { userData } = useContext(UserContext);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [enablePrimaryEdit, setEnablePrimaryEdit] = useState(false);
   const [enableSecondaryEdit, setEnableSecondaryEdit] = useState(false);
 
-  if (error === "unauthorized") {
-    localStorage.clear();
-    return <ReLoginPage />;
-  }
-
-  if (error === "serverError") {
-    return <ServerErrorPage />;
-  }
-
   return (
     <>
       {showDeleteModal && (
-        <DeleteAccount
-          setError={setError}
-          setShowDeleteModal={setShowDeleteModal}
-        />
+        <DeleteAccount setShowDeleteModal={setShowDeleteModal} />
       )}
-      <Navbar settings={"min-h-10 py-2 m-0 z-10 fixed top-0 left-0 right-0"} />
-      <div className="text-white h-svh w-svw overflow-auto grid grid-cols-[300px,1fr] pt-10 bg-[#2b2a2a]">
+      <Navbar settings={"min-h-14 py-2 m-0 z-10 fixed top-0 left-0 right-0"} />
+      <div className="text-white size-full grid grid-cols-[300px,1fr] pt-14 bg-[#2b2a2a]">
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
-          <ChangeUserDp setError={setError} />
+          <ChangeUserDp />
           {!enablePrimaryEdit ? (
             <>
               <span className="text-xl font-semibold text-slate-800">
@@ -90,16 +75,12 @@ export default function UserSettingsPage() {
               )}
             </>
           ) : (
-            <PrimaryUserForm
-              setError={setError}
-              setEnablePrimaryEdit={setEnablePrimaryEdit}
-            />
+            <PrimaryUserForm setEnablePrimaryEdit={setEnablePrimaryEdit} />
           )}
         </div>
         <main className="relative px-10 py-5 bg-gray-600 size-full">
           <span className="text-3xl">YOUR PUBLIC PROFILE</span>
           <SecondaryUserForm
-            setError={setError}
             enableSecondaryEdit={enableSecondaryEdit}
             setEnableSecondaryEdit={setEnableSecondaryEdit}
           />

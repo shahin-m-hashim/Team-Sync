@@ -1,14 +1,16 @@
 import { toast } from "react-toastify";
 import { deleteAccount } from "@/services/db";
+import { useNavigate } from "react-router-dom";
+import { useContext, useRef, useState } from "react";
 import showPass from "../../assets/images/ShowPass.png";
 import hidePass from "../../assets/images/HidePass.png";
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ErrorContext } from "@/providers/ErrorProvider";
 
 /* eslint-disable react/prop-types */
-export default function DeleteAccount({ setError, setShowDeleteModal }) {
+export default function DeleteAccount({ setShowDeleteModal }) {
   const passwordRef = useRef();
   const navigate = useNavigate();
+  const { setError } = useContext(ErrorContext);
   const [showError, setShowError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 

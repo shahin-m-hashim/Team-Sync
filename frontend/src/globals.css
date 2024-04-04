@@ -54,8 +54,9 @@
     @apply p-0 m-0 border-border;
   }
   html,
-  body {
-    @apply w-screen h-screen bg-background text-foreground;
+  body,
+  #root {
+    @apply w-svw h-svh bg-background text-foreground;
   }
 }
 
@@ -64,7 +65,7 @@
     @apply w-2 h-full bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-md bg-[#307ae2];
+    @apply rounded-md bg-slate-400;
   }
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
