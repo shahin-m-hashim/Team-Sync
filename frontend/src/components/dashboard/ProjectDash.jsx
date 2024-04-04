@@ -9,7 +9,16 @@ import { useEffect, useReducer, useState } from "react";
 import { listReducer } from "@/helpers/listReducer";
 import ListSubHeader from "../list/ListSubHeader";
 
-const initialProjects = [];
+const initialProjects = [
+  // {
+  //   name: "Project 1",
+  //   createdDate: "01/02/2024",
+  //   icon: "",
+  //   progress: 0,
+  //   status: "Not Started",
+  //   role: "Leader",
+  // },
+];
 
 const leaderProjects = initialProjects.filter(
   (project) => project.role === "Leader"
@@ -64,12 +73,12 @@ export default function ProjectDash() {
 
   return (
     <>
-      <div className="grid grid-cols-[1.3fr,1fr,330px] text-white">
-        <StatusCard list={projects} renderList="Project" />
+      <div className="grid grid-cols-[1fr,1fr,1.3fr] min-h-[17rem] border-white border-2 border-t-0 text-white">
         <ActivityCard />
         <MessageCard />
+        <StatusCard list={projects} renderList="Project" />
       </div>
-      <div className="bg-[#141414] mx-1 rounded-t-md text-white">
+      <div>
         <ListHeader
           renderList="Project"
           setList={setProjects}
@@ -85,16 +94,15 @@ export default function ProjectDash() {
           setListNameSearchTxt={setProjectNameSearchTxt}
         />
       </div>
-      <div
-        id="scrollableListBody"
-        className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
-      >
+      <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList="Project" />
-        <ListBody
-          list={projects}
-          renderList="Project"
-          listNameSearchTxt={projectNameSearchTxt}
-        />
+        <div>
+          <ListBody
+            list={projects}
+            renderList="Project"
+            listNameSearchTxt={projectNameSearchTxt}
+          />
+        </div>
       </div>
       {showProjectAddPopUp && (
         <AddComponent

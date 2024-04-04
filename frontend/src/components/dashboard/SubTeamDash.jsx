@@ -148,7 +148,7 @@ export default function SubTeamDash() {
 
   return (
     <>
-      <div className="grid grid-cols-[1fr,1fr] text-white">
+      <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
           details={{
             name: "Project 1",
@@ -159,7 +159,7 @@ export default function SubTeamDash() {
         />
         <StatusCard list={subTeams} renderList="Sub Team" />
       </div>
-      <div className="bg-[#141414] mx-1 rounded-t-md text-white">
+      <div>
         <ListHeader
           setList={setSubTeams}
           renderList="Sub Team"
@@ -175,10 +175,7 @@ export default function SubTeamDash() {
           setListNameSearchTxt={setSubTeamNameSearchTxt}
         />
       </div>
-      <div
-        id="scrollableListBody"
-        className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
-      >
+      <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList="Sub Team" />
         <ListBody
           list={subTeams}

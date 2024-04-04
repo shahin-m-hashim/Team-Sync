@@ -94,6 +94,7 @@ const initialTeams = [
     role: "guide",
   },
 ];
+
 const leaderTeams = initialTeams.filter((team) => team.role === "Leader");
 
 export default function TeamDash() {
@@ -145,7 +146,7 @@ export default function TeamDash() {
 
   return (
     <>
-      <div className="grid grid-cols-[1fr,1fr] text-white">
+      <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
           details={{
             name: "Team 1",
@@ -156,7 +157,7 @@ export default function TeamDash() {
         />
         <StatusCard list={teams} renderList="Team" />
       </div>
-      <div className="bg-[#141414] mx-1 rounded-t-md text-white">
+      <div>
         <ListHeader
           setList={setTeams}
           renderList="Team"
@@ -172,16 +173,15 @@ export default function TeamDash() {
           setListNameSearchTxt={setTeamNameSearchTxt}
         />
       </div>
-      <div
-        id="scrollableListBody"
-        className="flex flex-col h-svh overflow-auto m-1 mt-0 rounded-b-md bg-[#141414] text-white"
-      >
+      <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList={"Team"} />
-        <ListBody
-          list={teams}
-          renderList={"Team"}
-          listNameSearchTxt={teamNameSearchTxt}
-        />
+        <div>
+          <ListBody
+            list={teams}
+            renderList={"Team"}
+            listNameSearchTxt={teamNameSearchTxt}
+          />
+        </div>
       </div>
       {showTeamAddPopUp && (
         <AddComponent

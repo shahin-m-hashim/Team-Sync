@@ -20,7 +20,7 @@ export default function UserSettingsPage() {
       {showDeleteModal && (
         <DeleteAccount setShowDeleteModal={setShowDeleteModal} />
       )}
-      <Navbar settings={"min-h-14 py-2 m-0 z-10 fixed top-0 left-0 right-0"} />
+      <Navbar settings={"z-10 fixed top-0 left-0 right-0"} />
       <div className="text-white size-full grid grid-cols-[300px,1fr] pt-14 bg-[#2b2a2a]">
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
