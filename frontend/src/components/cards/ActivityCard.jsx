@@ -33,9 +33,8 @@ export default function ActivityCard() {
     activities.map((activity) => {
       const { dp, description, date, time } = activity;
       return (
-        // Add return statement here
         <div
-          className="bg-[#D9D9D9] text-black gap-5 p-2 rounded-md flex"
+          className="bg-[#D9D9D9] text-black gap-5 p-1 rounded-md flex"
           key={activity.userId}
         >
           <img className="pl-2" src={dp} alt="user" />
@@ -52,9 +51,14 @@ export default function ActivityCard() {
     });
 
   const EmptyActivityCard = () => (
-    <div className="flex items-center object-contain gap-3">
-      <img src={noActivities} alt="noActivities" width="35%" />
-      <span className="text-xl font-light text-center">
+    <div className="flex items-center object-contain gap-3 px-5">
+      <img
+        src={noActivities}
+        className="flex-1"
+        alt="noActivities"
+        width="30%"
+      />
+      <span className="flex-1 text-xl font-light text-center">
         Currently,&nbsp;
         <br />
         There are no activities
@@ -63,9 +67,15 @@ export default function ActivityCard() {
   );
 
   return (
-    <div className="flex flex-col bg-[#141414] my-1 p-2 rounded-lg gap-2 justify-around">
-      <span className="font-semibold">Activity</span>
-      {activities.length ? <ActivityCards /> : <EmptyActivityCard />}
+    <div className="flex flex-col h-full bg-[#141414] p-3 border-white  rounded-md gap-2 justify-around">
+      <span className="mb-3 font-semibold">Activity</span>
+      {activities.length ? (
+        <div className="mt-[-12px] flex flex-col gap-2">
+          <ActivityCards />
+        </div>
+      ) : (
+        <EmptyActivityCard />
+      )}
     </div>
   );
 }

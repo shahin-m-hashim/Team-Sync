@@ -14,7 +14,7 @@ export default function DashboardPage({ children }) {
   return (
     <>
       <SideBar setShowLoggedOut={setShowLoggedOut} />
-      <div className="flex pl-[235px] flex-col h-screen">
+      <div className="flex pl-[235px] flex-col">
         <Navbar setShowLoggedOut={setShowLoggedOut} />
         {children}
       </div>
