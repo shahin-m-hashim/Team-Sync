@@ -1,21 +1,21 @@
+import Test from "./pages/Test";
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
+import DummyPage from "./pages/DummyPage";
 import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
-import DashboardPage from "./pages/DashboardPage";
+import UserProvider from "./providers/UserProvider";
+import ErrorProvider from "./providers/ErrorProvider";
+import DashboardPage from "./pages/user/DashboardPage";
 import TaskDash from "./components/dashboard/TaskDash";
 import TeamDash from "./components/dashboard/TeamDash";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-
-import Test from "./pages/Test";
-import DummyPage from "./pages/DummyPage";
-import UserProvider from "./providers/UserProvider";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const router = createBrowserRouter([
   {
@@ -107,7 +107,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ErrorProvider>
+      <RouterProvider router={router} />
+    </ErrorProvider>
+  );
 }
 
 export default App;

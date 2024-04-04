@@ -4,14 +4,16 @@ import showPass from "../../assets/images/ShowPass.png";
 import hidePass from "../../assets/images/HidePass.png";
 import { Link, useNavigate } from "react-router-dom";
 import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { cn, getLocalSecureItem } from "@/lib/utils";
 import { signup } from "@/services/auth";
 import SuccessfullSignUpAlert from "@/components/toasts/SuccessfullSignUpAlert";
+import { ErrorContext } from "@/providers/ErrorProvider";
 
 export default function SignupPage() {
   const errorRef = useRef();
   const navigate = useNavigate();
+  const { setError } = useContext(ErrorContext);
   const [showSuccessfullSignUpAlert, setShowSuccessfullSignUpAlert] =
     useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -60,15 +62,14 @@ export default function SignupPage() {
       });
       setShowSuccessfullSignUpAlert(true);
     } catch (e) {
-      if (e.code !== "ERR_NETWORK") {
+      if (e.status === 500 || e.message === "Network Error") {
+        setError("serverError");
+      } else {
         errorRef.current.innerText = e.response.data.error;
         if (e.response.data.validationErrors) {
           alert(JSON.stringify(e.response.data.validationErrors));
-        }
+        } else console.log(e);
         document.body.addEventListener("click", handleSignUpError);
-      } else {
-        console.log(e);
-        navigate("/serverError", { replace: true });
       }
     }
   };
