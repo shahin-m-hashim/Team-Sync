@@ -6,6 +6,8 @@ const {
   updateProfilePic,
   deleteProfilePic,
   updatePrimaryDetails,
+  updateContactDetails,
+  updateSecurityDetails,
   updateSecondaryDetails,
 } = require("../controllers/userController");
 
@@ -16,6 +18,8 @@ userRouter.get("/userDetails", fetchUserDetails);
 userRouter.patch("/profilePic", updateProfilePic);
 userRouter.patch("/primaryDetails", updatePrimaryDetails);
 userRouter.patch("/secondaryDetails", updateSecondaryDetails);
+userRouter.patch("/contactDetails", updateContactDetails);
+userRouter.patch("/securityDetails", updateSecurityDetails);
 
 // DELETE Requests
 userRouter.delete("/", deleteAccount);
