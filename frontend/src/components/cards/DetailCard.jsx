@@ -16,7 +16,7 @@ export default function DetailCard({ details }) {
   details.membersDp = [user1, user2, user3, user4, user5];
 
   return (
-    <div className="grid grid-cols-2 bg-[#141414] m-1 mr-0 rounded-lg p-3 px-10 ">
+    <div className="grid grid-cols-2 bg-[#141414] p-3 px-10 ">
       <div className="flex flex-col justify-around">
         <span className="ml-[-3px] text-4xl font-semibold">{details.name}</span>
         <div className="flex items-center gap-3">

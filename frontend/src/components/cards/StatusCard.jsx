@@ -18,7 +18,7 @@ export default function StatusCard({ list = [], renderList }) {
     <div
       className={cn(
         statusCount.empty && "p-5 gap-2",
-        "bg-[#141414] m-1 rounded-lg flex flex-col"
+        "bg-[#141414] flex flex-col"
       )}
     >
       {!statusCount.empty && (

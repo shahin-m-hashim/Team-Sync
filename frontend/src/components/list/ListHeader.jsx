@@ -24,7 +24,7 @@ export default function ListHeader({
   const user = getLocalSecureItem("user", "low");
 
   return (
-    <div className="flex items-center justify-between py-3 text-sm px-7">
+    <div className="flex overflow-auto  bg-[#141414] text-white  items-center justify-between py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
       <div className="flex flex-col gap-1">
         <span className="font-medium">
           {switchList && "Your"} {renderList}s
@@ -33,7 +33,7 @@ export default function ListHeader({
           List of all {switchList && "your"} {renderList.toLowerCase()}s
         </span>
       </div>
-      <div className="flex gap-5">
+      <div className="flex gap-7">
         <FilterButton
           setList={setList}
           renderList={renderList}

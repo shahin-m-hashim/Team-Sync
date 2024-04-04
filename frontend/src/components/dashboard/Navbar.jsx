@@ -10,7 +10,7 @@ const DropDownMenu = ({ name }) => {
   const { setUserStatus } = useContext(UserContext);
 
   return (
-    <div className="absolute w-max z-10 bg-slate-300 divide-y divide-black rounded-lg shadow min-w-[10vw] right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
+    <div className="absolute z-10 divide-y divide-black rounded-lg shadow w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
       {name && (
         <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
           <div>{name}</div>
@@ -65,15 +65,15 @@ export default function Navbar({ settings }) {
     <div
       id="dashNavbar"
       className={cn(
-        settings ? settings : "min-h-10 m-1 mb-0 rounded-lg",
-        "bg-[#141414] flex justify-between items-center"
+        settings ? settings : " border-white border-2 rounded-md",
+        "min-h-10 bg-[#141414] flex justify-between p-3 items-center"
       )}
     >
-      <span className="text-[#9685FF] font-semibold pl-3">TeamSync</span>
-      <div className="inline-flex items-center gap-3 pr-3">
+      <span className="text-[#9685FF] font-semibold">TeamSync</span>
+      <div className="inline-flex items-center gap-4">
         <svg
-          width={22}
-          height={22}
+          width={26}
+          height={26}
           viewBox="0 0 25 25"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +110,7 @@ export default function Navbar({ settings }) {
             alt="userDP"
             src={userData?.profilePic || defaultDp}
             onClick={() => setShowDropDown(!showDropDown)}
-            className="size-7 rounded-[50%] object-cover object-center cursor-pointer"
+            className="size-8 rounded-[50%] object-cover object-center cursor-pointer"
           />
           {showDropDown && <DropDownMenu name={userData.fname} />}
         </div>
