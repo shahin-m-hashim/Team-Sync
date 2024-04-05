@@ -1,12 +1,25 @@
 /* eslint-disable react/prop-types */
 import Loading from "@/components/Loading";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Navbar from "@/components/dashboard/Navbar";
 import { UserContext } from "@/providers/UserProvider";
 import ContactUserForm from "@/components/forms/user/ContactUserForm";
 import SecurityUserForm from "@/components/forms/user/SecurityUserForm";
 
 export default function SecuritySettingsPage() {
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing]);
+
   const { userData } = useContext(UserContext);
   const [isContactLoading, setIsContactLoading] = useState(false);
   const [isSecurityLoading, setIsSecurityLoading] = useState(false);
@@ -16,17 +29,13 @@ export default function SecuritySettingsPage() {
   return (
     <>
       <Navbar settings={"z-10 fixed top-0 left-0 right-0"} />
-      <div className="size-full overflow-auto p-14 text-white shadow-md bg-[#2b2a2a]">
+      <div className="size-full overflow-auto p-12 text-white shadow-md bg-[#2b2a2a]">
         <h1 className="max-w-6xl mx-auto text-3xl mt-14">
           Sign In And Security
         </h1>
         <div className="grid max-w-6xl grid-cols-2 mx-auto mt-10 w gap-y-5 gap-x-10">
           <div className="relative p-10 rounded-md bg-slate-700">
-            {isContactLoading && (
-              <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
-                <Loading />
-              </div>
-            )}
+            {isContactLoading && <Loading />}
             <div className="mb-8 space-y-2">
               <h1 className="text-xl font-semibold">Primary settings</h1>
               <p className="text-xs text-gray-400">
@@ -43,6 +52,7 @@ export default function SecuritySettingsPage() {
             </div>
             {enableContactEdit ? (
               <ContactUserForm
+                setIsEditing={setIsEditing}
                 setIsContactLoading={setIsContactLoading}
                 setEnableContactEdit={setEnableContactEdit}
               />
@@ -91,11 +101,7 @@ export default function SecuritySettingsPage() {
             )}
           </div>
           <div className="relative p-10 rounded-md bg-slate-700">
-            {isSecurityLoading && (
-              <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
-                <Loading />
-              </div>
-            )}
+            {isSecurityLoading && <Loading />}
             <div className="mb-8 space-y-2">
               <h1 className="text-xl font-semibold">Change Password</h1>
               <p className="text-xs text-gray-400">
@@ -104,6 +110,7 @@ export default function SecuritySettingsPage() {
             </div>
             {enableSecurityEdit ? (
               <SecurityUserForm
+                setIsEditing={setIsEditing}
                 setIsSecurityLoading={setIsSecurityLoading}
                 setEnableSecurityEdit={setEnableSecurityEdit}
               />

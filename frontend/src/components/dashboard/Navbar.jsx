@@ -10,7 +10,7 @@ const DropDownMenu = ({ name }) => {
   const { setUserStatus } = useContext(UserContext);
 
   return (
-    <div className="absolute z-10 divide-y divide-black rounded-lg shadow w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
+    <div className="absolute z-10 divide-y divide-black rounded-lg shadow min-w-36 w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
       {name && (
         <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
           <div>{name}</div>

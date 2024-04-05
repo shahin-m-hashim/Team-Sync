@@ -15,7 +15,7 @@ const useFetch = (url, reFetch) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // console.log("Fetching data...");
+      // console.log("Fetching data...", url);
       try {
         const { data } = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
           withCredentials: true,

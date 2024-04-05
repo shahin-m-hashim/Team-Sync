@@ -12,7 +12,7 @@ import groupVoiceCall from "../../assets/images/Call.png";
 import groupChat from "../../assets/images/Chat Messages.png";
 import groupVideoCall from "../../assets/images/Video Call.png";
 
-export default function DetailCard({ details }) {
+export default function DetailCard({ details, renderList }) {
   details.membersDp = [user1, user2, user3, user4, user5];
 
   return (
@@ -30,7 +30,7 @@ export default function DetailCard({ details }) {
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-1 h-7 p-3 text-xs  border-[1px] border-white rounded-xl">
             <img src={invite} alt="invite" />
-            <span>Invite</span>
+            <span>{renderList === "Project" ? "Invite" : "Add"}</span>
           </button>
           <button>
             <img src={settings} alt="settings" />

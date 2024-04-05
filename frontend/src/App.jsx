@@ -16,6 +16,7 @@ import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import ProjectProvider from "./providers/ProjectProvider";
 
 const router = createBrowserRouter([
   {
@@ -56,7 +57,11 @@ const router = createBrowserRouter([
           },
           {
             path: "projects",
-            element: <ProjectDash />,
+            element: (
+              <ProjectProvider>
+                <ProjectDash />
+              </ProjectProvider>
+            ),
           },
           {
             path: "teams",

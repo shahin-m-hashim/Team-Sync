@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
-import ListHeader from "@/components/list/ListHeader";
-import ListBody from "@/components/list/ListBody";
-import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
-import AddComponent from "../AddComponent";
+import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
+import AddTaskForm from "../forms/tasks/AddTaskForm";
+import ListHeader from "@/components/list/ListHeader";
+import { useState, useEffect, useReducer } from "react";
+import ListSubHeader from "@/components/list/ListSubHeader";
 import editSubmitted from "../../assets/images/Edit submitted.png";
 import viewSubmitted from "../../assets/images/View submitted.png";
-import { useState, useEffect, useReducer } from "react";
 
 const initialTasks = [
   {
@@ -185,21 +185,13 @@ export default function TaskDash() {
     }
   }, [listOnlyYourTasks]);
 
-  const handleTaskUpload = async (taskDoc) => {
-    console.log(taskDoc);
-    // try {
-    //   await axios.post(base_url + "auth/signup", taskDoc, {
-    //     withCredentials: true,
-    //   });
-    // } catch (e) {
-    //   console.log(e);
-    // }
-  };
-
-  const [showTaskAddPopUp, setShowTaskAddPopUp] = useState(false);
+  const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
   return (
     <>
+      {showAddTaskForm && (
+        <AddTaskForm setShowAddTaskForm={setShowAddTaskForm} />
+      )}
       <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
           details={{
@@ -213,14 +205,14 @@ export default function TaskDash() {
       </div>
       <div>
         <ListHeader
-          setList={setTasks}
           renderList="Task"
-          resetList={resetTaskList}
+          setList={setTasks}
           leaderList={yourTasks}
+          resetList={resetTaskList}
           initialList={initialTasks}
-          filterBtnTxt={taskFilterBtnTxt}
           switchList={listOnlyYourTasks}
-          setShowAddPopUp={setShowTaskAddPopUp}
+          filterBtnTxt={taskFilterBtnTxt}
+          setShowAddForm={setShowAddTaskForm}
           setSwitchList={setListOnlyYourTasks}
           listNameSearchTxt={taskNameSearchTxt}
           setFilterBtnTxt={setTaskFilterBtnTxt}
@@ -235,14 +227,6 @@ export default function TaskDash() {
           listNameSearchTxt={taskNameSearchTxt}
         />
       </div>
-      {showTaskAddPopUp && (
-        <AddComponent
-          renderList="Task"
-          handleUpload={handleTaskUpload}
-          setShowAddPopUp={setShowTaskAddPopUp}
-          description="Your can assign new tasks to team members, and collaborate seamlessly to achieve your project goals."
-        />
-      )}
     </>
   );
 }

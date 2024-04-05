@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
-import ListHeader from "@/components/list/ListHeader";
-import ListBody from "@/components/list/ListBody";
-import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
-import { useEffect, useReducer, useState } from "react";
 import StatusCard from "../cards/StatusCard";
-import AddComponent from "../AddComponent";
+import ListBody from "@/components/list/ListBody";
+import { listReducer } from "@/helpers/listReducer";
+import AddTeamForm from "../forms/teams/AddTeamForm";
+import ListHeader from "@/components/list/ListHeader";
+import { useEffect, useReducer, useState } from "react";
+import ListSubHeader from "@/components/list/ListSubHeader";
 import google from "../../assets/images/project icons/Google.png";
+import youtube from "../../assets/images/project icons/Youtube.png";
 import facebook from "../../assets/images/project icons/Facebook.png";
 import instagram from "../../assets/images/project icons/Instagram.png";
-import youtube from "../../assets/images/project icons/Youtube.png";
-import { listReducer } from "@/helpers/listReducer";
 
 const initialTeams = [
   {
@@ -131,21 +131,13 @@ export default function TeamDash() {
     }
   }, [listOnlyAdminTeams]);
 
-  const handleTeamUpload = async (teamDoc) => {
-    console.log(teamDoc);
-    // try {
-    //   await axios.post(base_url + "auth/signup", projectDoc, {
-    //     withCredentials: true,
-    //   });
-    // } catch (e) {
-    //   console.log(e);
-    // }
-  };
-
-  const [showTeamAddPopUp, setShowTeamAddPopUp] = useState(false);
+  const [showAddTeamForm, setShowAddTeamForm] = useState(false);
 
   return (
     <>
+      {showAddTeamForm && (
+        <AddTeamForm setShowAddTeamForm={setShowAddTeamForm} />
+      )}
       <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
           details={{
@@ -154,6 +146,7 @@ export default function TeamDash() {
             guide: "Sindhiya",
             nom: 20,
           }}
+          renderList="Team"
         />
         <StatusCard list={teams} renderList="Team" />
       </div>
@@ -164,7 +157,7 @@ export default function TeamDash() {
           resetList={resetTeamList}
           leaderList={leaderTeams}
           initialList={initialTeams}
-          setShowAddPopUp={setShowTeamAddPopUp}
+          setShowAddForm={setShowAddTeamForm}
           filterBtnTxt={teamFilterBtnTxt}
           switchList={listOnlyAdminTeams}
           setSwitchList={setListOnlyAdminTeams}
@@ -183,14 +176,6 @@ export default function TeamDash() {
           />
         </div>
       </div>
-      {showTeamAddPopUp && (
-        <AddComponent
-          renderList="Team"
-          handleUpload={handleTeamUpload}
-          setShowAddPopUp={setShowTeamAddPopUp}
-          description="Your Team is where you can organize your sub teams, add members and work with them effortlessly."
-        />
-      )}
     </>
   );
 }
