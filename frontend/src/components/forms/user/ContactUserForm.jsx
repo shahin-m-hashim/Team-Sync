@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
+import { toast } from "react-toastify";
 import { useContext, useState } from "react";
-import { UserContext } from "@/providers/UserProvider";
 import "react-international-phone/style.css";
+import { UserContext } from "@/providers/UserProvider";
 import { PhoneInput } from "react-international-phone";
 import { PhoneNumberUtil } from "google-libphonenumber";
-import { toast } from "react-toastify";
 import { ErrorContext } from "@/providers/ErrorProvider";
 
 const phoneUtil = PhoneNumberUtil.getInstance();
@@ -18,28 +18,42 @@ const isPhoneValid = (phone) => {
   }
 };
 
-const ContactUserForm = ({ setIsContactLoading, setEnableContactEdit }) => {
+const ContactUserForm = ({
+  setIsEditing,
+  setIsContactLoading,
+  setEnableContactEdit,
+}) => {
   const { setError } = useContext(ErrorContext);
   const { userData, updateUserDetails, setReFetchUser } =
     useContext(UserContext);
+
+  const initialValues = {
+    secondaryEmail: userData?.secondaryEmail || "",
+    phone: {
+      countryCode: userData?.phone?.countryCode || "+91",
+      number: userData?.phone?.number || "",
+    },
+  };
 
   const [phone, setPhone] = useState(
     userData?.phone?.countryCode + userData?.phone?.number || ""
   );
   const [secondaryEmail, setSecondaryEmail] = useState(
-    userData?.secondaryEmail || ""
+    initialValues.secondaryEmail
   );
 
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isPhnValid, setIsPhnValid] = useState(true);
 
   const handleEmailChange = (e) => {
+    setIsEditing(true);
     const email = e.target.value;
     setSecondaryEmail(email);
     setIsEmailValid(!email || email.match(emailRegex));
   };
 
   const handlePhoneChange = (value) => {
+    setIsEditing(true);
     setPhone(value);
     setIsPhnValid(!value || isPhoneValid(value));
   };
@@ -64,6 +78,11 @@ const ContactUserForm = ({ setIsContactLoading, setEnableContactEdit }) => {
 
     if (!isEmailValid || !isPhnValid) return;
 
+    if (JSON.stringify(initialValues) === JSON.stringify(newContactDetails)) {
+      toast.info("You have made no changes !!!");
+      return;
+    }
+
     try {
       setIsContactLoading(true);
       await updateUserDetails("contactDetails", { newContactDetails });
@@ -82,6 +101,7 @@ const ContactUserForm = ({ setIsContactLoading, setEnableContactEdit }) => {
         console.error(error);
       }
     } finally {
+      setIsEditing(false);
       setIsContactLoading(false);
       setEnableContactEdit(false);
       setReFetchUser((prev) => !prev);
@@ -135,7 +155,10 @@ const ContactUserForm = ({ setIsContactLoading, setEnableContactEdit }) => {
       <div className="grid grid-cols-2 gap-2 mt-10">
         <button
           type="button"
-          onClick={() => setEnableContactEdit(false)}
+          onClick={() => {
+            setEnableContactEdit(false);
+            setIsEditing(false);
+          }}
           className="rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Cancel

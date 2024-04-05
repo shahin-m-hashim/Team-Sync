@@ -6,7 +6,7 @@ export default function DashboardPage({ children }) {
   return (
     <>
       <SideBar />
-      <div className="flex flex-col h-screen pl-[16vw]">
+      <div className="flex relative flex-col h-full pl-[16vw]">
         <Navbar />
         {children}
       </div>

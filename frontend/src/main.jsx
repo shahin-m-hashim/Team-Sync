@@ -2,6 +2,7 @@ import "./globals.css";
 import React from "react";
 import App from "./App.jsx";
 import ReactDOM from "react-dom/client";
+import "react-toastify/dist/ReactToastify.css";
 import BreakPoint from "./components/BreakPoint";
 import { Flip, ToastContainer } from "react-toastify";
 

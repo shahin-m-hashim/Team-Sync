@@ -1,11 +1,19 @@
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
 
 export default function Test() {
-  const notify = () => toast.success("Wow so easy!");
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   return (
     <>
-      <button onClick={notify}>Notify</button>
+      <button>Notify</button>
     </>
   );
 }

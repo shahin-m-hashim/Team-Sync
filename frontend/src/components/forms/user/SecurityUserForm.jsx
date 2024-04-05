@@ -9,7 +9,11 @@ import showPass from "../../../assets/images/ShowPass.png";
 import hidePass from "../../../assets/images/HidePass.png";
 import { securitySettingsValidationSchema as validationSchema } from "@/validations/authValidations";
 
-const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
+const SecurityUserForm = ({
+  setIsEditing,
+  setIsSecurityLoading,
+  setEnableSecurityEdit,
+}) => {
   const { setError } = useContext(ErrorContext);
   const { updateUserDetails, setReFetchUser } = useContext(UserContext);
 
@@ -49,16 +53,18 @@ const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
         setEnableSecurityEdit(false);
       }
     } finally {
+      setIsEditing(false);
       setIsSecurityLoading(false);
       setReFetchUser((prev) => !prev);
     }
   };
 
-  const { errors, handleSubmit, touched, getFieldProps } = useFormik({
-    initialValues,
-    validationSchema,
-    onSubmit,
-  });
+  const { errors, handleSubmit, touched, getFieldProps, handleChange } =
+    useFormik({
+      initialValues,
+      validationSchema,
+      onSubmit,
+    });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -75,6 +81,10 @@ const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
           name="currentPassword"
           placeholder="Enter your current password"
           {...getFieldProps("currentPassword")}
+          onChange={(e) => {
+            handleChange(e);
+            setIsEditing(true);
+          }}
           className="w-full px-3 py-2 text-black border border-gray-300 rounded-md placeholder:text-black focus:outline-none focus:border-indigo-500"
         />
         {errors.currentPassword && touched.currentPassword && (
@@ -95,6 +105,10 @@ const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
             name="newPassword"
             placeholder="Enter a new secure password"
             {...getFieldProps("newPassword")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="w-full px-3 py-2 text-black border border-gray-300 rounded-md placeholder:text-black focus:outline-none focus:border-indigo-500"
           />
           <img
@@ -126,6 +140,10 @@ const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
             name="cNewPassword"
             placeholder="Confirm your new password"
             {...getFieldProps("cNewPassword")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="w-full px-3 py-2 text-black border border-gray-300 rounded-md placeholder:text-black focus:outline-none focus:border-indigo-500"
           />
           <img
@@ -145,7 +163,10 @@ const SecurityUserForm = ({ setIsSecurityLoading, setEnableSecurityEdit }) => {
       <div className="grid grid-cols-2 gap-2 mt-10">
         <button
           type="button"
-          onClick={() => setEnableSecurityEdit(false)}
+          onClick={() => {
+            setIsEditing(false);
+            setEnableSecurityEdit(false);
+          }}
           className="rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Cancel
