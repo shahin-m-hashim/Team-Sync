@@ -13,7 +13,7 @@ export default function ListHeader({
   resetList,
   leaderList,
   initialList,
-  setShowAddPopUp,
+  setShowAddForm,
   filterBtnTxt,
   switchList,
   setSwitchList,
@@ -24,7 +24,7 @@ export default function ListHeader({
   const user = getLocalSecureItem("user", "low");
 
   return (
-    <div className="flex overflow-auto  bg-[#141414] text-white  items-center justify-between py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
+    <div className="flex bg-[#141414] text-white  items-center justify-between py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
       <div className="flex flex-col gap-1">
         <span className="font-medium">
           {switchList && "Your"} {renderList}s
@@ -59,7 +59,7 @@ export default function ListHeader({
       <div className="inline-flex gap-5">
         <ResetListBtn resetList={resetList} />
         <SwitchListBtn switchList={switchList} setSwitchList={setSwitchList} />
-        <button onClick={() => setShowAddPopUp(true)}>
+        <button onClick={() => setShowAddForm(true)}>
           <img src={add} className="size-10" alt="addToList" />
         </button>
       </div>

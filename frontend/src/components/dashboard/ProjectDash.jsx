@@ -1,30 +1,22 @@
 /* eslint-disable react/prop-types */
-import ActivityCard from "@/components/cards/ActivityCard";
-import MessageCard from "@/components/cards/MessageCard";
-import ListHeader from "@/components/list/ListHeader";
-import ListBody from "@/components/list/ListBody";
 import StatusCard from "../cards/StatusCard";
-import AddComponent from "../AddComponent";
-import { useEffect, useReducer, useState } from "react";
-import { listReducer } from "@/helpers/listReducer";
+import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
-
-const initialProjects = [
-  // {
-  //   name: "Project 1",
-  //   createdDate: "01/02/2024",
-  //   icon: "",
-  //   progress: 0,
-  //   status: "Not Started",
-  //   role: "Leader",
-  // },
-];
-
-const leaderProjects = initialProjects.filter(
-  (project) => project.role === "Leader"
-);
+import { listReducer } from "@/helpers/listReducer";
+import ListHeader from "@/components/list/ListHeader";
+import { useContext, useEffect, useReducer, useState } from "react";
+import MessageCard from "@/components/cards/MessageCard";
+import ActivityCard from "@/components/cards/ActivityCard";
+import AddProjectForm from "../forms/projects/AddProjectForm";
+import { ProjectContext } from "@/providers/ProjectProvider";
 
 export default function ProjectDash() {
+  const { projects } = useContext(ProjectContext);
+
+  const leaderProjects = projects.filter(
+    (project) => project.role === "Leader"
+  );
+
   const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
   const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
@@ -35,11 +27,11 @@ export default function ProjectDash() {
     setProjectFilterBtnTxt("Filter");
     setProjects({
       type: "RESET",
-      initialState: initialProjects,
+      initialState: projects,
     });
   };
 
-  const [projects, dispatch] = useReducer(listReducer, initialProjects);
+  const [initialProjects, dispatch] = useReducer(listReducer, projects);
   const setProjects = (action) => dispatch(action);
 
   useEffect(() => {
@@ -53,41 +45,33 @@ export default function ProjectDash() {
     } else {
       setProjects({
         type: "SWITCH",
-        payload: initialProjects,
+        payload: projects,
       });
     }
   }, [listOnlyAdminProjects]);
 
-  const handleProjectUpload = async (projectDoc) => {
-    console.log(projectDoc);
-    // try {
-    //   await axios.post(base_url + "auth/signup", projectDoc, {
-    //     withCredentials: true,
-    //   });
-    // } catch (e) {
-    //   console.log(e);
-    // }
-  };
-
-  const [showProjectAddPopUp, setShowProjectAddPopUp] = useState(false);
+  const [showProjectAddForm, setShowProjectAddForm] = useState(false);
 
   return (
     <>
+      {showProjectAddForm && (
+        <AddProjectForm setShowProjectAddForm={setShowProjectAddForm} />
+      )}
       <div className="grid grid-cols-[1fr,1fr,1.3fr] min-h-[17rem] border-white border-2 border-t-0 text-white">
         <ActivityCard />
         <MessageCard />
-        <StatusCard list={projects} renderList="Project" />
+        <StatusCard list={initialProjects} renderList="Project" />
       </div>
       <div>
         <ListHeader
           renderList="Project"
           setList={setProjects}
-          resetList={resetProjectList}
           leaderList={leaderProjects}
-          initialList={initialProjects}
-          setShowAddPopUp={setShowProjectAddPopUp}
+          resetList={resetProjectList}
+          initialList={projects}
           filterBtnTxt={projectFilterBtnTxt}
           switchList={listOnlyAdminProjects}
+          setShowAddForm={setShowProjectAddForm}
           setSwitchList={setListOnlyAdminProjects}
           listNameSearchTxt={projectNameSearchTxt}
           setFilterBtnTxt={setProjectFilterBtnTxt}
@@ -98,20 +82,12 @@ export default function ProjectDash() {
         <ListSubHeader renderList="Project" />
         <div>
           <ListBody
-            list={projects}
+            list={initialProjects}
             renderList="Project"
             listNameSearchTxt={projectNameSearchTxt}
           />
         </div>
       </div>
-      {showProjectAddPopUp && (
-        <AddComponent
-          renderList="Project"
-          handleUpload={handleProjectUpload}
-          setShowAddPopUp={setShowProjectAddPopUp}
-          description="Your project is where you can create your teams, add members and work with them effortlessly."
-        />
-      )}
     </>
   );
 }

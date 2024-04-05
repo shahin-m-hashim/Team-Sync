@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
-import ListHeader from "@/components/list/ListHeader";
-import ListBody from "@/components/list/ListBody";
-import ListSubHeader from "@/components/list/ListSubHeader";
 import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
-import AddComponent from "../AddComponent";
+import ListBody from "@/components/list/ListBody";
+import { listReducer } from "@/helpers/listReducer";
+import ListHeader from "@/components/list/ListHeader";
+import { useEffect, useReducer, useState } from "react";
+import ListSubHeader from "@/components/list/ListSubHeader";
+import AddSubTeamForm from "../forms/subTeams/AddSubTeamForm";
 import google from "../../assets/images/project icons/Google.png";
+import youtube from "../../assets/images/project icons/Youtube.png";
 import facebook from "../../assets/images/project icons/Facebook.png";
 import instagram from "../../assets/images/project icons/Instagram.png";
-import youtube from "../../assets/images/project icons/Youtube.png";
-import { useEffect, useReducer, useState } from "react";
-import { listReducer } from "@/helpers/listReducer";
 
 const initialSubTeams = [
   {
@@ -133,21 +133,13 @@ export default function SubTeamDash() {
     }
   }, [listOnlyAdminSubTeams]);
 
-  const handleSubTeamUpload = async (subTeamDoc) => {
-    console.log(subTeamDoc);
-    // try {
-    //   await axios.post(base_url + "auth/signup", subTeamDoc, {
-    //     withCredentials: true,
-    //   });
-    // } catch (e) {
-    //   console.log(e);
-    // }
-  };
-
-  const [showSubTeamAddPopUp, setShowSubTeamAddPopUp] = useState(false);
+  const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
 
   return (
     <>
+      {showAddSubTeamForm && (
+        <AddSubTeamForm setShowAddSubTeamForm={setShowAddSubTeamForm} />
+      )}
       <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
           details={{
@@ -168,7 +160,7 @@ export default function SubTeamDash() {
           initialList={initialSubTeams}
           filterBtnTxt={subTeamFilterBtnTxt}
           switchList={listOnlyAdminSubTeams}
-          setShowAddPopUp={setShowSubTeamAddPopUp}
+          setShowAddForm={setShowAddSubTeamForm}
           setSwitchList={setListOnlyAdminSubTeams}
           listNameSearchTxt={subTeamNameSearchTxt}
           setFilterBtnTxt={setSubTeamFilterBtnTxt}
@@ -183,14 +175,6 @@ export default function SubTeamDash() {
           listNameSearchTxt={subTeamNameSearchTxt}
         />
       </div>
-      {showSubTeamAddPopUp && (
-        <AddComponent
-          renderList="Sub Team"
-          handleUpload={handleSubTeamUpload}
-          setShowAddPopUp={setShowSubTeamAddPopUp}
-          description="Your Sub Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."
-        />
-      )}
     </>
   );
 }

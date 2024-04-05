@@ -1,13 +1,17 @@
 /* eslint-disable react/prop-types */
-import Loading from "../../Loading";
+
 import { useFormik } from "formik";
+import Loading from "../../Loading";
+import { toast } from "react-toastify";
 import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
-import { primaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
-import { toast } from "react-toastify";
 import { ErrorContext } from "@/providers/ErrorProvider";
+import { primaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
 
-export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
+export default function PrimaryUserForm({
+  setIsEditing,
+  setEnablePrimaryEdit,
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const { userData, updateUserDetails, setReFetchUser } =
     useContext(UserContext);
@@ -23,6 +27,11 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
   };
 
   const onSubmit = async (values) => {
+    if (JSON.stringify(initialValues) === JSON.stringify(values)) {
+      toast.info("You have made no changes !!!");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await updateUserDetails("primaryDetails", { newPrimaryDetails: values });
@@ -43,26 +52,28 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
       }
     } finally {
       setIsLoading(false);
+      setIsEditing(false);
       setEnablePrimaryEdit(false);
       setReFetchUser((prev) => !prev);
     }
   };
 
-  const { errors, handleSubmit, touched, getFieldProps, resetForm } = useFormik(
-    {
-      initialValues,
-      validationSchema,
-      onSubmit,
-    }
-  );
+  const {
+    errors,
+    handleSubmit,
+    touched,
+    getFieldProps,
+    handleChange,
+    resetForm,
+  } = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit,
+  });
 
   return (
     <>
-      {isLoading && (
-        <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
-          <Loading />
-        </div>
-      )}
+      {isLoading && <Loading />}
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           <input
@@ -71,6 +82,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
             name="fname"
             placeholder="Your Full Name"
             {...getFieldProps("fname")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="w-full p-1 text-slate-800"
           />
           {errors.fname && touched.fname && (
@@ -87,6 +102,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
               name="username"
               placeholder="a unique username"
               {...getFieldProps("username")}
+              onChange={(e) => {
+                handleChange(e);
+                setIsEditing(true);
+              }}
               className="w-1/2 p-1 text-slate-800"
             />
             <select
@@ -94,6 +113,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
               name="pronoun"
               className="w-1/2 text-black"
               {...getFieldProps("pronoun")}
+              onChange={(e) => {
+                handleChange(e);
+                setIsEditing(true);
+              }}
             >
               {!userData?.pronoun && (
                 <option value="" className="hidden">
@@ -117,6 +140,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
             name="tag"
             placeholder="Your Tagline"
             {...getFieldProps("tag")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="w-full p-1 text-slate-800"
           />
           {errors.tag && touched.tag && (
@@ -131,6 +158,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
           name="bio"
           placeholder="Enter Your Bio"
           {...getFieldProps("bio")}
+          onChange={(e) => {
+            handleChange(e);
+            setIsEditing(true);
+          }}
           className="p-1 text-slate-800"
         />
         {errors.bio && touched.bio && (
@@ -145,6 +176,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
             name="socialLinks.website"
             placeholder="Website"
             {...getFieldProps("socialLinks.website")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="p-1 text-slate-800"
           />
           {errors.socialLinks?.website && touched.socialLinks?.website && (
@@ -157,6 +192,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
             name="socialLinks.linkedIn"
             placeholder="LinkedIn"
             {...getFieldProps("socialLinks.linkedIn")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="p-1 text-slate-800"
           />
           {errors.socialLinks?.linkedIn && touched.socialLinks?.linkedIn && (
@@ -169,6 +208,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
             name="socialLinks.github"
             placeholder="Github"
             {...getFieldProps("socialLinks.github")}
+            onChange={(e) => {
+              handleChange(e);
+              setIsEditing(true);
+            }}
             className="p-1 text-slate-800"
           />
           {errors.socialLinks?.github && touched.socialLinks?.github && (
@@ -190,7 +233,10 @@ export default function PrimaryUserForm({ setEnablePrimaryEdit }) {
           </button>
           <button
             type="button"
-            onClick={() => setEnablePrimaryEdit(false)}
+            onClick={() => {
+              setIsEditing(false);
+              setEnablePrimaryEdit(false);
+            }}
             className="w-full px-2 bg-red-500"
           >
             Cancel

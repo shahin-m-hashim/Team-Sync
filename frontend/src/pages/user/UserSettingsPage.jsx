@@ -1,7 +1,9 @@
-import { useContext, useState } from "react";
+import app from "@/lib/firebase";
+import { useContext, useEffect, useState } from "react";
 import Navbar from "@/components/dashboard/Navbar";
+import { getStorage, ref } from "firebase/storage";
 import github from "../../assets/images/github.png";
-import ChangeUserDp from "@/components/ChangeUserDp";
+import ImageHandler from "@/components/ImageHandler";
 import website from "../../assets/images/website.png";
 import { UserContext } from "@/providers/UserProvider";
 import linkedIn from "../../assets/images/linkedIn.png";
@@ -10,10 +12,36 @@ import PrimaryUserForm from "@/components/forms/user/PrimaryUserForm";
 import SecondaryUserForm from "@/components/forms/user/SecondaryUserForm";
 
 export default function UserSettingsPage() {
-  const { userData } = useContext(UserContext);
+  const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [enablePrimaryEdit, setEnablePrimaryEdit] = useState(false);
   const [enableSecondaryEdit, setEnableSecondaryEdit] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing]);
+
+  const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
+    useContext(UserContext);
+
+  const storage = getStorage(app);
+  const storageRef = ref(storage, `users/${userData?._id}/images/profilePic`);
+
+  const updateDp = async (downloadURL) =>
+    await updateUserDetails("profilePic", {
+      newProfilePic: downloadURL,
+    });
+
+  const deleteDp = async () => await deleteUserData("profilePic");
+
+  const ReFetchUserDetails = () => setReFetchUser((prev) => !prev);
 
   return (
     <>
@@ -24,7 +52,15 @@ export default function UserSettingsPage() {
       <div className="text-white size-full grid grid-cols-[300px,1fr] pt-14 bg-[#2b2a2a]">
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
-          <ChangeUserDp />
+          <ImageHandler
+            updateImage={updateDp}
+            deleteImage={deleteDp}
+            storageRef={storageRef}
+            MAX_SIZE={100 * 1024 * 1024}
+            setIsEditing={setIsEditing}
+            initialImage={userData?.profilePic}
+            reFetchDetails={ReFetchUserDetails}
+          />
           {!enablePrimaryEdit ? (
             <>
               <span className="text-xl font-semibold text-slate-800">
@@ -75,12 +111,16 @@ export default function UserSettingsPage() {
               )}
             </>
           ) : (
-            <PrimaryUserForm setEnablePrimaryEdit={setEnablePrimaryEdit} />
+            <PrimaryUserForm
+              setIsEditing={setIsEditing}
+              setEnablePrimaryEdit={setEnablePrimaryEdit}
+            />
           )}
         </div>
         <main className="relative px-10 py-5 bg-gray-600 size-full">
           <span className="text-3xl">YOUR PUBLIC PROFILE</span>
           <SecondaryUserForm
+            setIsEditing={setIsEditing}
             enableSecondaryEdit={enableSecondaryEdit}
             setEnableSecondaryEdit={setEnableSecondaryEdit}
           />

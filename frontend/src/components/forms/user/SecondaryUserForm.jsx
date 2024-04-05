@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { ErrorContext } from "@/providers/ErrorProvider";
 
 export default function SecondaryUserForm({
+  setIsEditing,
   enableSecondaryEdit,
   setEnableSecondaryEdit,
 }) {
@@ -28,6 +29,11 @@ export default function SecondaryUserForm({
   const [selected, setSelected] = useState(initialValues?.address?.country);
 
   const onSubmit = async (values) => {
+    if (JSON.stringify(initialValues) === JSON.stringify(values)) {
+      toast.info("You have made no changes !!!");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await updateUserDetails("secondaryDetails", {
@@ -36,7 +42,7 @@ export default function SecondaryUserForm({
       toast.success("Details Updated Successfully");
     } catch (error) {
       if (error.response?.status === 401) {
-        setError("Unauthorized");
+        setError("unauthorized");
       } else if (
         error.code === "ERR_NETWORK" ||
         error.message === "Network Error" ||
@@ -50,6 +56,7 @@ export default function SecondaryUserForm({
       }
     } finally {
       setIsLoading(false);
+      setIsEditing(false);
       setEnableSecondaryEdit(false);
       setReFetchUser((prev) => !prev);
     }
@@ -61,6 +68,7 @@ export default function SecondaryUserForm({
     touched,
     getFieldProps,
     setFieldValue,
+    handleChange,
     resetForm,
   } = useFormik({
     initialValues,
@@ -70,11 +78,7 @@ export default function SecondaryUserForm({
 
   return (
     <>
-      {isLoading && (
-        <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
-          <Loading />
-        </div>
-      )}
+      {isLoading && <Loading />}
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-5 mt-10">
         <div className="flex flex-col flex-1 gap-7">
           <h1 className="font-mono text-lg underline underline-offset-8">
@@ -120,6 +124,10 @@ export default function SecondaryUserForm({
                       disabled={!enableSecondaryEdit}
                       placeholder="Your current district"
                       {...getFieldProps("address.district")}
+                      onChange={(e) => {
+                        handleChange(e);
+                        setIsEditing(true);
+                      }}
                       className={cn(
                         enableSecondaryEdit
                           ? "placeholder:text-gray-600"
@@ -149,6 +157,10 @@ export default function SecondaryUserForm({
                       disabled={!enableSecondaryEdit}
                       placeholder="Your current state"
                       {...getFieldProps("address.state")}
+                      onChange={(e) => {
+                        handleChange(e);
+                        setIsEditing(true);
+                      }}
                       className={cn(
                         enableSecondaryEdit
                           ? "placeholder:text-gray-600"
@@ -175,6 +187,7 @@ export default function SecondaryUserForm({
                 selected={selected}
                 onSelect={(code) => {
                   setSelected(code);
+                  setIsEditing(true);
                   setFieldValue("address.country", code);
                 }}
                 className="p-1 font-semibold bg-blue-300 rounded-md"
@@ -197,6 +210,10 @@ export default function SecondaryUserForm({
                   disabled={!enableSecondaryEdit}
                   placeholder="Your current occupation"
                   {...getFieldProps("occupation")}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setIsEditing(true);
+                  }}
                   className={cn(
                     enableSecondaryEdit
                       ? "placeholder:text-gray-600"
@@ -227,6 +244,10 @@ export default function SecondaryUserForm({
                   name="organization"
                   placeholder="Your current organization"
                   {...getFieldProps("organization")}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setIsEditing(true);
+                  }}
                   className={cn(
                     enableSecondaryEdit
                       ? "placeholder:text-gray-600"
@@ -278,6 +299,7 @@ export default function SecondaryUserForm({
                     resetForm();
                     setSelected(userData?.address?.country);
                     setEnableSecondaryEdit(false);
+                    setIsEditing(false);
                   }}
                   className="w-full p-2 text-white bg-red-500 rounded-sm hover:bg-red-600"
                 />
