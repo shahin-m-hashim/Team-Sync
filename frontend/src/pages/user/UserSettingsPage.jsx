@@ -1,11 +1,9 @@
-import app from "@/lib/firebase";
-import { useContext, useEffect, useState } from "react";
 import Navbar from "@/components/dashboard/Navbar";
-import { getStorage, ref } from "firebase/storage";
 import github from "../../assets/images/github.png";
 import ImageHandler from "@/components/ImageHandler";
 import website from "../../assets/images/website.png";
 import { UserContext } from "@/providers/UserProvider";
+import { useContext, useEffect, useState } from "react";
 import linkedIn from "../../assets/images/linkedIn.png";
 import DeleteAccount from "@/components/auth/DeleteAccount";
 import PrimaryUserForm from "@/components/forms/user/PrimaryUserForm";
@@ -16,6 +14,21 @@ export default function UserSettingsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [enablePrimaryEdit, setEnablePrimaryEdit] = useState(false);
   const [enableSecondaryEdit, setEnableSecondaryEdit] = useState(false);
+
+  const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
+    useContext(UserContext);
+
+  const updateProfilePic = async (downloadURL) => {
+    await updateUserDetails("profilePic", {
+      newProfilePic: downloadURL,
+    });
+    setReFetchUser((prev) => !prev);
+  };
+
+  const deleteProfilePic = async () => {
+    await deleteUserData("profilePic");
+    setReFetchUser((prev) => !prev);
+  };
 
   useEffect(() => {
     if (!isEditing) return;
@@ -28,21 +41,6 @@ export default function UserSettingsPage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isEditing]);
 
-  const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
-    useContext(UserContext);
-
-  const storage = getStorage(app);
-  const storageRef = ref(storage, `users/${userData?._id}/images/profilePic`);
-
-  const updateDp = async (downloadURL) =>
-    await updateUserDetails("profilePic", {
-      newProfilePic: downloadURL,
-    });
-
-  const deleteDp = async () => await deleteUserData("profilePic");
-
-  const ReFetchUserDetails = () => setReFetchUser((prev) => !prev);
-
   return (
     <>
       {showDeleteModal && (
@@ -53,13 +51,12 @@ export default function UserSettingsPage() {
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
           <ImageHandler
-            updateImage={updateDp}
-            deleteImage={deleteDp}
-            storageRef={storageRef}
-            MAX_SIZE={100 * 1024 * 1024}
+            MAX_SIZE={2 * 1024 * 1024}
             setIsEditing={setIsEditing}
+            updateImage={updateProfilePic}
+            deleteImage={deleteProfilePic}
             initialImage={userData?.profilePic}
-            reFetchDetails={ReFetchUserDetails}
+            firebasePath={`users/${userData?._id}/images/profilePic`}
           />
           {!enablePrimaryEdit ? (
             <>

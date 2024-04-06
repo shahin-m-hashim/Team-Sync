@@ -5,9 +5,10 @@ import DummyPage from "./pages/DummyPage";
 import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
+import DashboardPage from "./pages/DashboardPage";
 import UserProvider from "./providers/UserProvider";
+import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
-import DashboardPage from "./pages/user/DashboardPage";
 import TaskDash from "./components/dashboard/TaskDash";
 import TeamDash from "./components/dashboard/TeamDash";
 import UserSettingsPage from "./pages/user/UserSettingsPage";
@@ -16,7 +17,6 @@ import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import ProjectProvider from "./providers/ProjectProvider";
 
 const router = createBrowserRouter([
   {
@@ -58,9 +58,9 @@ const router = createBrowserRouter([
           {
             path: "projects",
             element: (
-              <ProjectProvider>
-                <ProjectDash />
-              </ProjectProvider>
+              // <ProjectProvider>
+              <ProjectDash />
+              // </ProjectProvider>
             ),
           },
           {
@@ -114,7 +114,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <ErrorProvider>
-      <RouterProvider router={router} />
+      <FileProvider>
+        <RouterProvider router={router} />
+      </FileProvider>
     </ErrorProvider>
   );
 }

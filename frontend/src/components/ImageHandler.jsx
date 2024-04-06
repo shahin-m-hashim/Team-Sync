@@ -5,17 +5,17 @@ import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import addDp from "../assets/images/addDp.png";
 import editDp from "../assets/images/editDp.png";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import defaultDp from "../assets/images/defaultDp.png";
+import { FileContext } from "@/providers/FileProvider";
 import { ErrorContext } from "@/providers/ErrorProvider";
-import { uploadBytes, deleteObject, getDownloadURL } from "firebase/storage";
 
 const DropUpMenu = ({
   userDp,
-  handleCancelImage,
   dpInputRef,
-  handleDeleteDp,
   handleSaveDp,
+  handleDeleteDp,
+  handleCancelImage,
 }) => {
   return (
     <div className="absolute flex flex-col p-1 text-xs bottom-8 left-10 bg-slate-900">
@@ -57,22 +57,28 @@ const DropUpMenu = ({
 
 export default function ImageHandler({
   position,
-  storageRef,
   updateImage,
   deleteImage,
-  initialImage,
   setIsEditing,
-  reFetchDetails,
+  initialImage,
+  firebasePath,
   MAX_SIZE = 2 * 1024 * 1024,
 }) {
   const { setError } = useContext(ErrorContext);
+  const { file, uploadFile, deleteFile } = useContext(FileContext);
+
+  useEffect(() => {
+    console.log("updating");
+    if (file.uploadStatus === "completed") {
+      setImage(file.uploadedFileURL);
+    }
+  }, [file.uploadStatus, file.uploadedFileURL]);
 
   const dpInputRef = useRef();
   const dpErrorRef = useRef();
 
   const [imgFile, setImgFile] = useState();
   const [image, setImage] = useState(initialImage);
-  const [isLoading, setIsLoading] = useState(false);
   const [showDropDown, setShowDropDown] = useState(false);
 
   const handleImageChange = (e) => {
@@ -100,46 +106,46 @@ export default function ImageHandler({
 
   const handleSaveDp = async () => {
     if (!imgFile) return;
-    setIsLoading(true);
+
+    setIsEditing(false);
+    setShowDropDown(false);
+    setImage(initialImage);
+    dpInputRef.current.value = "";
+    dpErrorRef.current.style.display = "none";
+
     try {
-      await uploadBytes(storageRef, imgFile);
-      const downloadURL = await getDownloadURL(storageRef);
-      await updateImage(downloadURL);
-      setIsLoading(false);
-      toast.success("Update successfull !");
-      reFetchDetails();
+      toast.info("Profile pic will be updated shortly...");
+      await uploadFile(imgFile, firebasePath, updateImage);
+      toast.success("Update successful!");
     } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");
-        await deleteObject(storageRef);
+        await deleteFile(firebasePath);
       } else if (
         error.code === "ERR_NETWORK" ||
         error.message === "Network Error" ||
         error.response?.status === 500
       ) {
         setError("serverError");
-        await deleteObject(storageRef);
+        await deleteFile(firebasePath);
       } else {
-        toast.error("Update failed !!!");
-        setImage(initialImage);
-        dpInputRef.current.value = "";
-        console.log("Error uploading file:", error);
+        toast.error("Profile Pic Update failed !!!");
+        console.log("Error uploading profile pic:", error);
       }
-    } finally {
-      setIsEditing(false);
-      setShowDropDown(false);
-      dpErrorRef.current.style.display = "none";
     }
   };
 
   const handleDeleteDp = async () => {
-    setIsLoading(true);
+    setIsEditing(false);
+    setShowDropDown(false);
+    dpInputRef.current.value = "";
+    dpErrorRef.current.style.display = "none";
+
     try {
       await deleteImage();
-      await deleteObject(storageRef);
-      toast.success("Deletion sucessfull !!!");
+      await deleteFile(firebasePath);
       setImage("");
-      reFetchDetails();
+      toast.success("Deletion sucessfull !!!");
     } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");
@@ -154,10 +160,6 @@ export default function ImageHandler({
         toast.error("Deletion Failed !!!");
         console.error("Error deleting file:", error);
       }
-    } finally {
-      setIsLoading(false);
-      setShowDropDown(false);
-      dpErrorRef.current.style.display = "none";
     }
   };
 
@@ -175,7 +177,7 @@ export default function ImageHandler({
         >
           Max file size is 2 MB
         </span>
-        {isLoading && <Loading />}
+        {file.uploadStatus === "uploading" && <Loading />}
         {!image ? (
           <img
             src={addDp}
