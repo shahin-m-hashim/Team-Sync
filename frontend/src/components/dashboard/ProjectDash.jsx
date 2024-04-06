@@ -4,14 +4,15 @@ import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import MessageCard from "@/components/cards/MessageCard";
 import ActivityCard from "@/components/cards/ActivityCard";
 import AddProjectForm from "../forms/projects/AddProjectForm";
-import { ProjectContext } from "@/providers/ProjectProvider";
 
 export default function ProjectDash() {
-  const { projects } = useContext(ProjectContext);
+  // const { projects } = useContext(ProjectContext);
+
+  const projects = [];
 
   const leaderProjects = projects.filter(
     (project) => project.role === "Leader"
