@@ -298,8 +298,8 @@ export default function SecondaryUserForm({
                   onClick={() => {
                     resetForm();
                     setSelected(userData?.address?.country);
-                    setEnableSecondaryEdit(false);
                     setIsEditing(false);
+                    setEnableSecondaryEdit(false);
                   }}
                   className="w-full p-2 text-white bg-red-500 rounded-sm hover:bg-red-600"
                 />

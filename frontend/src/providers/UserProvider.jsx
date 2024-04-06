@@ -52,9 +52,9 @@ const UserProvider = ({ children }) => {
       value={{
         userData,
         setUserStatus,
-        updateUserDetails,
         deleteUserData,
         setReFetchUser,
+        updateUserDetails,
       }}
     >
       {children}
