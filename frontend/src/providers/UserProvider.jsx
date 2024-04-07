@@ -25,8 +25,14 @@ const UserProvider = ({ children }) => {
   const deleteUserData = async (url) => await deleteData(url);
 
   if (userStatus === "LOGGED_OUT") {
-    logout();
-    return <LoggedOutPage />;
+    try {
+      logout();
+      return <LoggedOutPage />;
+    } catch (e) {
+      if (e.response.status === 500) {
+        setError("serverError");
+      }
+    }
   }
 
   if (res?.error === "unauthorized") {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setLocalSecureItem } from "@/lib/utils";
+import { getLocalSecureItem, setLocalSecureItem } from "@/lib/utils";
 
 const base_url = import.meta.env.VITE_APP_BASE_URL;
 
@@ -52,8 +52,13 @@ const resetPassword = async (credentials) => {
 };
 
 const logout = async () => {
+  const { id } = getLocalSecureItem("user", "low");
+  await axios.post(
+    base_url + "/auth/logout",
+    { userId: id },
+    { withCredentials: true }
+  );
   localStorage.clear();
-  await axios.get(base_url + "/auth/logout", { withCredentials: true });
 };
 
 export { signup, login, reqPassResetOTP, verifyOTP, resetPassword, logout };
