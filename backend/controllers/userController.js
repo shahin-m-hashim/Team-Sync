@@ -1,13 +1,38 @@
 const {
+  createProject,
   removeAccount,
-  getUserDetails,
   setProfilePic,
+  getUserDetails,
   removeProfilePic,
   setPrimaryDetails,
   setContactDetails,
   setSecurityDetails,
+  getAllUserProjects,
   setSecondaryDetails,
 } = require("../services/userService");
+
+// POST REQUESTS
+const addProject = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { projectDetails } = req.body;
+    const projectId = await createProject(userId, projectDetails);
+    console.log(`New project ${projectId} is created for user ${userId}`);
+    res.status(201).json({
+      success: true,
+      message: "Project created successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("ProjectAlreadyExists"));
+    }
+    next(e);
+  }
+};
 
 // FETCH REQUESTS
 const fetchUserDetails = async (req, res, next) => {
@@ -15,6 +40,16 @@ const fetchUserDetails = async (req, res, next) => {
     const { userId } = req.user;
     const userDetails = await getUserDetails(userId);
     res.status(200).json(userDetails);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchAllUserProjects = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const projects = await getAllUserProjects(userId);
+    res.status(200).json(projects);
   } catch (e) {
     next(e);
   }
@@ -28,6 +63,13 @@ const updateProfilePic = async (req, res, next) => {
     const updatedProfilePic = await setProfilePic(userId, newProfilePic);
     res.status(200).json({ updatedProfilePic });
   } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("UserAlreadyExists"));
+    }
     next(e);
   }
 };
@@ -139,10 +181,12 @@ const deleteAccount = async (req, res, next) => {
 };
 
 module.exports = {
+  addProject,
   deleteAccount,
   updateProfilePic,
   deleteProfilePic,
   fetchUserDetails,
+  fetchAllUserProjects,
   updatePrimaryDetails,
   updateContactDetails,
   updateSecurityDetails,

@@ -21,6 +21,6 @@ authRouter.post("/verifyPassResetOtp", verifyPassResetOtpController);
 
 authRouter.post("/resetPass", resetPassController);
 
-authRouter.get("/logout", logoutController);
+authRouter.post("/logout", logoutController);
 
 module.exports = authRouter;
