@@ -1,15 +1,55 @@
 const bcrypt = require("bcrypt");
+const moment = require("moment");
 const users = require("../models/userModel");
+const projects = require("../models/projectModel");
 
 // GET
 const getUserDetails = async (userId) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
-  const { password, createdAt, usedOtps, __v, ...userData } = user._doc;
+  const { password, createdAt, updatedAt, usedOtps, __v, ...userData } =
+    user._doc;
   return userData;
 };
 
-// SET
+const getAllUserProjects = async (userId) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+  await user.populate("projects");
+
+  const formattedProjects = user.projects.map((project) => {
+    const { id, name, leader, icon, createdAt, progress, status } = project;
+    const formattedDate = moment(createdAt).format("DD/MM/YYYY");
+    return {
+      id,
+      name,
+      leader,
+      icon,
+      createdAt: formattedDate,
+      progress,
+      status,
+    };
+  });
+
+  return formattedProjects;
+};
+
+// POST
+const createProject = async (userId, projectDetails) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+
+  const newProject = await projects.create({
+    ...projectDetails,
+    leader: userId,
+  });
+
+  user.projects.push(newProject._id);
+  await user.save();
+  return newProject._id;
+};
+
+// PATCH
 const setProfilePic = async (userId, newProfilePic) => {
   const user = await users.findById(userId);
   if (!user) throw new Error("UnknownUser");
@@ -88,12 +128,14 @@ const removeAccount = async (userId, password) => {
 };
 
 module.exports = {
+  createProject,
   removeAccount,
   setProfilePic,
   getUserDetails,
   removeProfilePic,
   setPrimaryDetails,
   setContactDetails,
+  getAllUserProjects,
   setSecurityDetails,
   setSecondaryDetails,
 };

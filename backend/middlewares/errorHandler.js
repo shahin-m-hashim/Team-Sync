@@ -13,6 +13,24 @@ const errorHandler = (error, req, res, next) => {
         error: "User not found, Please sign up first",
       });
 
+    case "UnknownProject":
+      return res.status(404).json({
+        success: false,
+        error: "Project not found, Please create or join a project first",
+      });
+
+    case "UnknownInvitedUser":
+      return res.status(404).json({
+        success: false,
+        error: "User not found, Please check the username and try again",
+      });
+
+    case "UnknownInvitingUser":
+      return res.status(404).json({
+        success: false,
+        error: "Failed to send invitation, Please try again",
+      });
+
     case "InvalidPassword":
       return res.status(401).json({
         success: false,
@@ -66,6 +84,18 @@ const errorHandler = (error, req, res, next) => {
       return res.status(401).json({
         success: false,
         error: "Account deletion failed",
+      });
+
+    case "ProjectAlreadyExists":
+      return res.status(400).json({
+        success: false,
+        error: "A project with the given name already exists",
+      });
+
+    case "ForbiddenAction":
+      return res.status(403).json({
+        success: false,
+        error: "Forbidden. You do not have permission to perform this action",
       });
 
     default:

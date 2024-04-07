@@ -13,6 +13,7 @@ const { verifyAccessToken } = require("./middlewares/token");
 // custom routes
 const authRoutes = require("./routes/authRoute");
 const userRoutes = require("./routes/userRoute");
+const projectRoutes = require("./routes/projectRoute");
 
 const app = express();
 
@@ -36,7 +37,7 @@ app.use(requestLogger);
 app.use("/api/auth/", authRoutes);
 
 // Protected Routes
-app.use("/api/user/:userId", verifyAccessToken, userRoutes);
+app.use("/api/user/:userId", verifyAccessToken, [userRoutes, projectRoutes]);
 
 // Unknown routes handling middleware
 app.use("*", unknownRouteHandler);
