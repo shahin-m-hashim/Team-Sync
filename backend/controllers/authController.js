@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 const {
-  signUpUser,
   loginUser,
+  signUpUser,
+  logoutUser,
   sendPassResetOtp,
-  verifyPassResetOtp,
   resetUserPassword,
+  verifyPassResetOtp,
 } = require("../services/authService");
 
 const signUpController = async (req, res, next) => {
@@ -181,6 +182,9 @@ const resetPassController = async (req, res, next) => {
 
 const logoutController = async (req, res, next) => {
   try {
+    const { userId } = req.body;
+    await logoutUser(userId);
+
     res.clearCookie("accJwt");
     res.clearCookie("refJwt");
 

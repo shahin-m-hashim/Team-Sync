@@ -7,7 +7,7 @@ const otpGenerator = require("otp-generator");
 
 const signUpUser = async (user) => {
   const { id } = await users.create(user);
-  console.log(`User registered with id: ${id}`);
+  console.log(`A new user ${id} is registered`);
 };
 
 const loginUser = async (email, password) => {
@@ -15,8 +15,17 @@ const loginUser = async (email, password) => {
   if (!user) throw new Error("UnknownUser");
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) throw new Error("InvalidPassword");
-
+  user.status = "active";
+  await user.save();
   return user.id;
+};
+
+const logoutUser = async (userId) => {
+  const user = await users.findById(userId);
+  if (!user) throw new Error("UnknownUser");
+  user.status = "inActive";
+  user.last_seen = Date.now();
+  await user.save();
 };
 
 const sendPassResetOtp = async (email) => {
@@ -56,9 +65,10 @@ const resetUserPassword = async (userId, password) => {
 };
 
 module.exports = {
-  signUpUser,
   loginUser,
+  signUpUser,
+  logoutUser,
   sendPassResetOtp,
-  verifyPassResetOtp,
   resetUserPassword,
+  verifyPassResetOtp,
 };
