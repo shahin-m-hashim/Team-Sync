@@ -17,6 +17,8 @@ import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import PublicProfile from "./pages/PublicProfile";
+import ProjectSettings from "./pages/user/project/ProjectSettings";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginPage />,
+  },
+  {
+    path: ":username",
+    element:<PublicProfile/>
   },
   {
     path: "user/:userId",
@@ -84,6 +90,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <DummyPage />,
+          },
+          {
+            path: "project",
+            element: <ProjectSettings/>
           },
           {
             path: "general",
