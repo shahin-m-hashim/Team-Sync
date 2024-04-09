@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import rocket from "../assets/images/rocket.png";
-import NavbarComponent from "@/components/Navbar";
+import NavbarComponent from "@/components/PublicNavbar";
 import { getLocalSecureItem } from "@/lib/utils";
 import { useEffect, useState } from "react";
 export default function HomePage() {
@@ -18,7 +18,7 @@ export default function HomePage() {
     render && (
       <>
         <NavbarComponent />
-        <section className="grid h-full grid-cols-1 gap-x-14 my-10 md:my-auto lg:grid-cols-[2fr,1fr] px-7 md:px-28">
+        <section className="pt-20 grid h-full grid-cols-1 gap-x-14 my-10 md:my-auto lg:grid-cols-[2fr,1fr] px-7 md:px-28">
           <div className="flex flex-col">
             <div className="inline-block px-3 py-1 mt-10 bg-blue-100 rounded-xl w-fit">
               Welcome to Team Sync
