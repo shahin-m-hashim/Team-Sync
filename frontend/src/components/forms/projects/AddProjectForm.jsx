@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { getLocalSecureItem } from "@/lib/utils";
-import AddEntityListForm from "../AddEntityListForm";
+import AddEntityListForm from "../AddEntityForm";
 
 export default function AddProjectForm({ setShowProjectAddForm }) {
   const { id } = getLocalSecureItem("user", "low");

@@ -16,9 +16,11 @@ import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import ProjectSettings from "./pages/user/project/ProjectSettings";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import ProjectSettings from "./pages/user/ProjectSettings";
+import TeamSettings from "./pages/user/TeamSettings";
+import SubTeamSettings from "./pages/user/SubTeamSettings";
 
 const router = createBrowserRouter([
   {
@@ -94,6 +96,14 @@ const router = createBrowserRouter([
           {
             path: "project",
             element: <ProjectSettings />,
+          },
+          {
+            path: "team",
+            element: <TeamSettings />,
+          },
+          {
+            path: "subTeam",
+            element: <SubTeamSettings />,
           },
           {
             path: "general",

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import AddEntityListForm from "../AddEntityListForm";
+import AddEntityListForm from "../AddEntityForm";
 
 export default function AddTeamForm({ setShowAddTeamForm }) {
   const handleTeamUpload = (TeamData) => {
