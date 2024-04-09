@@ -11,9 +11,26 @@ import settings from "../../assets/images/settings colored.png";
 import groupVoiceCall from "../../assets/images/Call.png";
 import groupChat from "../../assets/images/Chat Messages.png";
 import groupVideoCall from "../../assets/images/Video Call.png";
+import GroupedUsers from "../GroupedUsers";
 
 export default function DetailCard({ details, renderList }) {
-  details.membersDp = [user1, user2, user3, user4, user5];
+  const users = [
+    {
+      dp: user1,
+    },
+    {
+      dp: user2,
+    },
+    {
+      dp: user3,
+    },
+    {
+      dp: user4,
+    },
+    {
+      dp: user5,
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 bg-[#141414] p-3 px-10 ">
@@ -41,16 +58,7 @@ export default function DetailCard({ details, renderList }) {
         </div>
       </div>
       <div className="flex flex-col items-start justify-around">
-        <div className="flex items-center">
-          <img src={user1} width={"16%"} />
-          <img src={user2} width={"16%"} className="ml-[-10px]" />
-          <img src={user3} width={"16%"} className="ml-[-10px]" />
-          <img src={user4} width={"16%"} className="ml-[-10px]" />
-          <img src={user5} width={"16%"} className="ml-[-10px]" />
-          <div className="p-2 bg-slate-800 border-white border-2 ml-[-10px] rounded-[50%]">
-            +{details.nom - 5}
-          </div>
-        </div>
+        <GroupedUsers users={users} />
         <span className="text-[#9685FF] text-lg">{details.nom} members</span>
         <div className="flex items-center gap-10 ml-[-10px]">
           <img src={groupVoiceCall} />

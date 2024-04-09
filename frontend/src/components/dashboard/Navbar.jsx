@@ -46,6 +46,30 @@ const DropDownMenu = ({ name }) => {
         </li>
         <li>
           <Link
+            to={`/user/${user?.id}/settings/team`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Team Settings
+          </Link>
+        </li>
+        <li>
+          <Link
+            to={`/user/${user?.id}/settings/subTeam`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Sub Team Settings
+          </Link>
+        </li>
+        <li>
+          <Link
+            to={`/user/${user?.id}/settings/team`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Task Settings
+          </Link>
+        </li>
+        <li>
+          <Link
             to={`/user/${user?.id}/settings/security`}
             className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
@@ -73,7 +97,7 @@ export default function Navbar({ settings }) {
     <div
       id="dashNavbar"
       className={cn(
-        settings ? settings : " border-white border-2 rounded-md",
+        settings ? settings : "border-white border-2 rounded-md",
         "min-h-10 bg-[#141414] flex justify-between p-3 items-center"
       )}
     >
