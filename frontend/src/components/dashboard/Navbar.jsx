@@ -38,6 +38,14 @@ const DropDownMenu = ({ name }) => {
         </li>
         <li>
           <Link
+            to={`/user/${user?.id}/settings/project`}
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+          >
+            Project Settings
+          </Link>
+        </li>
+        <li>
+          <Link
             to={`/user/${user?.id}/settings/security`}
             className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
