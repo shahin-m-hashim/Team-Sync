@@ -6,6 +6,7 @@ import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
+import PublicProfile from "./pages/PublicProfile";
 import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
@@ -15,10 +16,9 @@ import UserSettingsPage from "./pages/user/UserSettingsPage";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ProjectSettings from "./pages/user/project/ProjectSettings";
 import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import PublicProfile from "./pages/PublicProfile";
-import ProjectSettings from "./pages/user/project/ProjectSettings";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
   },
   {
     path: ":username",
-    element:<PublicProfile/>
+    element: <PublicProfile />,
   },
   {
     path: "user/:userId",
@@ -93,7 +93,7 @@ const router = createBrowserRouter([
           },
           {
             path: "project",
-            element: <ProjectSettings/>
+            element: <ProjectSettings />,
           },
           {
             path: "general",

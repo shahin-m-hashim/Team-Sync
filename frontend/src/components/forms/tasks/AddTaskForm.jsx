@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import { cn } from "@/lib/utils";
 import closeIcon from "@/assets/images/Close.png";
-import ajmalDp from "../../../assets/images/ajmalDp.png";
 import { useEffect, useRef, useState } from "react";
 import attachIcon from "@/assets/images/Attach.png";
 import successIcon from "@/assets/images/Success.png";
+import ajmalDp from "../../../assets/images/ajmalDp.png";
 import user1 from "../../../assets/images/activities/user1.png";
 import user2 from "../../../assets/images/activities/user2.png";
 import user3 from "../../../assets/images/activities/user3.png";
