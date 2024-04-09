@@ -93,12 +93,13 @@ export default function Navbar({ settings }) {
   const { userData } = useContext(UserContext);
   const [showDropDown, setShowDropDown] = useState(false);
 
+  console.log(settings);
+
   return (
     <div
-      id="dashNavbar"
       className={cn(
-        settings ? settings : "border-white border-2 rounded-md",
-        "min-h-10 bg-[#141414] flex justify-between p-3 items-center"
+        settings ? settings : "z-10 fixed top-0 left-0 right-0 px-48 py-3",
+        "min-h-10 bg-[#141414] flex justify-between items-center"
       )}
     >
       <span className="text-[#9685FF] font-semibold">TeamSync</span>

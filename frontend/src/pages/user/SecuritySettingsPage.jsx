@@ -28,7 +28,7 @@ export default function SecuritySettingsPage() {
 
   return (
     <>
-      <Navbar settings={"z-10 fixed top-0 left-0 right-0"} />
+      <Navbar />
       <div className="size-full overflow-auto p-12 text-white shadow-md bg-[#2b2a2a]">
         <h1 className="max-w-6xl mx-auto text-3xl mt-14">
           Sign In And Security
