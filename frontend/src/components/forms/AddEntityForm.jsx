@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import closeIcon from "@/assets/images/Close.png";
 
-export default function AddEntityListForm({
+export default function AddEntityForm({
   renderList,
   description,
   handleSubmit,
@@ -32,7 +32,7 @@ export default function AddEntityListForm({
       <div className="relative w-[400px] top-1/2 left-1/2 transform -translate-x-1/2 p-5 -translate-y-1/2 flex items-center gap-y-4 flex-col h-fit bg-[#313338] text-white ">
         <div className="grid grid-cols-[1fr,25px] w-full">
           <span className="ml-2 text-xl text-center">
-            Customize Your {renderList}
+            Create Your {renderList}
           </span>
           <button onClick={() => setShowAddForm(false)}>
             <img src={closeIcon} alt="Close" />

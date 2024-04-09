@@ -1,19 +1,22 @@
 import { useFormik } from "formik";
-import { projectValidationSchema as validationSchema } from "@/validations/entityValidations";
+import { capitalizeFirstLetter } from "@/helpers/stringHandler";
 
 /* eslint-disable react/prop-types */
-const UpdateProjectDetailsForm = ({
-  initialData,
-  setShowUpdateProjectDetailsForm,
+const UpdateEntityDetailsForm = ({
+  entity,
+  entityData,
+  validationSchema,
+  handleUpdateEntityDetails,
+  setShowUpdateEntityDetailsForm,
 }) => {
   const initialValues = {
-    name: initialData?.name || "",
-    description: initialData?.description || "",
+    name: entityData?.name || "",
+    description: entityData?.description || "",
   };
 
   const onSubmit = async (values) => {
-    console.log(values);
-    setShowUpdateProjectDetailsForm(false);
+    handleUpdateEntityDetails(values);
+    setShowUpdateEntityDetailsForm(false);
   };
 
   const { errors, handleSubmit, touched, getFieldProps } = useFormik({
@@ -29,14 +32,14 @@ const UpdateProjectDetailsForm = ({
       </div>
       <div className="mb-8">
         <label htmlFor="prName" className="block mb-4 text-sm font-medium">
-          Project Name
+          {capitalizeFirstLetter(entity)} Name
         </label>
         <input
           type="text"
           id="prName"
           name="prName"
           {...getFieldProps("name")}
-          placeholder="Your project name"
+          placeholder={`Your ${capitalizeFirstLetter(entity)} name`}
           className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
         />
         {errors.name && touched.name && (
@@ -47,7 +50,7 @@ const UpdateProjectDetailsForm = ({
       </div>
       <div className="mb-8">
         <label htmlFor="description" className="block mb-4 text-sm font-medium">
-          Project Description
+          {capitalizeFirstLetter(entity)} Description
         </label>
         <textarea
           type="text"
@@ -55,7 +58,7 @@ const UpdateProjectDetailsForm = ({
           rows={2}
           name="description"
           {...getFieldProps("description")}
-          placeholder="Your project description"
+          placeholder={`Your ${capitalizeFirstLetter(entity)} description`}
           className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
         />
         {errors.description && touched.description && (
@@ -74,7 +77,7 @@ const UpdateProjectDetailsForm = ({
         </button>
         <button
           type="button"
-          onClick={() => setShowUpdateProjectDetailsForm(false)}
+          onClick={() => setShowUpdateEntityDetailsForm(false)}
           className="flex w-full items-center gap-2 justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-600"
         >
           Cancel
@@ -84,4 +87,4 @@ const UpdateProjectDetailsForm = ({
   );
 };
 
-export default UpdateProjectDetailsForm;
+export default UpdateEntityDetailsForm;
