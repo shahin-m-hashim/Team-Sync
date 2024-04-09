@@ -1,108 +1,99 @@
-import Navbar from "@/components/dashboard/Navbar";
-import { useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
 
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import Navbar from "@/components/dashboard/Navbar";
 import ajmalDp from "../../../assets/images/ajmalDp.png";
 import user1 from "../../../assets/images/activities/user1.png";
 import user2 from "../../../assets/images/activities/user2.png";
 import user3 from "../../../assets/images/activities/user3.png";
 import user4 from "../../../assets/images/activities/user4.png";
-import invite from "../../../assets/images/invite.png";
+import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
+import UpdateProjectDetailsForm from "@/components/forms/projects/UpdateProjectDetailsForm";
 
-const members = [
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-];
+// const members = [
+//   {
+//     username: "ajmal236",
+//     dp: ajmalDp,
+//   },
+//   {
+//     username: "shahin128",
+//     dp: user1,
+//   },
+//   {
+//     username: "hari5436",
+//     dp: user2,
+//   },
+//   {
+//     username: "asma098",
+//     dp: user3,
+//   },
+//   {
+//     username: "thomson12",
+//     dp: user4,
+//   },
+//   {
+//     username: "ajmal236",
+//     dp: ajmalDp,
+//   },
+//   {
+//     username: "shahin128",
+//     dp: user1,
+//   },
+//   {
+//     username: "hari5436",
+//     dp: user2,
+//   },
+//   {
+//     username: "asma098",
+//     dp: user3,
+//   },
+//   {
+//     username: "thomson12",
+//     dp: user4,
+//   },
+//   {
+//     username: "ajmal236",
+//     dp: ajmalDp,
+//   },
+//   {
+//     username: "shahin128",
+//     dp: user1,
+//   },
+//   {
+//     username: "hari5436",
+//     dp: user2,
+//   },
+//   {
+//     username: "asma098",
+//     dp: user3,
+//   },
+//   {
+//     username: "thomson12",
+//     dp: user4,
+//   },
+// ];
 
-const SearchAssignee = () => {
-  const [searchTxt, setSearchTxt] = useState("");
-  const [filteredMembers, setFilteredMembers] = useState([]);
-
-  useEffect(() => {
-    const filtered = members.filter((member) =>
-      member.username.toLowerCase().includes(searchTxt.toLowerCase())
-    );
-    setFilteredMembers(filtered);
-  }, [searchTxt]);
-
+const CurrentCollaborators = ({ existingCollaborators = [] }) => {
   return (
-    <div className="absolute top-0 left-[-200px] z-10 h-full p-2 bg-slate-700">
-      <input
-        type="text"
-        onChange={(e) => setSearchTxt(e.target.value)}
-        className="w-full px-2 py-2 my-4 bg-blue-500 border-2 rounded-lg border-block placeholder:text-black"
-        placeholder="Search assignee"
-      />
-      <div className="h-[86%] overflow-auto">
-        {filteredMembers.length !== 0 ? (
-          filteredMembers.map((member, index) => (
+    <div className="absolute left-0 right-0 z-10 h-[85.2%] px-8 py-4 mb-8 top-3 bg-slate-700">
+      <label className="block mb-5 font-medium">
+        All your project collaborators
+      </label>
+      <div className="h-full overflow-auto">
+        {existingCollaborators.length !== 0 ? (
+          existingCollaborators.map((collaborator, index) => (
             <button
               key={index}
               className="flex justify-between items-center w-full bg-slate-600 border-black border-[1px] p-2"
             >
-              <div>{member.username}</div>
-              <img className="size-8" src={member.dp} alt="memberDp" />
+              <img className="size-8" src={collaborator.dp} />
+              <div>{collaborator?.username}</div>
+              <div>{collaborator?.role || "member"}</div>
             </button>
           ))
         ) : (
-          <div className="w-full p-2 text-center bg-slate-600">
+          <div className="w-full h-full p-2 text-center bg-slate-600">
             No member found
           </div>
         )}
@@ -112,138 +103,316 @@ const SearchAssignee = () => {
 };
 
 const ProjectSettings = () => {
+  const existingCollaborators = [
+    {
+      username: "ajmal236",
+      dp: ajmalDp,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+    {
+      username: "ajmal236",
+      dp: ajmalDp,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+    {
+      username: "ajmal236",
+      dp: ajmalDp,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+  ];
+
+  const users = [
+    {
+      username: "ajmal236",
+      dp: ajmalDp,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+    {
+      username: "shahin128",
+      dp: user1,
+    },
+    {
+      username: "hari5436",
+      dp: user2,
+    },
+    {
+      username: "asma098",
+      dp: user3,
+    },
+    {
+      username: "thomson12",
+      dp: user4,
+    },
+  ];
+
+  const projectData = {
+    name: "Project 1",
+    leader: "shahin123",
+    guide: "ajmal236",
+    description: "",
+  };
+
+  const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
+    useState(false);
+  const [showCurrentCollaborators, setShowCurrentCollaborators] =
+    useState(false);
+  const [showUpdateProjectDetailsForm, setShowUpdateProjectDetailsForm] =
+    useState(false);
+
   return (
-    <>
+    <div className="relative h-full">
       <Navbar settings={"z-10 fixed top-0 left-0 right-0"} />
       <div className="size-full overflow-auto p-12 text-white shadow-md bg-[#2b2a2a]">
-        <h1 className="max-w-6xl mx-auto text-3xl mt-14">Project Settings</h1>
-        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-10 w gap-y-5 gap-x-10">
-          <div className="relative p-10 rounded-md bg-slate-700">
-            <div className="mb-8 space-y-2">
-              <h1 className="text-xl font-semibold">General</h1>
-              <p className="text-xs text-gray-400">
-                Update your account&apos;s general settings
-              </p>
-            </div>
-            <div className="mb-8">
-              <label className="block mb-2 text-sm font-medium">
-                Project Name
-              </label>
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                Your project name
-              </div>
-            </div>
-            <div className="mb-8">
-              <label className="block mb-2 text-sm font-medium">
-                Project Description
-              </label>
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                Your project description
-              </div>
-            </div>
-            <button className="mt-10 flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
+        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-14 w gap-y-5 gap-x-10">
+          {showSendProjectInviteForm ? (
+            <SendProjectInviteForm
+              users={users}
+              setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+            />
+          ) : (
+            <div className="relative p-10 rounded-md bg-slate-700">
+              {showCurrentCollaborators && (
+                <CurrentCollaborators
+                  existingCollaborators={existingCollaborators}
                 />
-              </svg>
-              <span>&nbsp;Update Info</span>
-            </button>
-          </div>
-          <div className="relative p-10 rounded-md bg-slate-700">
+              )}
+              <div className="mb-8 space-y-2">
+                <h1 className="text-xl font-semibold">General</h1>
+                <p className="text-xs text-gray-400">
+                  Update your project&apos;s general settings
+                </p>
+              </div>
+              <div
+                className={cn(
+                  showUpdateProjectDetailsForm ? "mb-3" : " mb-8",
+                  "flex gap-3"
+                )}
+              >
+                <div className="flex-1">
+                  <label className="block mb-4 text-sm font-medium">
+                    Project Leader
+                  </label>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    {projectData?.leader || "Your project leader"}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="block mb-4 text-sm font-medium">
+                    Project Guide
+                  </label>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    {projectData?.guide || "Your project guide"}
+                  </div>
+                </div>
+              </div>
+              {showUpdateProjectDetailsForm ? (
+                <UpdateProjectDetailsForm
+                  setShowUpdateProjectDetailsForm={
+                    setShowUpdateProjectDetailsForm
+                  }
+                  projectData={projectData}
+                />
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <label className="block mb-4 text-sm font-medium">
+                      Project Name
+                    </label>
+                    <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                      {projectData?.name || "Your project name"}
+                    </div>
+                  </div>
+                  <div className="mb-8">
+                    <label className="block mb-4 text-sm font-medium">
+                      Project Description
+                    </label>
+                    <div className="w-full h-[4.2rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                      {projectData?.description || "Your project description"}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowUpdateProjectDetailsForm(true)}
+                    className="mt-8 flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline "
+                  >
+                    Update Project
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          <div className="p-10 rounded-md bg-slate-700">
             <div className="mb-8 space-y-2">
-              <h1 className="text-xl font-semibold">Invite User&apos;s</h1>
+              <h1 className="text-xl font-semibold">Collaboration</h1>
               <p className="text-xs text-gray-400">
-                Update or invite users into your project
+                View or invite new collaborators into your project
               </p>
             </div>
             <div className="mb-8">
-              <label className="block mb-2 text-sm font-medium">
-                Collaboration
+              <label className="block mb-4 text-sm font-medium">
+                Total no of collaborators in this project
               </label>
-              <div className="w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-md text-slate-600 focus:outline-none focus:border-indigo-500">
-                Search for users to collaborate
+              <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                {existingCollaborators.length || 0} collaborators
               </div>
             </div>
-            <div className="mb-8">
-              <label className="block mb-2 text-sm font-medium">
-                Project Role
+            <div className="relative flex items-center mb-12">
+              <label className="block mb-16 text-sm font-medium">
+                Project Collaborators
               </label>
-              <div className="w-full px-3 py-1 border rounded-md">
-                Choose a role for inviting user in your project
-              </div>
-              <div className="flex gap-3">
-                <button className="mt-10 flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
-                    />
-                  </svg>
-                  <span>&nbsp;Leader</span>
-                </button>
-                <button className="mt-10 flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
-                    />
-                  </svg>
-                  <span>&nbsp;Member</span>
-                </button>
-                <button className="mt-10 flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"
-                    />
-                  </svg>
-                  <span>&nbsp;Guide</span>
-                </button>
+              <div>
+                <img
+                  className="absolute object-cover object-center left-0 z-[1px] size-12"
+                  src={existingCollaborators[0]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[2px] left-8 size-12"
+                  src={existingCollaborators[1]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[3px] left-16 size-12 "
+                  src={existingCollaborators[2]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[4px] left-24 size-12 "
+                  src={existingCollaborators[3]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[5px] left-32 size-12"
+                  src={existingCollaborators[4]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[6px] left-40 size-12"
+                  src={existingCollaborators[5]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[7px] left-48 size-12"
+                  src={existingCollaborators[6]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[8px] left-56 size-12 "
+                  src={existingCollaborators[7]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[10px] left-64 size-12 "
+                  src={existingCollaborators[8]?.dp}
+                />
+                <img
+                  className="absolute object-cover object-center z-[11px] left-72 size-12"
+                  src={existingCollaborators[9]?.dp}
+                />
+                <div className="absolute text-sm font-medium bg-black border-2 p-6 border-slate-300 flex justify-center items-center size-12 rounded-[50%] z-[12px] left-[20rem]">
+                  {existingCollaborators.length - 10}+
+                </div>
               </div>
             </div>
-
-            <button className="mt-10 flex w-full items-center gap-3 justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                <img src={invite}/>
-              <span>&nbsp;Send Invite</span>
+            <label className="block mb-8 text-sm font-medium">
+              Missing something ? Try the options below.
+            </label>
+            <button
+              className={cn(
+                showCurrentCollaborators
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-green-500 hover:bg-green-600",
+                "mb-8 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
+              )}
+              disabled={showSendProjectInviteForm}
+              onClick={() =>
+                setShowCurrentCollaborators(!showCurrentCollaborators)
+              }
+            >
+              <span>
+                {!showCurrentCollaborators ? "View" : "Close"} all current
+                collaborators and their roles
+              </span>
+            </button>
+            <button
+              disabled={showCurrentCollaborators}
+              onClick={() => setShowSendProjectInviteForm(true)}
+              className="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1.5 font-semibold text-black rounded-md disabled:bg-blue-300"
+            >
+              Invite New Collaborators
             </button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
