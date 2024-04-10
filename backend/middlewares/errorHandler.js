@@ -4,31 +4,64 @@ const errorHandler = (error, req, res, next) => {
       return res.status(400).json({
         success: false,
         error:
-          "A user with the given email or username already exists, please login instead",
+          "A user with the given email or username already exists, please login instead.",
       });
 
     case "UnknownUser":
       return res.status(404).json({
         success: false,
-        error: "User not found, Please sign up first",
+        error: "User not found, Please sign up first.",
       });
 
     case "UnknownProject":
       return res.status(404).json({
         success: false,
-        error: "Project not found, Please create or join a project first",
+        error: "Project not found, Please create or join a project first.",
       });
 
-    case "UnknownInvitedUser":
+    case "UnknownTeam":
       return res.status(404).json({
         success: false,
-        error: "User not found, Please check the username and try again",
+        error: "Team not found, Please create a team first.",
+      });
+
+    case "UnknownSubTeam":
+      return res.status(404).json({
+        success: false,
+        error: "Sub team not found, Please create a sub team first.",
       });
 
     case "UnknownInvitingUser":
       return res.status(404).json({
         success: false,
-        error: "Failed to send invitation, Please try again",
+        error: "Failed to send invitation, Please try again later.",
+      });
+
+    case "UnknownInvitedUser":
+      return res.status(404).json({
+        success: false,
+        error: "User not found, Please check the username and try again.",
+      });
+
+    case "UnknownUserFromProject":
+      return res.status(404).json({
+        success: false,
+        error:
+          "Failed to add user, he/she might have been removed from the project.",
+      });
+
+    case "UnknownUserFromTeam":
+      return res.status(404).json({
+        success: false,
+        error:
+          "Failed to add user, he/she might have been removed from the team.",
+      });
+
+    case "UnknownUserFromSubTeam":
+      return res.status(404).json({
+        success: false,
+        error:
+          "Failed to add user, he/she might have been removed from the sub team.",
       });
 
     case "InvalidPassword":
@@ -90,6 +123,12 @@ const errorHandler = (error, req, res, next) => {
       return res.status(400).json({
         success: false,
         error: "A project with the given name already exists",
+      });
+
+    case "TeamAlreadyExists":
+      return res.status(400).json({
+        success: false,
+        error: "A team with the given name already exists",
       });
 
     case "ForbiddenAction":

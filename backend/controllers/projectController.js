@@ -1,8 +1,34 @@
 const {
+  createTeam,
   setProjectIcon,
   setProjectDetails,
   sendProjectInvitation,
 } = require("../services/projectService");
+
+const addTeam = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { teamDetails } = req.body;
+    const { projectId } = req.project;
+    const teamId = await createTeam(userId, projectId, teamDetails);
+    console.log(
+      `New team ${teamId} is created for project ${projectId} by leader ${userId}`
+    );
+    res.status(201).json({
+      success: true,
+      message: "Team created successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("TeamAlreadyExists"));
+    }
+    next(e);
+  }
+};
 
 const updateProjectDetails = async (req, res, next) => {
   try {
@@ -63,6 +89,7 @@ const inviteProjectMember = async (req, res, next) => {
 };
 
 module.exports = {
+  addTeam,
   updateProjectIcon,
   updateProjectDetails,
   inviteProjectMember,
