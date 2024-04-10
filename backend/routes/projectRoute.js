@@ -1,13 +1,24 @@
+const teamRoutes = require("./teamRoute");
 const projectRouter = require("express").Router();
+const { isProjectLeader } = require("../middlewares/RBAC");
 
 const {
+  addTeam,
   updateProjectIcon,
   inviteProjectMember,
   updateProjectDetails,
 } = require("../controllers/projectController");
 
-// project RBAC middlewares
-const { isProjectLeader } = require("../middlewares/RBAC");
+projectRouter.use("/projects/:projectId", teamRoutes);
+
+// POST Requests
+projectRouter.post("/projects/:projectId/team", isProjectLeader, addTeam);
+
+projectRouter.post(
+  "/projects/:projectId/invite/:username/role/:role",
+  isProjectLeader,
+  inviteProjectMember
+);
 
 // PATCH Requests
 projectRouter.patch(
@@ -20,12 +31,6 @@ projectRouter.patch(
   "/projects/:projectId/icon",
   isProjectLeader,
   updateProjectIcon
-);
-
-projectRouter.post(
-  "/projects/:projectId/invite/:username/role/:role",
-  isProjectLeader,
-  inviteProjectMember
 );
 
 module.exports = projectRouter;
