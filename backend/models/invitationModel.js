@@ -28,6 +28,11 @@ const invitationSchema = new mongoose.Schema(
       enum: ["pending", "accepted", "rejected", "expired"],
       default: "pending",
     },
+    isRead: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -44,6 +49,10 @@ invitationSchema.pre("save", async function (next) {
   next();
 });
 
-const Invitation = mongoose.model("invitations", invitationSchema);
+userSchema.post("save", async function (invitationDoc, next) {
+  if (this.wasNew)
+    console.log(`Invitation ${invitationDoc.id} is saved successfully`);
+  next();
+});
 
-module.exports = Invitation;
+module.exports = mongoose.model("invitations", invitationSchema);

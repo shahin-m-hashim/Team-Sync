@@ -8,6 +8,11 @@ function isValidFirebaseUrl(url) {
 
 const subTeamSchema = new mongoose.Schema(
   {
+    grandParent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+      required: [true, "Grand parent project is required"],
+    },
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "teams",
@@ -16,17 +21,18 @@ const subTeamSchema = new mongoose.Schema(
     name: {
       type: String,
       unique: true,
-      required: [true, "Project name is required"],
-      maxLength: [50, "Name cannot exceed 50 characters"],
+      required: [true, "Sub team name is required"],
+      maxLength: [50, "Sub team name cannot exceed 50 characters"],
     },
     leader: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      required: [true, "Leader is required"],
+      required: [true, "Sub team leader is required"],
     },
     guide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
+      default: null,
     },
     description: {
       type: String,
@@ -57,6 +63,10 @@ const subTeamSchema = new mongoose.Schema(
         ref: "teams",
       },
     ],
+    NOT: {
+      type: Number,
+      default: 0,
+    },
     progress: {
       type: Number,
       default: 0,
@@ -71,10 +81,15 @@ const subTeamSchema = new mongoose.Schema(
 );
 
 subTeamSchema.pre("save", async function (next) {
-  this.guide = this.guide || null;
-  const membersCount = this.members.length;
-  this.NOM = membersCount + (this.guide ? 2 : 1);
+  this.NOT = this.tasks.length;
+  this.NOM = this.members.length + (this.guide ? 2 : 1);
   next();
 });
 
-module.exports = mongoose.model("subTeams", subTeamSchema);
+userSchema.post("save", async function (subTeamDoc, next) {
+  if (this.wasNew)
+    console.log(`Sub team ${subTeamDoc.id} is saved successfully`);
+  next();
+});
+
+module.exports = mongoose.model("subteams", subTeamSchema);

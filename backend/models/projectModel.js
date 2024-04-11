@@ -17,11 +17,12 @@ const projectSchema = new mongoose.Schema(
     leader: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      required: [true, "Leader is required"],
+      required: [true, "Project leader is required"],
     },
     guide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
+      default: null,
     },
     description: {
       type: String,
@@ -52,12 +53,30 @@ const projectSchema = new mongoose.Schema(
         ref: "invitations",
       },
     ],
+    NOI: {
+      type: Number,
+      default: 0,
+    },
+    activities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "activities",
+      },
+    ],
+    NOA: {
+      type: Number,
+      default: 0,
+    },
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "teams",
       },
     ],
+    NOT: {
+      type: Number,
+      default: 0,
+    },
     progress: {
       type: Number,
       default: 0,
@@ -72,9 +91,16 @@ const projectSchema = new mongoose.Schema(
 );
 
 projectSchema.pre("save", async function (next) {
-  this.guide = this.guide || null;
-  const membersCount = this.members.length;
-  this.NOM = membersCount + (this.guide ? 2 : 1);
+  this.NOT = this.teams.length;
+  this.NOA = this.activities.length;
+  this.NOI = this.invitations.length;
+  this.NOM = this.members.length + (this.guide ? 2 : 1);
+  next();
+});
+
+userSchema.post("save", async function (projectDoc, next) {
+  if (this.wasNew)
+    console.log(`Project ${projectDoc.id} is saved successfully`);
   next();
 });
 

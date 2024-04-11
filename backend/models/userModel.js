@@ -178,24 +178,40 @@ const userSchema = new mongoose.Schema(
         ref: "projects",
       },
     ],
+    NOP: {
+      type: Number,
+      default: 0,
+    },
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "teams",
       },
     ],
+    NOTe: {
+      type: Number,
+      default: 0,
+    },
     subTeams: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "subTeams",
       },
     ],
+    NOST: {
+      type: Number,
+      default: 0,
+    },
     tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "tasks",
       },
     ],
+    NOTa: {
+      type: Number,
+      default: 0,
+    },
     connections: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -212,6 +228,30 @@ const userSchema = new mongoose.Schema(
         ref: "notifications",
       },
     ],
+    NON: {
+      type: Number,
+      default: 0,
+    },
+    activities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "activities",
+      },
+    ],
+    NOA: {
+      type: Number,
+      default: 0,
+    },
+    invitations: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "invitations",
+      },
+    ],
+    NOI: {
+      type: Number,
+      default: 0,
+    },
     last_seen: {
       type: Date,
       default: null,
@@ -230,6 +270,15 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
   }
 
+  this.NOTe = this.teams.length;
+  this.NOTa = this.tasks.length;
+  this.NOP = this.projects.length;
+  this.NOST = this.subTeams.length;
+  this.NOA = this.activities.length;
+  this.NOC = this.connections.length;
+  this.NOI = this.invitations.length;
+  this.NON = this.notifications.length;
+
   this.phone.countryCode = this.phone.countryCode || "+91";
   this.address.country = this.address.country || "IN";
   this.wasNew = this.isNew;
@@ -237,7 +286,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.post("save", async function (userDoc, next) {
-  if (this.wasNew) console.log(`User ${userDoc.id} saved successfully`);
+  if (this.wasNew) console.log(`User ${userDoc.id} is saved successfully`);
   next();
 });
 
