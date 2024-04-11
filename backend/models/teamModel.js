@@ -17,16 +17,17 @@ const teamSchema = new mongoose.Schema(
       type: String,
       unique: true,
       required: [true, "Project name is required"],
-      maxLength: [50, "Name cannot exceed 50 characters"],
+      maxLength: [50, "Team Name cannot exceed 50 characters"],
     },
     leader: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
-      required: [true, "Leader is required"],
+      required: [true, "Team Leader is required"],
     },
     guide: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
+      default: null,
     },
     description: {
       type: String,
@@ -57,6 +58,10 @@ const teamSchema = new mongoose.Schema(
         ref: "teams",
       },
     ],
+    NOS: {
+      type: Number,
+      default: 0,
+    },
     progress: {
       type: Number,
       default: 0,
@@ -71,9 +76,13 @@ const teamSchema = new mongoose.Schema(
 );
 
 teamSchema.pre("save", async function (next) {
-  this.guide = this.guide || null;
-  const membersCount = this.members.length;
-  this.NOM = membersCount + (this.guide ? 2 : 1);
+  this.NOS = this.subTeams.length;
+  this.NOM = this.members.length + (this.guide ? 2 : 1);
+  next();
+});
+
+userSchema.post("save", async function (teamDoc, next) {
+  if (this.wasNew) console.log(`Team ${teamDoc.id} is saved successfully`);
   next();
 });
 
