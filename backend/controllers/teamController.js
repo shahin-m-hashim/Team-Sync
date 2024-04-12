@@ -2,9 +2,10 @@ const {
   setTeamIcon,
   createSubTeam,
   setTeamDetails,
-  setTeamCollaborator,
+  createTeamCollaborator,
 } = require("../services/teamService");
 
+// POST REQUESTS
 const addSubTeam = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -27,6 +28,26 @@ const addSubTeam = async (req, res, next) => {
       next(new Error("SubTeamAlreadyExists"));
     }
     next(e);
+  }
+};
+
+const addTeamCollaborator = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { username, role, teamId } = req.team;
+    await createTeamCollaborator(userId, teamId, username, role);
+    res.status(200).json({
+      success: true,
+      message: `User ${username} added successfully for team ${teamId} as a ${role}`,
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else {
+      next(e);
+    }
   }
 };
 
@@ -57,26 +78,6 @@ const updateTeamIcon = async (req, res, next) => {
     const { newTeamIcon } = req.body;
     const updatedTeamIcon = await setTeamIcon(teamId, newTeamIcon);
     res.status(200).json({ updatedTeamIcon });
-  } catch (e) {
-    if (e.name === "ValidationError") {
-      const customError = new Error("ValidationError");
-      customError.errors = e.errors;
-      next(customError);
-    } else {
-      next(e);
-    }
-  }
-};
-
-const addTeamCollaborator = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { username, role, teamId } = req.team;
-    await setTeamCollaborator(userId, teamId, username, role);
-    res.status(200).json({
-      success: true,
-      message: `User ${username} added successfully for team ${TeamId} as a ${role}`,
-    });
   } catch (e) {
     if (e.name === "ValidationError") {
       const customError = new Error("ValidationError");

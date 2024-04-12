@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
-function isValidFirebaseUrl(url) {
-  return url.startsWith(
-    "https://firebasestorage.googleapis.com/v0/b/s8-main-project.appspot.com"
-  );
-}
+const { isValidFirebaseUrl } = require("../utils/validator");
 
 const teamSchema = new mongoose.Schema(
   {
@@ -48,6 +44,16 @@ const teamSchema = new mongoose.Schema(
         ref: "users",
       },
     ],
+    activities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "activities",
+      },
+    ],
+    NOA: {
+      type: Number,
+      default: 0,
+    },
     NOM: {
       type: Number,
       default: 0,
@@ -76,12 +82,12 @@ const teamSchema = new mongoose.Schema(
 );
 
 teamSchema.pre("save", async function (next) {
+  this.NOM = this.members.length;
   this.NOS = this.subTeams.length;
-  this.NOM = this.members.length + (this.guide ? 2 : 1);
   next();
 });
 
-userSchema.post("save", async function (teamDoc, next) {
+teamSchema.post("save", async function (teamDoc, next) {
   if (this.wasNew) console.log(`Team ${teamDoc.id} is saved successfully`);
   next();
 });

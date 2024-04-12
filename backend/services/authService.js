@@ -16,6 +16,7 @@ const loginUser = async (email, password) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) throw new Error("InvalidPassword");
   user.status = "active";
+  user.last_seen = null;
   await user.save();
   return user.id;
 };
