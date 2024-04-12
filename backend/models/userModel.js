@@ -1,20 +1,11 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const { isEmail, isURL, isStrongPassword } = require("validator");
-
-function isValidLinkedInURL(url) {
-  return url.startsWith("https://www.linkedin.com/");
-}
-
-function isValidGitHubURL(url) {
-  return url.startsWith("https://github.com/");
-}
-
-function isValidFirebaseUrl(url) {
-  return url.startsWith(
-    "https://firebasestorage.googleapis.com/v0/b/s8-main-project.appspot.com"
-  );
-}
+const {
+  isValidFirebaseUrl,
+  isValidGitHubURL,
+  isValidLinkedInURL,
+} = require("../utils/validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -195,7 +186,7 @@ const userSchema = new mongoose.Schema(
     subTeams: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "subTeams",
+        ref: "subteams",
       },
     ],
     NOST: {
@@ -232,16 +223,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    activities: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "activities",
-      },
-    ],
-    NOA: {
-      type: Number,
-      default: 0,
-    },
     invitations: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -274,7 +255,6 @@ userSchema.pre("save", async function (next) {
   this.NOTa = this.tasks.length;
   this.NOP = this.projects.length;
   this.NOST = this.subTeams.length;
-  this.NOA = this.activities.length;
   this.NOC = this.connections.length;
   this.NOI = this.invitations.length;
   this.NON = this.notifications.length;

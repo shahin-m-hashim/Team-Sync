@@ -1,6 +1,8 @@
 const teamRouter = require("express").Router();
 const subTeamRoutes = require("./subTeamRoute");
+
 const { isTeamLeader } = require("../middlewares/RBAC");
+const { passTeam } = require("../middlewares/passParams");
 
 const {
   addSubTeam,
@@ -9,7 +11,7 @@ const {
   addTeamCollaborator,
 } = require("../controllers/teamController");
 
-teamRouter.use("/teams/:teamId", isTeamLeader, subTeamRoutes);
+teamRouter.use("/teams/:teamId", passTeam, subTeamRoutes);
 
 // POST Requests
 teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
