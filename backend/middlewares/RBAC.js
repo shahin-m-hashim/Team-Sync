@@ -35,11 +35,15 @@ const isTeamLeader = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { teamId } = req.params;
+    const { projectId } = req.project;
 
     const team = await teams.findById(teamId);
     if (!team) throw new Error("UnknownTeam");
 
-    if (userId === team.leader.toString()) {
+    if (
+      userId === team.leader.toString() &&
+      team.parent.toString() === projectId
+    ) {
       req.team = req.params;
       next();
     } else throw new Error("ForbiddenAction");

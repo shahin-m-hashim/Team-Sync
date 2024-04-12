@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const invitationSchema = new mongoose.Schema(
   {
+    authenticity: {
+      type: String,
+      required: true,
+    },
     project: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "projects",
@@ -17,11 +21,16 @@ const invitationSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    invitationRole: {
+    role: {
       type: String,
       enum: ["leader", "member", "guide"],
       default: "member",
       required: true,
+    },
+    message: {
+      type: String,
+      maxLength: [500, "Message cannot exceed 500 characters"],
+      default: "",
     },
     status: {
       type: String,
@@ -49,7 +58,7 @@ invitationSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.post("save", async function (invitationDoc, next) {
+invitationSchema.post("save", async function (invitationDoc, next) {
   if (this.wasNew)
     console.log(`Invitation ${invitationDoc.id} is saved successfully`);
   next();

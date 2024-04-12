@@ -1,9 +1,31 @@
 const {
   createTeam,
+  removeProject,
   setProjectIcon,
   setProjectDetails,
   sendProjectInvitation,
 } = require("../services/projectService");
+
+// POST Requests
+const inviteProjectMember = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { username, role, projectId } = req.project;
+    await sendProjectInvitation(userId, projectId, username, role);
+    res.status(200).json({
+      success: true,
+      message: `User ${username} invited successfully for project ${projectId} as a ${role}`,
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else {
+      next(e);
+    }
+  }
+};
 
 const addTeam = async (req, res, next) => {
   try {
@@ -30,6 +52,7 @@ const addTeam = async (req, res, next) => {
   }
 };
 
+// PATCH Requests
 const updateProjectDetails = async (req, res, next) => {
   try {
     const { projectId } = req.project;
@@ -68,28 +91,24 @@ const updateProjectIcon = async (req, res, next) => {
   }
 };
 
-const inviteProjectMember = async (req, res, next) => {
+// DELETE Requests
+const deleteProject = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { username, role, projectId } = req.project;
-    await sendProjectInvitation(userId, projectId, username, role);
+    const { projectId } = req.params;
+    await removeProject(userId, projectId);
     res.status(200).json({
       success: true,
-      message: `User ${username} invited successfully for project ${projectId} as a ${role}`,
+      message: "Project deleted successfully",
     });
   } catch (e) {
-    if (e.name === "ValidationError") {
-      const customError = new Error("ValidationError");
-      customError.errors = e.errors;
-      next(customError);
-    } else {
-      next(e);
-    }
+    next(e);
   }
 };
 
 module.exports = {
   addTeam,
+  deleteProject,
   updateProjectIcon,
   updateProjectDetails,
   inviteProjectMember,

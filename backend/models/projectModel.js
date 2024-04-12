@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
-function isValidFirebaseUrl(url) {
-  return url.startsWith(
-    "https://firebasestorage.googleapis.com/v0/b/s8-main-project.appspot.com"
-  );
-}
+const { isValidFirebaseUrl } = require("../utils/validator");
 
 const projectSchema = new mongoose.Schema(
   {
@@ -92,13 +88,13 @@ const projectSchema = new mongoose.Schema(
 
 projectSchema.pre("save", async function (next) {
   this.NOT = this.teams.length;
+  this.NOM = this.members.length;
   this.NOA = this.activities.length;
   this.NOI = this.invitations.length;
-  this.NOM = this.members.length + (this.guide ? 2 : 1);
   next();
 });
 
-userSchema.post("save", async function (projectDoc, next) {
+projectSchema.post("save", async function (projectDoc, next) {
   if (this.wasNew)
     console.log(`Project ${projectDoc.id} is saved successfully`);
   next();

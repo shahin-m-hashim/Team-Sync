@@ -75,19 +75,19 @@ const refreshTokensController = (req, res, next) => {
 
     if (!refreshToken) throw new Error("InvalidRefreshToken");
 
-    const { userId } = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+    const { id } = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
     console.log("Refresh token verified successfully");
 
     // Generate new access token
     const newAccessToken = jwt.sign(
-      { userId },
+      { id },
       process.env.JWT_ACCESS_KEY,
       { expiresIn: "1m" } // 1 min
     );
 
     // Generate new refresh token
     const newRefreshToken = jwt.sign(
-      { userId },
+      { id },
       process.env.JWT_REFRESH_KEY,
       { expiresIn: "1d" } // 1 day
     );

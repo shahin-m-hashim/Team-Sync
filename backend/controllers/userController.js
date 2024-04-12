@@ -1,14 +1,19 @@
 const {
+  setInvitation,
   createProject,
   removeAccount,
   setProfilePic,
   getUserDetails,
+  getAllUserTeams,
   removeProfilePic,
   setPrimaryDetails,
   setContactDetails,
   setSecurityDetails,
   getAllUserProjects,
+  getAllUserSubTeams,
   setSecondaryDetails,
+  getAllUserInvitations,
+  getAllUserNotifications,
 } = require("../services/userService");
 
 // POST REQUESTS
@@ -50,6 +55,46 @@ const fetchAllUserProjects = async (req, res, next) => {
     const { userId } = req.user;
     const projects = await getAllUserProjects(userId);
     res.status(200).json(projects);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchAllUserTeams = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const teams = await getAllUserTeams(userId);
+    res.status(200).json(teams);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchAllUserSubTeams = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const subTeams = await getAllUserSubTeams(userId);
+    res.status(200).json(subTeams);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchAllUserInvitations = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const invitations = await getAllUserInvitations(userId);
+    res.status(200).json(invitations);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchAllUserNotifications = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const notifications = await getAllUserNotifications(userId);
+    res.status(200).json(notifications);
   } catch (e) {
     next(e);
   }
@@ -150,6 +195,22 @@ const updateSecurityDetails = async (req, res, next) => {
   }
 };
 
+const handleInvitation = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { inviteId, status } = req.params;
+
+    await setInvitation(userId, inviteId, status);
+
+    res.status(200).json({
+      success: true,
+      message: "Invitation handled successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 // DELETE REQUESTS
 const deleteProfilePic = async (req, res, next) => {
   try {
@@ -184,11 +245,16 @@ module.exports = {
   addProject,
   deleteAccount,
   updateProfilePic,
+  handleInvitation,
   deleteProfilePic,
   fetchUserDetails,
+  fetchAllUserTeams,
+  fetchAllUserSubTeams,
   fetchAllUserProjects,
   updatePrimaryDetails,
   updateContactDetails,
   updateSecurityDetails,
   updateSecondaryDetails,
+  fetchAllUserInvitations,
+  fetchAllUserNotifications,
 };
