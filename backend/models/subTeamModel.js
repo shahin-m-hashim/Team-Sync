@@ -16,7 +16,6 @@ const subTeamSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      unique: true,
       required: [true, "Sub team name is required"],
       maxLength: [50, "Sub team name cannot exceed 50 characters"],
     },
@@ -53,6 +52,7 @@ const subTeamSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    unavailableMembers: [{ type: String }],
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -86,9 +86,12 @@ const subTeamSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+subTeamSchema.index({ name: 1, parent: 1 }, { unique: true });
+
 subTeamSchema.pre("save", async function (next) {
   this.NOT = this.tasks.length;
   this.NOM = this.members.length;
+  this.NOA = this.activities.length;
   next();
 });
 

@@ -14,13 +14,13 @@ const {
 teamRouter.use("/teams/:teamId", passTeam, subTeamRoutes);
 
 // POST Requests
-teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
-
 teamRouter.post(
   "/teams/:teamId/add/:username/role/:role",
   isTeamLeader,
   addTeamCollaborator
 );
+
+teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
 
 // PATCH Requests
 teamRouter.patch("/teams/:teamId/icon", isTeamLeader, updateTeamIcon);

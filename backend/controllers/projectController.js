@@ -14,7 +14,7 @@ const inviteProjectMember = async (req, res, next) => {
     await sendProjectInvitation(userId, projectId, username, role);
     res.status(200).json({
       success: true,
-      message: `User ${username} invited successfully for project ${projectId} as a ${role}`,
+      message: `User ${username} invited successfully for the project ${projectId} as a ${role}`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -34,7 +34,7 @@ const addTeam = async (req, res, next) => {
     const { projectId } = req.project;
     const teamId = await createTeam(userId, projectId, teamDetails);
     console.log(
-      `New team ${teamId} is created for project ${projectId} by leader ${userId}`
+      `New team ${teamId} is created for this project ${projectId} by leader ${userId}`
     );
     res.status(201).json({
       success: true,

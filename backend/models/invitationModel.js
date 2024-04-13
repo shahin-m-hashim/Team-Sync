@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { isURL } = require("validator");
+const { isValidFirebaseUrl } = require("../utils/validator");
 
 const invitationSchema = new mongoose.Schema(
   {
@@ -36,6 +38,15 @@ const invitationSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "accepted", "rejected", "expired"],
       default: "pending",
+    },
+    image: {
+      type: String,
+      validate: {
+        validator: (value) =>
+          !value || (isURL(value) && isValidFirebaseUrl(value)),
+        message: "Invalid Image URL",
+      },
+      default: "",
     },
     isRead: {
       type: Boolean,
