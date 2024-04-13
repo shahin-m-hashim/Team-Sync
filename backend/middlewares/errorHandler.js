@@ -49,6 +49,46 @@ const errorHandler = (error, req, res, next) => {
         error: "This user has already been invited to this project.",
       });
 
+    case "InvitationAlreadyResponded":
+      return res.status(400).json({
+        success: false,
+        error: "This invitation has already been responded to.",
+      });
+
+    case "InvalidRole":
+      return res.status(400).json({
+        success: false,
+        error: "Invalid role, Please try again.",
+      });
+
+    case "UserAlreadyInAnotherTeam":
+      return res.status(400).json({
+        success: false,
+        error:
+          "User is already in a team within this project. Remove user from the team he/she's currently in, and try again",
+      });
+
+    case "UserAlreadyInAnotherSubTeam":
+      return res.status(400).json({
+        success: false,
+        error:
+          "User is already in a sub team team within this team. Remove user from the sub team he/she's currently in, and try again",
+      });
+
+    case "UserAlreadyInAnotherTeamAsLeader":
+      return res.status(400).json({
+        success: false,
+        error:
+          "User is already a leader in a team within this project. He cant be added unless he demotes his leader role first from that team.",
+      });
+
+    case "UserAlreadyInAnotherSubTeamAsLeader":
+      return res.status(400).json({
+        success: false,
+        error:
+          "User is already a leader in a sub team within this team. He cant be added unless he demotes his leader role first from that sub team.",
+      });
+
     case "UserAlreadyInTeam":
       return res.status(400).json({
         success: false,
@@ -83,21 +123,21 @@ const errorHandler = (error, req, res, next) => {
       return res.status(404).json({
         success: false,
         error:
-          "Failed to add user, he/she might have been removed from the project.",
+          "Failed to add user, he/she might not be in the project or have been removed.",
       });
 
     case "UnknownUserFromTeam":
       return res.status(404).json({
         success: false,
         error:
-          "Failed to add user, he/she might have been removed from the team.",
+          "Failed to add user, he/she might not be in the team or have been removed.",
       });
 
     case "UnknownUserFromSubTeam":
       return res.status(404).json({
         success: false,
         error:
-          "Failed to add user, he/she might have been removed from the sub team.",
+          "Failed to add user, he/she might not be in the sub team or have been removed.",
       });
 
     case "InvalidPassword":
