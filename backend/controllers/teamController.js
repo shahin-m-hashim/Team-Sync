@@ -2,7 +2,7 @@ const {
   setTeamIcon,
   createSubTeam,
   setTeamDetails,
-  createTeamCollaborator,
+  setTeamCollaborator,
 } = require("../services/teamService");
 
 // POST REQUESTS
@@ -35,10 +35,10 @@ const addTeamCollaborator = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { username, role, teamId } = req.team;
-    await createTeamCollaborator(userId, teamId, username, role);
+    await setTeamCollaborator(userId, teamId, username, role);
     res.status(200).json({
       success: true,
-      message: `User ${username} added successfully for team ${teamId} as a ${role}`,
+      message: `User ${username} added successfully to team ${teamId} as a ${role}`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -51,6 +51,7 @@ const addTeamCollaborator = async (req, res, next) => {
   }
 };
 
+// PATCH REQUESTS
 const updateTeamDetails = async (req, res, next) => {
   try {
     const { teamId } = req.team;

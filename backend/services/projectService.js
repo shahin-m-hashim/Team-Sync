@@ -20,30 +20,30 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
       .findById(projectId)
       .populate("leader")
       .populate("guide")
-      .populate("members")
+      .populate("members.member")
       .session(session);
+
     if (!project) throw new Error("UnknownProject");
 
     const invitedUser = await users.findOne({ username }).session(session);
     if (!invitedUser) throw new Error("UnknownInvitedUser");
 
-    if (project?.guide?.username === username)
+    if (project.guide?.username === username)
       throw new Error("UserAlreadyInProjectAsAGuide");
 
-    if (
-      project?.members &&
-      project?.members.some((member) => member.username === username)
-    )
-      throw new Error("UserAlreadyInProjectAsAMember");
+    if (project.members.some((member) => member.member.username === username)) {
+      throw new Error("UserAlreadyInProject");
+    }
 
-    // Check if user is already invited to the project
     const existingInvitation = await invitations.findOne({
       project: projectId,
       invitedUser: invitedUser._id,
+      status: { $in: ["pending", "accepted"] },
     });
 
-    if (existingInvitation && existingInvitation.status !== "expired")
+    if (existingInvitation) {
       throw new Error("UserAlreadyInvited");
+    }
 
     const inviteAcceptToken = jwt.sign(
       { invitedUserId: invitedUser._id },
@@ -53,7 +53,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
       }
     );
 
-    const invitationMessage = `You have been invited to join ${project.name} as a ${role} by its leader ${project.leader.username}.`;
+    const invitationMessage = `You have been invited to join the project ${project.name} as a ${role} by its leader ${project.leader.username}.`;
     const newInvitation = await invitations.create(
       [
         {
@@ -61,7 +61,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
           project: projectId,
           invitedBy: userId,
           invitedUser: invitedUser._id,
-          invitationRole: role,
+          role,
           message: invitationMessage,
           status: "pending",
         },
@@ -122,7 +122,7 @@ const createTeam = async (userId, projectId, teamDetails) => {
         {
           project: projectId,
           type: "teamAdded",
-          message: `A new team ${newTeam[0].name} is added to the project ${project.name} by its leader ${project.leader.username}.`,
+          message: `A new team ${newTeam[0].name} is added to this project ${project.name} by leader ${project.leader.username}.`,
         },
       ],
       { session }

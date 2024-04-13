@@ -252,7 +252,14 @@ const setInvitation = async (userId, inviteId, status) => {
 
   try {
     const invitation = await invitations.findById(inviteId).session(session);
-    if (!invitation) throw new Error("UnknownInvitation");
+    if (!invitation || invitation.invitedUser.toString() !== userId)
+      throw new Error("UnknownInvitation");
+
+    if (invitation.status === "accepted" || invitation.status === "rejected")
+      throw new Error("InvitationAlreadyResponded");
+
+    if (invitation.status === "expired")
+      throw new Error("InvitationHasExpired");
 
     const { invitedUserId } = jwt.verify(
       invitation.authenticity,
@@ -274,14 +281,11 @@ const setInvitation = async (userId, inviteId, status) => {
       throw new Error("UnknownInvitation");
     }
 
-    if (invitation.status === "expired")
-      throw new Error("InvitationHasExpired");
-
     if (status === "accept") {
       invitation.status = "accepted";
 
       if (invitation.role === "member") {
-        project.members.push(userId);
+        project.members.push(invitedUser._id);
       } else {
         project.guide = userId;
       }
@@ -292,7 +296,7 @@ const setInvitation = async (userId, inviteId, status) => {
         [
           {
             type: "collaboratorJoined",
-            message: `${invitedUser.username} has joined ${project.name} as a ${invitation.role}`,
+            message: `${invitedUser.username} has joined this project ${project.name} as a ${invitation.role}`,
             image: invitedUser.profilePic,
           },
         ],
@@ -306,7 +310,7 @@ const setInvitation = async (userId, inviteId, status) => {
           {
             user: projectLeader.id,
             type: "projectInvitationAccepted",
-            message: `${invitedUser.username} has accepted your invite to join ${project.name} as a ${invitation.role}`,
+            message: `${invitedUser.username} has accepted your invite to join the project ${project.name} as a ${invitation.role}`,
             image: invitedUser.profilePic,
           },
         ],
@@ -323,7 +327,7 @@ const setInvitation = async (userId, inviteId, status) => {
           {
             user: projectLeader.id,
             type: "projectInvitationRejected",
-            message: `${invitedUser.username} has rejected your invite to join ${project.name} as a ${invitation.role}`,
+            message: `${invitedUser.username} has rejected your invite to join the project ${project.name} as a ${invitation.role}`,
             image: invitedUser.profilePic,
           },
         ],
@@ -336,6 +340,7 @@ const setInvitation = async (userId, inviteId, status) => {
 
     await Promise.all([
       invitation.save({ session }),
+      invitedUser.save({ session }),
       projectLeader.save({ session }),
       project.save({ session }),
     ]);

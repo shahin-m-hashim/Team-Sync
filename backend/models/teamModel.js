@@ -11,8 +11,7 @@ const teamSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      unique: true,
-      required: [true, "Project name is required"],
+      required: [true, "Team name is required"],
       maxLength: [50, "Team Name cannot exceed 50 characters"],
     },
     leader: {
@@ -44,6 +43,11 @@ const teamSchema = new mongoose.Schema(
         ref: "users",
       },
     ],
+    NOM: {
+      type: Number,
+      default: 0,
+    },
+    unavailableMembers: [{ type: String }],
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -51,10 +55,6 @@ const teamSchema = new mongoose.Schema(
       },
     ],
     NOA: {
-      type: Number,
-      default: 0,
-    },
-    NOM: {
       type: Number,
       default: 0,
     },
@@ -81,9 +81,12 @@ const teamSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+teamSchema.index({ name: 1, parent: 1 }, { unique: true });
+
 teamSchema.pre("save", async function (next) {
-  this.NOM = this.members.length;
   this.NOS = this.subTeams.length;
+  this.NOA = this.activities.length;
+  this.NOM = this.members.length;
   next();
 });
 

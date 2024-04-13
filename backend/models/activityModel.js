@@ -11,9 +11,6 @@ const activitySchema = new mongoose.Schema(
         "teamAdded", // project activity
         "teamUpdated", // project activity
         "teamDeleted", // project activity
-        "projectGuideAdded", // project activity
-        "projectGuideRemoved", // project activity
-        "projectGuideChanged", // project activity
         "collaboratorJoined", // project activity
         "collaboratorLeft", // project activity
         "collaboratorRemoved", // project activity
@@ -47,11 +44,6 @@ const activitySchema = new mongoose.Schema(
     link: {
       type: String,
       default: "",
-    },
-    isRead: {
-      type: Boolean,
-      default: false,
-      required: true,
     },
   },
   { timestamps: true }
