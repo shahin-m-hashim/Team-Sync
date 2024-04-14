@@ -1,4 +1,3 @@
-const bcrypt = require("bcrypt");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -7,7 +6,6 @@ const projects = require("../models/projectModel");
 const activities = require("../models/activityModel");
 const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
-
 // GET
 const getUserDetails = async (userId) => {
   const user = await users.findById(userId);
@@ -38,30 +36,27 @@ const getUserDetails = async (userId) => {
 };
 
 const getAllUserProjects = async (userId) => {
-  const user = await users.findById(userId);
-  if (!user) throw new Error("UnknownUser");
-  await user.populate("projects");
-
-  const formattedProjects = user.projects.map(async (project) => {
-    await project.populate("leader");
-    await project.populate("guide");
-
-    const { name, icon, leader, guide, createdAt, NOM, progress, status } =
-      project;
-    const formattedDate = moment(createdAt).format("DD/MM/YYYY");
-    return {
-      name,
-      icon,
-      leader: leader?.username,
-      guide: guide?.username || "N/A",
-      createdAt: formattedDate,
-      NOM,
-      progress,
-      status,
-    };
+  const user = await users.findById(userId).populate({
+    path: "projects",
+    populate: { path: "leader guide" },
   });
 
-  return { projects: await Promise.all(formattedProjects), total: user.NOP };
+  if (!user) throw new Error("UnknownUser");
+
+  const formattedProjects = user.projects.map((project) => {
+    let role = "Member";
+
+    const createdAt = moment(project.createdAt).format("DD/MM/YYYY");
+
+    if (project.leader?.id === userId) role = "Leader";
+    else if (project.guide?.id === userId) role = "Guide";
+
+    if (project.status === "notStarted") project.status = "Not Started";
+
+    return { ...project._doc, role, createdAt };
+  });
+
+  return formattedProjects;
 };
 
 const getAllUserTeams = async (userId) => {
@@ -150,15 +145,25 @@ const getAllUserSubTeams = async (userId) => {
 
 const getAllUserInvitations = async (userId) => {
   const user = await users.findById(userId);
-  if (!user) throw new Error("UnknownUser");
-  await user.populate("invitations");
+  if (!user) {
+    throw new Error("UnknownUser");
+  }
 
-  const formattedInvitations = user.invitations.map((invitation) => {
-    const { authenticity, ...invitationData } = invitation._doc;
-    return invitationData;
-  });
+  const userInvitations = await invitations
+    .find({ invitedUser: userId })
+    .populate("invitedBy project");
 
-  return { invitations: [...formattedInvitations], total: user.NOI };
+  const formattedInvitations = userInvitations.map((invitation) => ({
+    id: invitation._id,
+    role: invitation.role,
+    status: invitation.status,
+    invitedBy: invitation.invitedBy.username,
+    project: invitation.project?.name || "N/A",
+    date: moment(invitation.createdAt).format("DD/MM/YYYY"),
+    time: moment(invitation.createdAt).format("hh:mm A"),
+  }));
+
+  return formattedInvitations;
 };
 
 const getAllUserNotifications = async (userId) => {
