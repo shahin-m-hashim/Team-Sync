@@ -1,5 +1,5 @@
-import Navbar from "@/components/dashboard/Navbar";
-import SideBar from "@/components/dashboard/SideBar";
+import Navbar from "@/components/navbars/UserNavbar";
+import SideBar from "@/components/sidebars/UserSideBar";
 
 // eslint-disable-next-line react/prop-types
 export default function DashboardPage({ children }) {

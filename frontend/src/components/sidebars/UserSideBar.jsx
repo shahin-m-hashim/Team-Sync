@@ -17,7 +17,7 @@ const MenuItem = ({ icon, text }) => (
   </div>
 );
 
-export default function SideBar() {
+export default function UserSideBar() {
   const { userData, setUserStatus } = useContext(UserContext);
 
   return (

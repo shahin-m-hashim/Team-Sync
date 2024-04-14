@@ -1,14 +1,16 @@
 /* eslint-disable react/prop-types */
 
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import Navbar from "@/components/dashboard/Navbar";
+import { useEffect, useState } from "react";
 import GroupedUsers from "@/components/GroupedUsers";
+import ImageHandler from "@/components/ImageHandler";
 import ajmalDp from "../../assets/images/ajmalDp.png";
+import UserNavbar from "@/components/navbars/UserNavbar";
 import user1 from "../../assets/images/activities/user1.png";
 import user2 from "../../assets/images/activities/user2.png";
 import user3 from "../../assets/images/activities/user3.png";
 import user4 from "../../assets/images/activities/user4.png";
+import defaultIcon from "../../assets/images/defaultIcon.png";
 import CurrentCollaborators from "@/components/list/CurrentCollaborators";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import UpdateProjectDetailsForm from "@/components/forms/projects/UpdateProjectDetailsForm";
@@ -75,6 +77,7 @@ const existingProjectCollaborators = [
     dp: user4,
   },
 ];
+
 const ProjectSettings = () => {
   const users = [
     {
@@ -134,10 +137,11 @@ const ProjectSettings = () => {
   const projectData = {
     description: "",
     name: "Project 1",
-    guide: "ajmal236",
     leader: "shahin123",
+    guide: "sindhiya123",
   };
 
+  const [isEditing, setIsEditing] = useState(false);
   const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
     useState(false);
   const [showCurrentCollaborators, setShowCurrentCollaborators] =
@@ -145,12 +149,23 @@ const ProjectSettings = () => {
   const [showUpdateProjectDetailsForm, setShowUpdateProjectDetailsForm] =
     useState(false);
 
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing]);
+
   return (
     <div className="relative h-full">
-      <Navbar />
-      <div className="size-full overflow-auto p-12 text-white shadow-md bg-[#2b2a2a]">
-        <h1 className="max-w-6xl mx-auto mt-6 text-2xl">Project Settings</h1>
-        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-7 w gap-x-10">
+      <UserNavbar />
+      <div className="size-full overflow-auto p-10 text-white shadow-md bg-[#2b2a2a]">
+        <h1 className="max-w-6xl mx-auto mt-12 text-2xl">Project Settings</h1>
+        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-7 gap-x-10">
           {showSendProjectInviteForm ? (
             <SendProjectInviteForm
               users={users}
@@ -169,28 +184,14 @@ const ProjectSettings = () => {
                   Update your project&apos;s general settings
                 </p>
               </div>
-              <div
-                className={cn(
-                  showUpdateProjectDetailsForm ? "mb-3" : " mb-8",
-                  "flex gap-3"
-                )}
-              >
-                <div className="flex-1">
-                  <label className="block mb-4 text-sm font-medium">
-                    Project Leader
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    {projectData?.leader || "Your project leader"}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="block mb-4 text-sm font-medium">
-                    Project Guide
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    {projectData?.guide || "Your project guide"}
-                  </div>
-                </div>
+              <div className="absolute top-5 right-5">
+                <ImageHandler
+                  firebasePath=""
+                  size="size-[120px]"
+                  defaultImage={defaultIcon}
+                  setIsEditing={setIsEditing}
+                  position="right-0 bottom-0"
+                />
               </div>
               {showUpdateProjectDetailsForm ? (
                 <UpdateProjectDetailsForm
@@ -213,15 +214,21 @@ const ProjectSettings = () => {
                     <label className="block mb-4 text-sm font-medium">
                       Project Description
                     </label>
-                    <div className="w-full h-[4.2rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    <div className="w-full h-[6.5rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
                       {projectData?.description || "Your project description"}
                     </div>
                   </div>
                   <button
                     onClick={() => setShowUpdateProjectDetailsForm(true)}
-                    className="flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline "
+                    className="flex w-full mb-4 justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline"
                   >
                     Update Project
+                  </button>
+                  <button
+                    onClick={() => setShowUpdateProjectDetailsForm(true)}
+                    className="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline"
+                  >
+                    Delete Project
                   </button>
                 </>
               )}
@@ -235,12 +242,22 @@ const ProjectSettings = () => {
                 View or invite new collaborators into your project
               </p>
             </div>
-            <div className="mb-8">
-              <label className="block mb-4 text-sm font-medium">
-                Total no of collaborators in this project
-              </label>
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                {existingProjectCollaborators.length || 0} collaborators
+            <div className="mb-8 flex gap-3">
+              <div className="flex-1">
+                <label className="block mb-4 text-sm font-medium">
+                  Project Leader
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  {projectData?.leader || "Your project leader"}
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block mb-4 text-sm font-medium">
+                  Project Guide
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  {projectData?.guide || "Your project guide"}
+                </div>
               </div>
             </div>
             <div className="mb-8">
@@ -262,7 +279,7 @@ const ProjectSettings = () => {
                 showCurrentCollaborators
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600",
-                "mb-8 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
+                "mb-4 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
               )}
               disabled={showSendProjectInviteForm}
               onClick={() =>
@@ -270,8 +287,8 @@ const ProjectSettings = () => {
               }
             >
               <span>
-                {!showCurrentCollaborators ? "View" : "Close"} all current
-                collaborators and their roles
+                {!showCurrentCollaborators ? "Manage" : "Close"} all
+                collaborators
               </span>
             </button>
             <button

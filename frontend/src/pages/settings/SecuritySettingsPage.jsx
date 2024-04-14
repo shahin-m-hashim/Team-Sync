@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import Loading from "@/components/Loading";
 import { useContext, useEffect, useState } from "react";
-import Navbar from "@/components/dashboard/Navbar";
+import Navbar from "@/components/navbars/UserNavbar";
 import { UserContext } from "@/providers/UserProvider";
 import ContactUserForm from "@/components/forms/user/ContactUserForm";
 import SecurityUserForm from "@/components/forms/user/SecurityUserForm";
