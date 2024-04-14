@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import filter from "../assets/images/Filter.png";
-import dropArrow from "../assets/images/Expand Arrow.png";
-import FilterDropDownMenu from "./FilterDropDownMenu";
 import { useEffect, useRef, useState } from "react";
+import dropArrow from "../assets/images/Expand Arrow.png";
+import FilterDropDownMenu from "./dropDowns/FilterDropDownMenu";
 
 export default function FilterButton({
   setList,
@@ -36,15 +36,15 @@ export default function FilterButton({
 
   return (
     <div
-      className="relative flex items-center gap-2 px-2 py-1 text-xs border-[1px] border-white rounded-xl"
+      className="relative max-h-8 flex items-center gap-2 p-4 text-xs border-[1px] border-white rounded-xl"
       ref={filterDropDownRef}
     >
-      <img src={filter} alt="filter" className="size-5" />
+      <img src={filter} className="size-5" />
       <span>{filterBtnTxt}</span>
       <button
         onClick={() => setShowFilterDropDownMenu((prevState) => !prevState)}
       >
-        <img src={dropArrow} alt="dropArrow" className="size-5" />
+        <img src={dropArrow} className="size-5" />
       </button>
       {showFilterDropDownMenu && (
         <FilterDropDownMenu

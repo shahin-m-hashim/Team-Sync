@@ -1,26 +1,28 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import Loading from "../Loading";
 import StatusCard from "../cards/StatusCard";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import { useEffect, useReducer, useState } from "react";
-import MessageCard from "@/components/cards/MessageCard";
-import ActivityCard from "@/components/cards/ActivityCard";
+import InvitationsCard from "../cards/InvitationCard";
+import { ProjectContext } from "@/providers/ProjectProvider";
 import AddProjectForm from "../forms/projects/AddProjectForm";
+import { useContext, useEffect, useReducer, useState } from "react";
 
-export default function ProjectDash() {
-  // const { projects } = useContext(ProjectContext);
-
-  const projects = [];
-
-  const leaderProjects = projects.filter(
-    (project) => project.role === "Leader"
-  );
-
+export default function Projects() {
+  const { projects } = useContext(ProjectContext);
+  const [showProjectAddForm, setShowProjectAddForm] = useState(false);
   const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
   const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminProjects, setListOnlyAdminProjects] = useState(false);
+
+  const leaderProjects = projects?.filter(
+    (project) => project.role === "Leader"
+  );
 
   const resetProjectList = () => {
     setProjectNameSearchTxt("");
@@ -49,27 +51,30 @@ export default function ProjectDash() {
         payload: projects,
       });
     }
-  }, [listOnlyAdminProjects]);
-
-  const [showProjectAddForm, setShowProjectAddForm] = useState(false);
+  }, [projects]);
 
   return (
     <>
       {showProjectAddForm && (
         <AddProjectForm setShowProjectAddForm={setShowProjectAddForm} />
       )}
-      <div className="grid grid-cols-[1fr,1fr,1.3fr] min-h-[17rem] border-white border-2 border-t-0 text-white">
-        <ActivityCard />
-        <MessageCard />
-        <StatusCard list={initialProjects} renderList="Project" />
+      <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
+        <InvitationsCard />
+        {initialProjects ? (
+          <StatusCard list={initialProjects} renderList="Project" />
+        ) : (
+          <div className="relative bg-[#141414]">
+            <Loading />
+          </div>
+        )}
       </div>
       <div>
         <ListHeader
           renderList="Project"
           setList={setProjects}
+          initialList={projects}
           leaderList={leaderProjects}
           resetList={resetProjectList}
-          initialList={projects}
           filterBtnTxt={projectFilterBtnTxt}
           switchList={listOnlyAdminProjects}
           setShowAddForm={setShowProjectAddForm}
@@ -81,13 +86,19 @@ export default function ProjectDash() {
       </div>
       <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList="Project" />
-        <div>
-          <ListBody
-            list={initialProjects}
-            renderList="Project"
-            listNameSearchTxt={projectNameSearchTxt}
-          />
-        </div>
+        {initialProjects ? (
+          <div>
+            <ListBody
+              renderList="Project"
+              list={initialProjects || []}
+              listNameSearchTxt={projectNameSearchTxt}
+            />
+          </div>
+        ) : (
+          <div className="relative h-full">
+            <Loading />
+          </div>
+        )}
       </div>
     </>
   );

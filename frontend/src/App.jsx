@@ -4,23 +4,24 @@ import ErrorPage from "./pages/ErrorPage";
 import DummyPage from "./pages/DummyPage";
 import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
+import Teams from "./components/dashBody/Teams";
+import Tasks from "./components/dashBody/Tasks";
 import SignupPage from "./pages/auth/SignUpPage";
-import DashboardPage from "./pages/DashboardPage";
 import PublicProfile from "./pages/PublicProfile";
+import UserDashboard from "./pages/UserDashboard";
 import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
-import TaskDash from "./components/dashboard/TaskDash";
-import TeamDash from "./components/dashboard/TeamDash";
+import Projects from "./components/dashBody/Projects";
+import SubTeams from "./components/dashBody/SubTeams";
 import TeamSettings from "./pages/settings/TeamSettings";
-import SubTeamDash from "./components/dashboard/SubTeamDash";
-import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
 import SubTeamSettings from "./pages/settings/SubTeamSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import ProjectProvider from "./providers/ProjectProvider";
 
 const router = createBrowserRouter([
   {
@@ -54,9 +55,9 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: (
-          <DashboardPage>
+          <UserDashboard>
             <Outlet />
-          </DashboardPage>
+          </UserDashboard>
         ),
         children: [
           {
@@ -66,22 +67,22 @@ const router = createBrowserRouter([
           {
             path: "projects",
             element: (
-              // <ProjectProvider>
-              <ProjectDash />
-              // </ProjectProvider>
+              <ProjectProvider>
+                <Projects />
+              </ProjectProvider>
             ),
           },
           {
             path: "teams",
-            element: <TeamDash />,
+            element: <Teams />,
           },
           {
             path: "subTeams",
-            element: <SubTeamDash />,
+            element: <SubTeams />,
           },
           {
             path: "tasks",
-            element: <TaskDash />,
+            element: <Tasks />,
           },
         ],
       },
