@@ -12,15 +12,15 @@ import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
 import TaskDash from "./components/dashboard/TaskDash";
 import TeamDash from "./components/dashboard/TeamDash";
-import UserSettingsPage from "./pages/user/UserSettingsPage";
+import TeamSettings from "./pages/settings/TeamSettings";
 import SubTeamDash from "./components/dashboard/SubTeamDash";
 import ProjectDash from "./components/dashboard/ProjectDash";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
-import SecuritySettingsPage from "./pages/user/SecuritySettingsPage";
+import ProjectSettings from "./pages/settings/ProjectSettings";
+import SubTeamSettings from "./pages/settings/SubTeamSettings";
+import UserSettingsPage from "./pages/settings/UserSettingsPage";
+import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import ProjectSettings from "./pages/user/ProjectSettings";
-import TeamSettings from "./pages/user/TeamSettings";
-import SubTeamSettings from "./pages/user/SubTeamSettings";
 
 const router = createBrowserRouter([
   {

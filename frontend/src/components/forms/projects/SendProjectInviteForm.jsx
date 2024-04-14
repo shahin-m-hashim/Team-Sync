@@ -58,7 +58,7 @@ const SendProjectInviteForm = ({ users, setShowSendProjectInviteForm }) => {
     <div className="relative p-10 rounded-md bg-slate-700">
       <form
         onSubmit={handleSendInvite}
-        className="absolute left-0 right-0 z-10 h-[76.3%] px-8 py-4 top-0 bg-slate-700"
+        className="absolute left-0 right-0 z-10 h-[80%] px-8 py-4 top-0 bg-slate-700"
       >
         {showSearchFrom ? (
           <>

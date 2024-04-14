@@ -1,99 +1,14 @@
 /* eslint-disable react/prop-types */
-import { Link } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
 import { useContext, useState } from "react";
-import { cn, getLocalSecureItem } from "@/lib/utils";
 import { UserContext } from "@/providers/UserProvider";
 import defaultDp from "../../assets/images/defaultDp.png";
+import UserNavbarDropDown from "../dropDowns/UserNavbarDropDown";
 
-const DropDownMenu = ({ name }) => {
-  const user = getLocalSecureItem("user", "low");
-  const { setUserStatus } = useContext(UserContext);
-
-  return (
-    <div className="absolute z-10 divide-y divide-black rounded-lg shadow min-w-36 w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
-      {name && (
-        <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
-          <div>{name}</div>
-        </div>
-      )}
-      <ul
-        className="py-2 text-sm text-gray-700 dark:text-gray-200"
-        aria-labelledby="dropdownUserAvatarButton"
-      >
-        <li>
-          <Link
-            to={`/user/${user?.id}/dashboard/projects`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Dashboard
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/general`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/project`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Project Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/team`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Team Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/subTeam`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Sub Team Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/team`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Task Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/security`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Security
-          </Link>
-        </li>
-      </ul>
-      <div className="py-2">
-        <button
-          onClick={() => setUserStatus("LOGGED_OUT")}
-          className="w-full px-4 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-  );
-};
-
-export default function Navbar({ settings }) {
+export default function UserNavbar({ settings }) {
   const { userData } = useContext(UserContext);
   const [showDropDown, setShowDropDown] = useState(false);
-
-  console.log(settings);
 
   return (
     <div
@@ -145,7 +60,7 @@ export default function Navbar({ settings }) {
             onClick={() => setShowDropDown(!showDropDown)}
             className="size-8 rounded-[50%] object-cover object-center cursor-pointer"
           />
-          {showDropDown && <DropDownMenu name={userData.fname} />}
+          {showDropDown && <UserNavbarDropDown name={userData.fname} />}
         </div>
       </div>
     </div>

@@ -24,9 +24,6 @@ const UpdateProjectDetailsForm = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mb-2 text-sm text-center text-red-600 dark:text-red-400">
-        You can update these in collaboration section !!!
-      </div>
       <div className="mb-8">
         <label htmlFor="prName" className="block mb-4 text-sm font-medium">
           Project Name
@@ -52,11 +49,10 @@ const UpdateProjectDetailsForm = ({
         <textarea
           type="text"
           id="description"
-          rows={2}
           name="description"
           {...getFieldProps("description")}
           placeholder="Your project description"
-          className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+          className="w-full px-3 py-2 h-[6.5rem] text-black border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
         />
         {errors.description && touched.description && (
           <span className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -64,22 +60,19 @@ const UpdateProjectDetailsForm = ({
           </span>
         )}
       </div>
-
-      <div className="flex gap-2 mt-6">
-        <button
-          type="submit"
-          className="flex w-full items-center gap-2 justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600"
-        >
-          Confirm changes
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowUpdateProjectDetailsForm(false)}
-          className="flex w-full items-center gap-2 justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-600"
-        >
-          Cancel
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="flex w-full mb-4 items-center gap-2 justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600"
+      >
+        Confirm changes
+      </button>
+      <button
+        type="button"
+        onClick={() => setShowUpdateProjectDetailsForm(false)}
+        className="flex w-full items-center gap-2 justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-600"
+      >
+        Cancel
+      </button>
     </form>
   );
 };
