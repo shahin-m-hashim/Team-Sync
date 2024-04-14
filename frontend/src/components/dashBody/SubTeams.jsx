@@ -99,7 +99,7 @@ const leaderSubTeams = initialSubTeams.filter(
   (subTeam) => subTeam.role === "Leader"
 );
 
-export default function SubTeamDash() {
+export default function SubTeams() {
   const [subTeamNameSearchTxt, setSubTeamNameSearchTxt] = useState("");
   const [subTeamFilterBtnTxt, setSubTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminSubTeams, setListOnlyAdminSubTeams] = useState(false);

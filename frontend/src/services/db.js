@@ -3,6 +3,21 @@ import { getLocalSecureItem } from "@/lib/utils";
 
 const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
+const addData = async (url, newData) => {
+  // console.log("Adding data...");
+  const user = getLocalSecureItem("user", "low");
+
+  try {
+    await axios.post(`${baseURL}/user/${user?.id}/${url}`, newData, {
+      withCredentials: true,
+    });
+  } catch (error) {
+    if (error.response?.status === 401) {
+      await reAuthorizeAdd(url);
+    } else throw error;
+  }
+};
+
 const updateData = async (url, newData) => {
   // console.log("Updating data...");
   const user = getLocalSecureItem("user", "low");
@@ -51,6 +66,12 @@ const deleteAccount = async (password) => {
   }
 };
 
+const reAuthorizeAdd = async (url, newData) => {
+  // console.log("Reauthorizing add...");
+  await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  await addData(url, newData);
+};
+
 const reAuthorizeUpdate = async (url, newData) => {
   // console.log("Reauthorizing update...");
   await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
@@ -69,4 +90,4 @@ const reAuthorizeAccountDelete = async (password) => {
   await deleteAccount(password);
 };
 
-export { updateData, deleteData, deleteAccount };
+export { updateData, deleteData, deleteAccount, addData };

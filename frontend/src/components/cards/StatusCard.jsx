@@ -6,7 +6,7 @@ import calcStatusCount from "@/helpers/calcStatusCount";
 import CircularProgress from "../CircularProgress";
 import calcOverallProgress from "@/helpers/calcOverallProgress";
 
-export default function StatusCard({ list = [], renderList }) {
+export default function StatusCard({ list, renderList }) {
   const statusCount = calcStatusCount(list);
   const overallProgress = calcOverallProgress(list);
 
@@ -18,7 +18,7 @@ export default function StatusCard({ list = [], renderList }) {
     <div
       className={cn(
         statusCount.empty && "p-5 gap-2",
-        "bg-[#141414] flex flex-col"
+        "bg-[#141414] flex flex-col h-full"
       )}
     >
       {!statusCount.empty && (

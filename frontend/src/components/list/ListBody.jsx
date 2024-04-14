@@ -5,24 +5,24 @@ import noImg from "../../assets/images/noImg.svg";
 import attach from "../../assets/images/Attach.png";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
-import submit from "../../assets/images/submitTask.png";
+import submitIcon from "../../assets/images/submitTask.png";
 
 function ListItem({
+  _id,
   name,
-  createdDate,
   icon,
+  role,
+  status,
   assignee,
   priority,
   progress,
-  status,
-  role,
-  submitIcon = submit,
-  deadlineDate,
+  createdAt,
   renderList,
+  deadlineDate,
 }) {
   return (
     <div
-      id="listItem"
+      id={_id}
       className={cn(
         renderList !== "Task"
           ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
@@ -31,7 +31,7 @@ function ListItem({
       )}
     >
       <span>{name}</span>
-      <span>{createdDate}</span>
+      <span>{createdAt}</span>
       {renderList !== "Task" ? (
         <div className="flex items-center pl-1">
           {icon ? (
@@ -131,9 +131,11 @@ function ListItem({
 }
 
 export default function ListBody({ renderList, list = [], listNameSearchTxt }) {
+  console.log(list);
+
   return list.length > 0 ? (
-    list.map((project, index) => (
-      <ListItem key={index} {...project} renderList={renderList} />
+    list.map((project) => (
+      <ListItem key={project._id} {...project} renderList={renderList} />
     ))
   ) : (
     <EmptyListBody name={renderList} listNameSearchTxt={listNameSearchTxt} />

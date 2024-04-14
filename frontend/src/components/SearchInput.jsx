@@ -13,7 +13,7 @@ const SearchInput = ({
       type="text"
       placeholder={`Search by ${renderList.toLowerCase()} name`}
       value={listNameSearchTxt}
-      className="py-1 pl-4 pr-16 text-xs bg-inherit border-[1px] border-white rounded-xl"
+      className="p-4 max-h-8 w-72 text-xs bg-inherit border-[1px] border-white rounded-xl"
       onChange={(e) => {
         setListNameSearchTxt(e.target.value);
         setList({

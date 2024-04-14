@@ -151,7 +151,7 @@ const yourTasks = initialTasks.filter(
   (project) => project.assignee === "Ajmal256"
 );
 
-export default function TaskDash() {
+export default function Tasks() {
   const [taskNameSearchTxt, setTaskNameSearchTxt] = useState("");
   const [taskFilterBtnTxt, setTaskFilterBtnTxt] = useState("Filter");
   const [listOnlyYourTasks, setListOnlyYourTasks] = useState(false);
