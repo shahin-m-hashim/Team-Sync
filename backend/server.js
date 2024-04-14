@@ -13,6 +13,7 @@ const { verifyAccessToken } = require("./middlewares/token");
 // custom routes
 const authRoutes = require("./routes/authRoute");
 const userRoutes = require("./routes/userRoute");
+const publicRoutes = require("./routes/publicRoute");
 const projectRoutes = require("./routes/projectRoute");
 
 const app = express();
@@ -33,10 +34,13 @@ app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 // Custom middleware for logging request paths
 app.use(requestLogger);
 
-// Authentication Routes
-app.use("/api/auth/", authRoutes);
+// Public Routes
+app.use("/api", publicRoutes);
 
-// Protected Routes
+// Authentication Routes
+app.use("/api/auth", authRoutes);
+
+// Private Routes
 app.use("/api/user/:userId", verifyAccessToken, [userRoutes, projectRoutes]);
 
 // Unknown routes handling middleware
