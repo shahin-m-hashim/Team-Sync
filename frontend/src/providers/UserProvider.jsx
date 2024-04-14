@@ -16,8 +16,15 @@ const UserProvider = ({ children }) => {
   const [userStatus, setUserStatus] = useState();
   const [reFetchUser, setReFetchUser] = useState(false);
 
-  const res = useFetch("userDetails", reFetchUser);
+  let res;
+
+  res = useFetch("user", reFetchUser);
   const userData = res?.apiData;
+
+  res = useFetch("invitations", reFetchUser);
+  const invitations = res?.apiData;
+
+  console.log(invitations);
 
   const updateUserDetails = async (url, newData) =>
     await updateData(url, newData);
@@ -57,6 +64,7 @@ const UserProvider = ({ children }) => {
     <UserContext.Provider
       value={{
         userData,
+        invitations,
         setUserStatus,
         deleteUserData,
         setReFetchUser,

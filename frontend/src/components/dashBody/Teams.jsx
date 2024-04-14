@@ -97,7 +97,7 @@ const initialTeams = [
 
 const leaderTeams = initialTeams.filter((team) => team.role === "Leader");
 
-export default function TeamDash() {
+export default function Teams() {
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);

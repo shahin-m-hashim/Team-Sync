@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Link } from "react-router-dom";
+
 import SearchInput from "../SearchInput";
 import ResetListBtn from "./ResetListBtn";
 import FilterButton from "../FilterButton";
 import SwitchListBtn from "./SwitchListBtn";
 import add from "../../assets/images/Add.png";
-import { getLocalSecureItem } from "@/lib/utils";
 
 export default function ListHeader({
   setList,
@@ -21,16 +20,12 @@ export default function ListHeader({
   listNameSearchTxt,
   setListNameSearchTxt,
 }) {
-  const user = getLocalSecureItem("user", "low");
-
   return (
-    <div className="flex bg-[#141414] text-white  items-center justify-between py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
+    <div className="grid bg-[#141414] grid-cols-[200px,1fr,180px] items-center text-white py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
       <div className="flex flex-col gap-1">
-        <span className="font-medium">
-          {switchList && "Your"} {renderList}s
-        </span>
+        <span className="font-medium">{renderList}s</span>
         <span className="text-[#828282]">
-          List of all {switchList && "your"} {renderList.toLowerCase()}s
+          List of all {renderList.toLowerCase()}s
         </span>
       </div>
       <div className="flex gap-7">
@@ -49,12 +44,6 @@ export default function ListHeader({
           listNameSearchTxt={listNameSearchTxt}
           setListNameSearchTxt={setListNameSearchTxt}
         />
-      </div>
-      <div className="flex gap-10 text-[#828282]">
-        <Link to={`/user/${user?.id}/dashboard/projects`}>Projects</Link>
-        <Link to={`/user/${user?.id}/dashboard/teams`}>Teams</Link>
-        <Link to={`/user/${user?.id}/dashboard/subTeams`}>Sub Teams</Link>
-        <Link to={`/user/${user?.id}/dashboard/tasks`}>Tasks</Link>
       </div>
       <div className="inline-flex gap-5">
         <ResetListBtn resetList={resetList} />

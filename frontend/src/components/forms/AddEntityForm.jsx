@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import closeIcon from "@/assets/images/Close.png";
 
 export default function AddEntityForm({
+  error,
   renderList,
   description,
   handleSubmit,
@@ -24,7 +25,6 @@ export default function AddEntityForm({
       return;
     }
     handleSubmit(doc);
-    setShowAddForm(false);
   };
 
   return (
@@ -75,6 +75,7 @@ export default function AddEntityForm({
         <div className="text-green-500 mt-[-5px]">
           You can add in members later
         </div>
+        {error && <div className="text-red-500">{error}</div>}
         <button
           onClick={() => validateAndSubmit()}
           className="rounded-lg  font-bold w-full px-3 py-2 bg-[#3085e5] text-black"

@@ -20,6 +20,12 @@ const MenuItem = ({ icon, text }) => (
 export default function UserSideBar() {
   const { userData, setUserStatus } = useContext(UserContext);
 
+  if (userData.username.length > 13)
+    userData.username = userData.username.substring(0, 13) + "...";
+
+  if (userData.tag.length > 15)
+    userData.tag = userData.tag.substring(0, 15) + "...";
+
   return (
     <div className="bg-[#141414] z-10 w-[16vw] border-2 rounded-md border-white border-r-0 fixed left-0 top-0 bottom-0  flex flex-col gap-20 justify-around items-start p-3 text-white">
       <img src={teamSyncLogo} alt="teamSyncLogo" className="w-16 mt-5 h-14" />
@@ -41,14 +47,10 @@ export default function UserSideBar() {
           <MenuItem icon={logoutIcon} text="Logout" />
         </button>
       </div>
-      <div
-        id="userCard"
-        className="bg-[#202020] flex gap-6 items-center w-full h-max p-3 rounded-xl"
-      >
+      <div className="bg-[#202020] flex justify-around items-center w-full py-2 rounded-xl">
         <img
           src={userData?.profilePic || defaultDp}
-          alt="userDP"
-          className="rounded-[50%] object-cover object-center size-10"
+          className="rounded-[50%] object-cover object-center size-14"
         />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">
@@ -58,6 +60,9 @@ export default function UserSideBar() {
             {userData?.tag || "random user"}
           </span>
         </div>
+        {userData?.status === "active" && (
+          <div className="bg-green-400 size-3 rounded-[50%]" />
+        )}
       </div>
     </div>
   );
