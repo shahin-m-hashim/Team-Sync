@@ -3,15 +3,14 @@
 import Loading from "./Loading";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
-import addDp from "../assets/images/addDp.png";
-import editDp from "../assets/images/editDp.png";
-import { useContext, useEffect, useRef, useState } from "react";
-import defaultDp from "../assets/images/defaultDp.png";
+import editImage from "../assets/images/edit.png";
+import addImage from "../assets/images/addImage.png";
 import { FileContext } from "@/providers/FileProvider";
 import { ErrorContext } from "@/providers/ErrorProvider";
+import { useContext, useEffect, useRef, useState } from "react";
 
 const DropUpMenu = ({
-  userDp,
+  image,
   dpInputRef,
   handleSaveDp,
   handleDeleteDp,
@@ -27,7 +26,7 @@ const DropUpMenu = ({
         >
           Change
         </button>
-        {userDp && (
+        {image && (
           <button
             type="button"
             onClick={handleDeleteDp}
@@ -56,11 +55,13 @@ const DropUpMenu = ({
 };
 
 export default function ImageHandler({
+  size,
   position,
   updateImage,
   deleteImage,
   setIsEditing,
   initialImage,
+  defaultImage,
   firebasePath,
   MAX_SIZE = 2 * 1024 * 1024,
 }) {
@@ -68,7 +69,6 @@ export default function ImageHandler({
   const { file, uploadFile, deleteFile } = useContext(FileContext);
 
   useEffect(() => {
-    console.log("updating");
     if (file.uploadStatus === "completed") {
       setImage(file.uploadedFileURL);
     }
@@ -167,9 +167,12 @@ export default function ImageHandler({
     <>
       <div className="relative flex items-center justify-center">
         <img
-          src={image || defaultDp}
+          src={image || defaultImage}
           alt="display-picture"
-          className="mx-auto rounded-[50%] size-[150px] object-cover object-center"
+          className={cn(
+            size ? size : "size-[150px]",
+            "mx-auto rounded-[50%]  object-cover object-center"
+          )}
         />
         <span
           ref={dpErrorRef}
@@ -180,30 +183,28 @@ export default function ImageHandler({
         {file.uploadStatus === "uploading" && <Loading />}
         {!image ? (
           <img
-            src={addDp}
-            alt="addDp"
+            src={addImage}
             onClick={() => dpInputRef.current.click()}
             className={cn(
-              position ? "right-[-5px] bottom-4" : "bottom-4 right-12",
+              position ? position : "bottom-4 right-12",
               "absolute p-1 bg-slate-800 rounded-3xl size-10 hover:cursor-pointer"
             )}
           />
         ) : (
           <div
             className={cn(
-              position ? "right-[-5px] bottom-4" : "bottom-4 right-12",
+              position ? position : "bottom-4 right-12",
               "absolute"
             )}
           >
             <img
-              src={editDp}
-              alt="editDp"
+              src={editImage}
               onClick={() => setShowDropDown(!showDropDown)}
               className="p-2 bg-slate-800 rounded-3xl size-10 hover:cursor-pointer"
             />
             {showDropDown && (
               <DropUpMenu
-                userDp={initialImage}
+                image={initialImage}
                 dpInputRef={dpInputRef}
                 handleSaveDp={handleSaveDp}
                 handleCancelImage={handleCancelImage}

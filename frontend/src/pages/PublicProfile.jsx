@@ -1,4 +1,4 @@
-import NavbarComponent from "@/components/PublicNavbar";
+import NavbarComponent from "@/components/navbars/PublicNavbar";
 
 export default function PublicProfile() {
   return (

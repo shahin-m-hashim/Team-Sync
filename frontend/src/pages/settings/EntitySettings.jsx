@@ -6,9 +6,11 @@ import {
 } from "@/helpers/stringHandler";
 
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import Navbar from "@/components/dashboard/Navbar";
+import { useEffect, useState } from "react";
 import GroupedUsers from "@/components/GroupedUsers";
+import ImageHandler from "@/components/ImageHandler";
+import UserNavbar from "@/components/navbars/UserNavbar";
+import defaultIcon from "../../assets/images/defaultIcon.png";
 import CurrentCollaborators from "@/components/list/CurrentCollaborators";
 import UpdateEntityDetailsForm from "@/components/forms/UpdateEntityDetailsForm";
 import AddEntityCollaboratorForm from "@/components/forms/AddEntityCollaboratorForm";
@@ -23,6 +25,7 @@ const EntitySettings = ({
   handleUpdateEntityDetails,
   handleSubmitAddCollaborator,
 }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [showAddEntityCollaboratorForm, setShowAddEntityCollaboratorForm] =
     useState(false);
   const [showCurrentCollaborators, setShowCurrentCollaborators] =
@@ -30,14 +33,25 @@ const EntitySettings = ({
   const [showUpdateEntityDetailsForm, setShowUpdateEntityDetailsForm] =
     useState(false);
 
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing]);
+
   return (
     <div className="relative h-full">
-      <Navbar />
-      <div className="size-full overflow-auto p-12 text-white shadow-md bg-[#2b2a2a]">
-        <h1 className="max-w-6xl mx-auto mt-6 text-2xl">
+      <UserNavbar />
+      <div className="size-full overflow-auto p-10 text-white shadow-md bg-[#2b2a2a]">
+        <h1 className="max-w-6xl mx-auto mt-12 text-2xl">
           {capitalizeFirstLetter(entity)} Settings
         </h1>
-        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-7 w gap-y-5 gap-x-10">
+        <div className="grid max-w-6xl grid-cols-2 mx-auto mt-7 gap-x-10">
           {showAddEntityCollaboratorForm ? (
             <AddEntityCollaboratorForm
               entity={entity}
@@ -62,30 +76,14 @@ const EntitySettings = ({
                   Update your {entity}&apos;s general settings
                 </p>
               </div>
-              <div
-                className={cn(
-                  showUpdateEntityDetailsForm ? "mb-3" : " mb-8",
-                  "flex gap-3"
-                )}
-              >
-                <div className="flex-1">
-                  <label className="block mb-4 text-sm font-medium">
-                    {capitalizeFirstLetterOfEachWord(entity)} Leader
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    {entityData?.leader ||
-                      `Your ${capitalizeFirstLetter(entity)} leader`}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <label className="block mb-4 text-sm font-medium">
-                    {capitalizeFirstLetterOfEachWord(entity)} Guide
-                  </label>
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    {entityData?.guide ||
-                      `Your ${capitalizeFirstLetter(entity)} guide`}
-                  </div>
-                </div>
+              <div className="absolute top-5 right-5">
+                <ImageHandler
+                  firebasePath=""
+                  size="size-[120px]"
+                  defaultImage={defaultIcon}
+                  setIsEditing={setIsEditing}
+                  position="right-0 bottom-0"
+                />
               </div>
               {showUpdateEntityDetailsForm ? (
                 <UpdateEntityDetailsForm
@@ -111,15 +109,21 @@ const EntitySettings = ({
                     <label className="block mb-4 text-sm font-medium">
                       {capitalizeFirstLetterOfEachWord(entity)} Description
                     </label>
-                    <div className="w-full h-[4.2rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    <div className="w-full h-[6.5rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
                       {entityData?.description || `Your ${entity} description`}
                     </div>
                   </div>
                   <button
                     onClick={() => setShowUpdateEntityDetailsForm(true)}
-                    className="mt-8 flex w-full justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline "
+                    className="flex w-full mb-4 justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-green-500 focus-visible:outline"
                   >
                     Update {capitalizeFirstLetterOfEachWord(entity)}
+                  </button>
+                  <button
+                    onClick={() => setShowUpdateEntityDetailsForm(true)}
+                    className="flex w-full mb-4 justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline"
+                  >
+                    Delete {capitalizeFirstLetterOfEachWord(entity)}
                   </button>
                 </>
               )}
@@ -133,12 +137,24 @@ const EntitySettings = ({
                 View or invite new collaborators into your {entity}
               </p>
             </div>
-            <div className="mb-8">
-              <label className="block mb-4 text-sm font-medium">
-                Total no of collaborators in this {entity}
-              </label>
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                {existingCollaborators.length || 0} collaborators
+            <div className="mb-8 flex gap-3">
+              <div className="flex-1">
+                <label className="block mb-4 text-sm font-medium">
+                  {capitalizeFirstLetterOfEachWord(entity)} Leader
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  {entityData?.leader ||
+                    `Your ${capitalizeFirstLetter(entity)} leader`}
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block mb-4 text-sm font-medium">
+                  {capitalizeFirstLetterOfEachWord(entity)} Guide
+                </label>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                  {entityData?.guide ||
+                    `Your ${capitalizeFirstLetter(entity)} guide`}
+                </div>
               </div>
             </div>
             <div className="mb-8">
@@ -159,7 +175,7 @@ const EntitySettings = ({
                 showCurrentCollaborators
                   ? "bg-red-500 hover:bg-red-600"
                   : "bg-green-500 hover:bg-green-600",
-                "mb-8 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
+                "mb-4 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
               )}
               disabled={showAddEntityCollaboratorForm}
               onClick={() =>
@@ -167,8 +183,8 @@ const EntitySettings = ({
               }
             >
               <span>
-                {!showCurrentCollaborators ? "View" : "Close"} all current
-                collaborators and their roles
+                {!showCurrentCollaborators ? "Manage" : "Close"} all
+                collaborators
               </span>
             </button>
             <button

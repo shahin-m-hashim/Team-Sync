@@ -1,10 +1,11 @@
-import Navbar from "@/components/dashboard/Navbar";
 import github from "../../assets/images/github.png";
+import Navbar from "@/components/navbars/UserNavbar";
 import ImageHandler from "@/components/ImageHandler";
 import website from "../../assets/images/website.png";
 import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
 import linkedIn from "../../assets/images/linkedIn.png";
+import defaultDp from "../../assets/images/defaultDp.png";
 import DeleteAccount from "@/components/auth/DeleteAccount";
 import PrimaryUserForm from "@/components/forms/user/PrimaryUserForm";
 import SecondaryUserForm from "@/components/forms/user/SecondaryUserForm";
@@ -51,6 +52,7 @@ export default function UserSettingsPage() {
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
           <ImageHandler
+            defaultImage={defaultDp}
             MAX_SIZE={2 * 1024 * 1024}
             setIsEditing={setIsEditing}
             updateImage={updateProfilePic}
