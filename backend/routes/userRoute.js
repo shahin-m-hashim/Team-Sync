@@ -25,12 +25,12 @@ const { isRegisteredUser } = require("../middlewares/RBAC");
 userRouter.post("/project", isRegisteredUser, addProject);
 
 // GET Requests
-userRouter.get("/userDetails", fetchUserDetails);
-userRouter.get("/allUserTeams", fetchAllUserTeams);
-userRouter.get("/allUserProjects", fetchAllUserProjects);
-userRouter.get("/allUserSubTeams", fetchAllUserSubTeams);
-userRouter.get("/allUserInvitations", fetchAllUserInvitations);
-userRouter.get("/allUserNotifications", fetchAllUserNotifications);
+userRouter.get("/user", fetchUserDetails);
+userRouter.get("/teams", fetchAllUserTeams);
+userRouter.get("/projects", fetchAllUserProjects);
+userRouter.get("/subteams", fetchAllUserSubTeams);
+userRouter.get("/invitations", fetchAllUserInvitations);
+userRouter.get("/notifications", fetchAllUserNotifications);
 
 // PATCH Requests
 userRouter.patch("/profilePic", updateProfilePic);

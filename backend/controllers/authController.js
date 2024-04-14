@@ -37,24 +37,24 @@ const loginController = async (req, res, next) => {
     const id = await loginUser(email, password);
 
     const accessToken = jwt.sign({ id }, process.env.JWT_ACCESS_KEY, {
-      expiresIn: "1m",
+      expiresIn: "1d",
     });
 
     const refreshToken = jwt.sign({ id }, process.env.JWT_REFRESH_KEY, {
-      expiresIn: "1d",
+      expiresIn: "7d",
     });
 
     if (accessToken && refreshToken) {
       res.cookie("accJwt", accessToken, {
         httpOnly: true,
         withCredentials: true,
-        expires: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
       });
 
       res.cookie("refJwt", refreshToken, {
         httpOnly: true,
         withCredentials: true,
-        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       });
     } else throw new Error("TokenCreationFailure");
 
@@ -78,19 +78,13 @@ const refreshTokensController = (req, res, next) => {
     const { id } = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
     console.log("Refresh token verified successfully");
 
-    // Generate new access token
-    const newAccessToken = jwt.sign(
-      { id },
-      process.env.JWT_ACCESS_KEY,
-      { expiresIn: "1m" } // 1 min
-    );
+    const newAccessToken = jwt.sign({ id }, process.env.JWT_ACCESS_KEY, {
+      expiresIn: "1d",
+    });
 
-    // Generate new refresh token
-    const newRefreshToken = jwt.sign(
-      { id },
-      process.env.JWT_REFRESH_KEY,
-      { expiresIn: "1d" } // 1 day
-    );
+    const newRefreshToken = jwt.sign({ id }, process.env.JWT_REFRESH_KEY, {
+      expiresIn: "7d",
+    });
 
     console.log("Tokens refreshed successfully");
 
@@ -98,13 +92,13 @@ const refreshTokensController = (req, res, next) => {
       res.cookie("accJwt", newAccessToken, {
         httpOnly: true,
         withCredentials: true,
-        expires: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
       });
 
       res.cookie("refJwt", newRefreshToken, {
         httpOnly: true,
         withCredentials: true,
-        expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
     } else throw new Error("TokenCreationFailure");
 

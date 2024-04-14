@@ -4,11 +4,10 @@ const projects = require("../models/projectModel");
 
 const isRegisteredUser = async (req, res, next) => {
   try {
+    const { role } = req.body;
     const { userId } = req.user;
-    const { userRole } = req.body;
-    if (userId && userRole === "ADMIN") {
-      next();
-    } else throw new Error("ForbiddenAction");
+    if (userId && role === "ADMIN") next();
+    else throw new Error("ForbiddenAction");
   } catch (e) {
     next(e);
   }
