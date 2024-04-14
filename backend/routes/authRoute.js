@@ -1,26 +1,23 @@
 const authRouter = require("express").Router();
 const {
-  signUpController,
   loginController,
-  refreshTokensController,
+  signUpController,
   logoutController,
+  resetPassController,
+  refreshTokensController,
   reqPassResetOtpController,
   verifyPassResetOtpController,
-  resetPassController,
 } = require("../controllers/authController");
 
-authRouter.post("/signup", signUpController);
-
-authRouter.post("/login", loginController);
-
+// GET REQUESTS
 authRouter.get("/refresh", refreshTokensController);
 
-authRouter.post("/reqPassResetOtp", reqPassResetOtpController);
-
-authRouter.post("/verifyPassResetOtp", verifyPassResetOtpController);
-
-authRouter.post("/resetPass", resetPassController);
-
+// POST REQUESTS
+authRouter.post("/login", loginController);
+authRouter.post("/signup", signUpController);
 authRouter.post("/logout", logoutController);
+authRouter.post("/resetPass", resetPassController);
+authRouter.post("/reqPassResetOtp", reqPassResetOtpController);
+authRouter.post("/verifyPassResetOtp", verifyPassResetOtpController);
 
 module.exports = authRouter;
