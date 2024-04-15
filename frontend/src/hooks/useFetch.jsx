@@ -7,9 +7,9 @@ const useFetch = (url, reFetch) => {
   const user = getLocalSecureItem("user", "low");
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
-  const [data, setData] = useState({
+  const [response, setResponse] = useState({
+    data: null,
     error: null,
-    apiData: null,
     isLoading: true,
   });
 
@@ -17,10 +17,11 @@ const useFetch = (url, reFetch) => {
     const fetchData = async () => {
       // console.log("Fetching data...", url);
       try {
-        const { data } = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
+        const res = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
           withCredentials: true,
         });
-        setData({ apiData: data, error: null, isLoading: false });
+
+        setResponse({ data: res.data, error: null, isLoading: false });
       } catch (error) {
         handleFetchError(error);
       }
@@ -34,16 +35,16 @@ const useFetch = (url, reFetch) => {
         error.message === "Network Error" ||
         error.response.status === 500
       ) {
-        setData({
-          apiData: null,
-          error: "serverError",
+        setResponse({
+          data: null,
           isLoading: false,
+          error: "serverError",
         });
       } else {
-        setData({
-          apiData: null,
-          error: error?.response?.data?.error || "Something went wrong",
+        setResponse({
+          data: null,
           isLoading: false,
+          error: error?.response?.data?.error || "Something went wrong",
         });
       }
     };
@@ -54,10 +55,10 @@ const useFetch = (url, reFetch) => {
         fetchData();
       } catch (error) {
         {
-          setData({
-            apiData: null,
-            error: "unauthorized",
+          setResponse({
+            data: null,
             isLoading: false,
+            error: "unauthorized",
           });
         }
       }
@@ -66,17 +67,17 @@ const useFetch = (url, reFetch) => {
     if (user) {
       fetchData();
     } else {
-      setData({
-        apiData: null,
-        error: "unauthorized",
+      setResponse({
+        data: null,
         isLoading: false,
+        error: "unauthorized",
       });
     }
 
     return () => {};
   }, [url, reFetch]);
 
-  return data;
+  return response;
 };
 
 export default useFetch;

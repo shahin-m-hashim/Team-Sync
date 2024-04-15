@@ -24,19 +24,18 @@ const ContactUserForm = ({
   setEnableContactEdit,
 }) => {
   const { setError } = useContext(ErrorContext);
-  const { userData, updateUserDetails, setReFetchUser } =
-    useContext(UserContext);
+  const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
 
   const initialValues = {
-    secondaryEmail: userData?.secondaryEmail || "",
+    secondaryEmail: user?.secondaryEmail || "",
     phone: {
-      countryCode: userData?.phone?.countryCode || "+91",
-      number: userData?.phone?.number || "",
+      countryCode: user?.phone?.countryCode || "+91",
+      number: user?.phone?.number || "",
     },
   };
 
   const [phone, setPhone] = useState(
-    userData?.phone?.countryCode + userData?.phone?.number || ""
+    user?.phone?.countryCode + user?.phone?.number || ""
   );
   const [secondaryEmail, setSecondaryEmail] = useState(
     initialValues.secondaryEmail

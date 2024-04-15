@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import Loading from "../Loading";
@@ -51,7 +49,7 @@ export default function Projects() {
         payload: projects,
       });
     }
-  }, [projects]);
+  }, [projects, listOnlyAdminProjects]);
 
   return (
     <>

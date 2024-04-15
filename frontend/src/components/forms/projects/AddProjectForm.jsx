@@ -7,14 +7,14 @@ import { ProjectContext } from "@/providers/ProjectProvider";
 
 export default function AddProjectForm({ setShowProjectAddForm }) {
   const [error, setError] = useState("");
-  const { userData } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const { addProject, setReFetchProjects } = useContext(ProjectContext);
 
-  const handleProjectUpload = async (projectData) => {
+  const handleProjectUpload = async (newProject) => {
     try {
       await addProject("project", {
-        role: userData.role,
-        projectDetails: projectData,
+        role: user?.role,
+        projectDetails: newProject,
       });
       setReFetchProjects((prev) => !prev);
       setShowProjectAddForm(false);

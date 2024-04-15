@@ -7,7 +7,7 @@ import defaultDp from "../../assets/images/defaultDp.png";
 import UserNavbarDropDown from "../dropDowns/UserNavbarDropDown";
 
 export default function UserNavbar({ settings }) {
-  const { userData } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [showDropDown, setShowDropDown] = useState(false);
 
   return (
@@ -56,11 +56,11 @@ export default function UserNavbar({ settings }) {
         <div className="relative">
           <img
             alt="userDP"
-            src={userData?.profilePic || defaultDp}
+            src={user?.profilePic || defaultDp}
             onClick={() => setShowDropDown(!showDropDown)}
             className="size-8 rounded-[50%] object-cover object-center cursor-pointer"
           />
-          {showDropDown && <UserNavbarDropDown name={userData.fname} />}
+          {showDropDown && <UserNavbarDropDown name={user?.fname} />}
         </div>
       </div>
     </div>

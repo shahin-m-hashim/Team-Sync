@@ -18,13 +18,12 @@ const MenuItem = ({ icon, text }) => (
 );
 
 export default function UserSideBar() {
-  const { userData, setUserStatus } = useContext(UserContext);
+  const { user, setUserStatus } = useContext(UserContext);
 
-  if (userData.username.length > 13)
-    userData.username = userData.username.substring(0, 13) + "...";
+  if (user?.username.length > 13)
+    user.username = user?.username.substring(0, 13) + "...";
 
-  if (userData.tag.length > 15)
-    userData.tag = userData.tag.substring(0, 15) + "...";
+  if (user?.tag.length > 15) user.tag = user?.tag.substring(0, 15) + "...";
 
   return (
     <div className="bg-[#141414] z-10 w-[16vw] border-2 rounded-md border-white border-r-0 fixed left-0 top-0 bottom-0  flex flex-col gap-20 justify-around items-start p-3 text-white">
@@ -49,18 +48,18 @@ export default function UserSideBar() {
       </div>
       <div className="bg-[#202020] flex justify-around items-center w-full py-2 rounded-xl">
         <img
-          src={userData?.profilePic || defaultDp}
+          src={user?.profilePic || defaultDp}
           className="rounded-[50%] object-cover object-center size-14"
         />
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">
-            {userData?.username || "loading..."}
+            {user?.username || "loading..."}
           </span>
           <span className="text-[#BDBDBD] text-xs">
-            {userData?.tag || "random user"}
+            {user?.tag || "random user"}
           </span>
         </div>
-        {userData?.status === "active" && (
+        {user?.status === "active" && (
           <div className="bg-green-400 size-3 rounded-[50%]" />
         )}
       </div>
