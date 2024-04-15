@@ -16,15 +16,7 @@ const UserProvider = ({ children }) => {
   const [userStatus, setUserStatus] = useState();
   const [reFetchUser, setReFetchUser] = useState(false);
 
-  let res;
-
-  res = useFetch("user", reFetchUser);
-  const userData = res?.apiData;
-
-  res = useFetch("invitations", reFetchUser);
-  const invitations = res?.apiData;
-
-  console.log(invitations);
+  const user = useFetch("user", reFetchUser);
 
   const updateUserDetails = async (url, newData) =>
     await updateData(url, newData);
@@ -42,17 +34,17 @@ const UserProvider = ({ children }) => {
     }
   }
 
-  if (res?.error === "unauthorized") {
+  if (user?.error === "unauthorized") {
     setError("unauthorized");
     return null;
   }
 
-  if (res?.error === "serverError") {
+  if (user?.error === "serverError") {
     setError("serverError");
     return null;
   }
 
-  if (res?.isLoading) {
+  if (user?.isLoading) {
     return (
       <div className="h-screen">
         <Loading />
@@ -63,8 +55,7 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        userData,
-        invitations,
+        user: user?.data,
         setUserStatus,
         deleteUserData,
         setReFetchUser,

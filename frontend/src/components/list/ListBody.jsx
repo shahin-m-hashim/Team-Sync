@@ -6,6 +6,7 @@ import attach from "../../assets/images/Attach.png";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
+import { capitalizeFirstLetter } from "@/helpers/stringHandler";
 
 function ListItem({
   _id,
@@ -27,7 +28,7 @@ function ListItem({
         renderList !== "Task"
           ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
           : "grid-cols-[160px,120px,155px,115px,120px,120px,120px,70px,70px,70px]",
-        "grid items-center my-[1px] gap-3 border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
+        "grid items-center gap-3 border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
       )}
     >
       <span>{name}</span>
@@ -66,14 +67,14 @@ function ListItem({
             className={cn(
               {
                 "bg-[#069843]": status === "Done",
-                "bg-[#e8be34]": status === "Not Started",
                 "bg-[#A87BFF]": status === "Pending",
                 "bg-[#B10F0F]": status === "Stopped",
+                "bg-[#e8be34]": status === "Not Started",
               },
               "text-xs inline-flex items-center justify-center text-black h-[25px] w-[80px] font-semibold rounded-xl"
             )}
           >
-            <span>{status}</span>
+            <span>{capitalizeFirstLetter(status)}</span>
           </div>
         </div>
       ) : (
@@ -82,8 +83,8 @@ function ListItem({
             className={cn(
               {
                 "bg-[#069843]": priority === "Low",
-                "bg-[#e8be34]": priority === "Medium",
                 "bg-[#B10F0F]": priority === "High",
+                "bg-[#e8be34]": priority === "Medium",
               },
               "text-xs inline-flex items-center justify-center text-black h-[25px] w-[80px] font-semibold rounded-xl"
             )}
@@ -105,9 +106,9 @@ function ListItem({
               className={cn(
                 {
                   "bg-[#069843]": status === "Done",
-                  "bg-[#e8be34]": status === "Not Started",
                   "bg-[#A87BFF]": status === "Pending",
                   "bg-[#B10F0F]": status === "Stopped",
+                  "bg-[#e8be34]": status === "Not Started",
                 },
                 "text-xs inline-flex items-center justify-center text-black h-[25px] w-[80px] font-semibold rounded-xl"
               )}
@@ -130,9 +131,7 @@ function ListItem({
   );
 }
 
-export default function ListBody({ renderList, list = [], listNameSearchTxt }) {
-  console.log(list);
-
+export default function ListBody({ renderList, list, listNameSearchTxt }) {
   return list.length > 0 ? (
     list.map((project) => (
       <ListItem key={project._id} {...project} renderList={renderList} />
