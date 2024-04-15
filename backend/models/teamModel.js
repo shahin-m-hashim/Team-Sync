@@ -74,8 +74,8 @@ const teamSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["notStarted", "pending", "completed", "stopped"],
-      default: "notStarted",
+      enum: ["Not Started", "Pending", "Done", "Stopped"],
+      default: "Not Started",
     },
   },
   { timestamps: true }
