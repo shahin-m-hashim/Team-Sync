@@ -14,6 +14,7 @@ import defaultIcon from "../../assets/images/defaultIcon.png";
 import CurrentCollaborators from "@/components/list/CurrentCollaborators";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import UpdateProjectDetailsForm from "@/components/forms/projects/UpdateProjectDetailsForm";
+import { useParams } from "react-router-dom";
 
 const existingProjectCollaborators = [
   {
@@ -79,6 +80,10 @@ const existingProjectCollaborators = [
 ];
 
 const ProjectSettings = () => {
+  const { projectId } = useParams();
+
+  console.log("projectId", projectId);
+
   const users = [
     {
       username: "ajmal236",
@@ -242,7 +247,7 @@ const ProjectSettings = () => {
                 View or invite new collaborators into your project
               </p>
             </div>
-            <div className="mb-8 flex gap-3">
+            <div className="flex gap-3 mb-8">
               <div className="flex-1">
                 <label className="block mb-4 text-sm font-medium">
                   Project Leader
