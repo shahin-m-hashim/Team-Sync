@@ -6,13 +6,23 @@ const { passProject } = require("../middlewares/passParams");
 
 const {
   addTeam,
+  fetchProject,
   deleteProject,
   updateProjectIcon,
   inviteProjectMember,
   updateProjectDetails,
+  fetchProjectSettings,
 } = require("../controllers/projectController");
 
 projectRouter.use("/projects/:projectId", passProject, teamRoutes);
+
+// GET Requests
+projectRouter.get("/projects/:projectId", isProjectLeader, fetchProject);
+projectRouter.get(
+  "/projects/:projectId/settings",
+  isProjectLeader,
+  fetchProjectSettings
+);
 
 // POST Requests
 projectRouter.post(

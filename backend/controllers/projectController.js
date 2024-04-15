@@ -1,10 +1,36 @@
 const {
+  getProject,
   createTeam,
   removeProject,
   setProjectIcon,
   setProjectDetails,
+  getProjectSettings,
   sendProjectInvitation,
 } = require("../services/projectService");
+
+// GET Requests
+const fetchProject = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { projectId } = req.project;
+
+    const project = await getProject(userId, projectId);
+    res.status(200).json(project);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchProjectSettings = async (req, res, next) => {
+  try {
+    const { projectId } = req.project;
+
+    const projectSettings = await getProjectSettings(projectId);
+    res.status(200).json(projectSettings);
+  } catch (e) {
+    next(e);
+  }
+};
 
 // POST Requests
 const inviteProjectMember = async (req, res, next) => {
@@ -108,8 +134,10 @@ const deleteProject = async (req, res, next) => {
 
 module.exports = {
   addTeam,
+  fetchProject,
   deleteProject,
   updateProjectIcon,
   updateProjectDetails,
   inviteProjectMember,
+  fetchProjectSettings,
 };

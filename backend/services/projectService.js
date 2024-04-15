@@ -8,6 +8,101 @@ const activities = require("../models/activityModel");
 const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
 
+// GET
+const getProject = async (userId, projectId) => {
+  const project = await projects
+    .findById(projectId)
+    .populate({
+      path: "leader",
+      select: "username profilePic",
+    })
+    .populate({
+      path: "guide",
+      select: "username profilePic",
+    })
+    .populate({
+      path: "members",
+      select: "profilePic",
+    })
+    .populate({
+      path: "teams",
+      select: "name createdAt icon progress status leader guide",
+    })
+    .populate("activities")
+    .exec();
+
+  if (!project) throw new Error("UnknownProject");
+
+  const teams = project.teams?.map((team) => {
+    let role = "member";
+    if (team.leader && team.leader.toString() === userId) role = "leader";
+    if (team.guide && team.guide.toString() === userId) role = "guide";
+
+    return { role, ...team.toObject() };
+  });
+
+  return {
+    icon: project.icon,
+    name: project.name,
+    description: project.description,
+    leader: project.leader?.username,
+    guide: project.guide?.username,
+    members: project.members?.map((member) => member.profilePic),
+    NOM: project.NOM,
+    teams,
+  };
+};
+
+const getProjectSettings = async (projectId) => {
+  const project = await projects
+    .findById(projectId)
+    .populate({
+      path: "leader guide members",
+      select: "username profilePic",
+    })
+    .populate({
+      path: "teams",
+      select: "name createdAt icon progress status leader guide",
+    })
+    .populate("activities")
+    .exec();
+
+  if (!project) {
+    throw new Error("UnknownProject");
+  }
+
+  const collaborators = [
+    {
+      role: "Leader",
+      username: project.leader?.username,
+      profilePic: project.leader?.profilePic,
+    },
+    ...project.members.map((member) => ({
+      role: "Member",
+      username: member.username,
+      profilePic: member.profilePic,
+    })),
+  ];
+
+  if (project.guide) {
+    collaborators.push({
+      role: "Guide",
+      username: project.guide.username,
+      profilePic: project.guide.profilePic,
+    });
+  }
+
+  return {
+    icon: project.icon,
+    name: project.name,
+    description: project.description,
+    leader: project.leader?.username,
+    guide: project.guide?.username,
+    collaborators,
+    NOC: collaborators.length,
+  };
+};
+
 // POST
 const sendProjectInvitation = async (userId, projectId, username, role) => {
   let session = null;
@@ -241,9 +336,11 @@ const removeProject = async (userId, projectId) => {
 };
 
 module.exports = {
+  getProject,
   createTeam,
   removeProject,
   setProjectIcon,
   setProjectDetails,
+  getProjectSettings,
   sendProjectInvitation,
 };
