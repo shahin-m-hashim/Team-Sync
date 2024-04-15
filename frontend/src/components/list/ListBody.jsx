@@ -7,6 +7,7 @@ import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
+import { useNavigate } from "react-router-dom";
 
 function ListItem({
   _id,
@@ -21,6 +22,8 @@ function ListItem({
   renderList,
   deadlineDate,
 }) {
+  const navigate = useNavigate();
+
   return (
     <div
       id={_id}
@@ -121,7 +124,10 @@ function ListItem({
           </button>
         </>
       )}
-      <button className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}>
+      <button
+        onClick={() => navigate(`${_id}/settings`)}
+        className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
+      >
         <img src={settings} width={25} alt="settings icon" />
       </button>
       <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>

@@ -5,9 +5,7 @@ import DummyPage from "./pages/DummyPage";
 import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import Teams from "./components/dashBody/Teams";
-import Tasks from "./components/dashBody/Tasks";
 import SignupPage from "./pages/auth/SignUpPage";
-import PublicProfile from "./pages/PublicProfile";
 import UserDashboard from "./pages/UserDashboard";
 import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
@@ -15,14 +13,14 @@ import ErrorProvider from "./providers/ErrorProvider";
 import Projects from "./components/dashBody/Projects";
 import SubTeams from "./components/dashBody/SubTeams";
 import TeamSettings from "./pages/settings/TeamSettings";
+import ProjectProvider from "./providers/ProjectProvider";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
 import SubTeamSettings from "./pages/settings/SubTeamSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
+import InvitationsProvider from "./providers/InvitationsProvider";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import ProjectProvider from "./providers/ProjectProvider";
-import InvitationsProvider from "./providers/InvitationsProvider";
 
 const router = createBrowserRouter([
   {
@@ -38,11 +36,7 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: ":username",
-    element: <PublicProfile />,
-  },
-  {
-    path: "user/:userId",
+    path: "user/:userId/dashboard",
     element: (
       <UserProvider>
         <InvitationsProvider>
@@ -56,7 +50,7 @@ const router = createBrowserRouter([
         element: <DummyUserPage />,
       },
       {
-        path: "dashboard",
+        path: "projects",
         element: (
           <UserDashboard>
             <Outlet />
@@ -65,10 +59,6 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <DummyUserPage />,
-          },
-          {
-            path: "projects",
             element: (
               <ProjectProvider>
                 <Projects />
@@ -76,18 +66,30 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "teams",
+            path: ":projectId/teams",
             element: <Teams />,
           },
           {
-            path: "subteams",
+            path: ":projectId/subteams",
             element: <SubTeams />,
           },
-          {
-            path: "tasks",
-            element: <Tasks />,
-          },
         ],
+      },
+      {
+        path: "projects/:projectId/settings",
+        element: <ProjectSettings />,
+      },
+      {
+        path: "projects/:projectId/teams/:teamId/settings",
+        element: <TeamSettings />,
+      },
+      {
+        path: "projects/:projectId/teams/:teamId/subteams/:subTeamId/settings",
+        element: <SubTeamSettings />,
+      },
+      {
+        path: "projects/:projectId/teams/:teamId/subteams/:subTeamId/tasks/:taskId/settings",
+        element: <ProjectSettings />,
       },
       {
         path: "settings",
@@ -96,18 +98,6 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <DummyPage />,
-          },
-          {
-            path: "project",
-            element: <ProjectSettings />,
-          },
-          {
-            path: "team",
-            element: <TeamSettings />,
-          },
-          {
-            path: "subTeam",
-            element: <SubTeamSettings />,
           },
           {
             path: "general",
