@@ -22,6 +22,7 @@ import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import ProjectProvider from "./providers/ProjectProvider";
+import InvitationsProvider from "./providers/InvitationsProvider";
 
 const router = createBrowserRouter([
   {
@@ -44,7 +45,9 @@ const router = createBrowserRouter([
     path: "user/:userId",
     element: (
       <UserProvider>
-        <Outlet />
+        <InvitationsProvider>
+          <Outlet />
+        </InvitationsProvider>
       </UserProvider>
     ),
     children: [
@@ -77,7 +80,7 @@ const router = createBrowserRouter([
             element: <Teams />,
           },
           {
-            path: "subTeams",
+            path: "subteams",
             element: <SubTeams />,
           },
           {

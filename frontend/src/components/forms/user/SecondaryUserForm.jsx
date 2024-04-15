@@ -17,13 +17,12 @@ export default function SecondaryUserForm({
 }) {
   const { setError } = useContext(ErrorContext);
   const [isLoading, setIsLoading] = useState(false);
-  const { userData, updateUserDetails, setReFetchUser } =
-    useContext(UserContext);
+  const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
 
   const initialValues = {
-    address: userData?.address,
-    occupation: userData?.occupation,
-    organization: userData?.organization,
+    address: user?.address,
+    occupation: user?.occupation,
+    organization: user?.organization,
   };
 
   const [selected, setSelected] = useState(initialValues?.address?.country);
@@ -88,10 +87,10 @@ export default function SecondaryUserForm({
             <span>Phone Number</span>
             <div className="flex gap-1">
               <div className="px-4 py-2 font-semibold text-black bg-blue-300 rounded-md">
-                {userData?.phone?.countryCode || "+91"}
+                {user?.phone?.countryCode || "+91"}
               </div>
               <div className="w-full p-2 text-black bg-blue-300 rounded-md">
-                {userData?.phone?.number || "0000000000"}
+                {user?.phone?.number || "0000000000"}
               </div>
             </div>
             {enableSecondaryEdit && (
@@ -103,7 +102,7 @@ export default function SecondaryUserForm({
           <div className="flex flex-col gap-2">
             <span>Email Address</span>
             <div className="p-2 text-black bg-blue-300 rounded-md text">
-              {userData?.email || "Your current email address"}
+              {user?.email || "Your current email address"}
             </div>
             {enableSecondaryEdit && (
               <span className="text-sm text-red-600 dark:text-red-400">
@@ -143,7 +142,7 @@ export default function SecondaryUserForm({
                   </>
                 ) : (
                   <div className="p-2 text-black bg-blue-300 rounded-md focus:bg-blue-300 ">
-                    {userData?.address?.district || "Your current district"}
+                    {user?.address?.district || "Your current district"}
                   </div>
                 )}
               </div>
@@ -176,7 +175,7 @@ export default function SecondaryUserForm({
                   </>
                 ) : (
                   <div className="p-2 text-black bg-blue-300 rounded-md focus:bg-blue-300 ">
-                    {userData?.address?.state || "Your current state"}
+                    {user?.address?.state || "Your current state"}
                   </div>
                 )}
               </div>
@@ -229,7 +228,7 @@ export default function SecondaryUserForm({
               </>
             ) : (
               <div className="p-2 text-black bg-blue-300 rounded-md focus:bg-blue-300 ">
-                {userData?.occupation || "Your current occupation"}
+                {user?.occupation || "Your current occupation"}
               </div>
             )}
           </div>
@@ -263,7 +262,7 @@ export default function SecondaryUserForm({
               </>
             ) : (
               <div className="p-2 text-black bg-blue-300 rounded-md focus:bg-blue-300 ">
-                {userData?.organization || "Your current organization"}
+                {user?.organization || "Your current organization"}
               </div>
             )}
           </div>
@@ -288,7 +287,7 @@ export default function SecondaryUserForm({
                   type="reset"
                   onClick={() => {
                     resetForm();
-                    setSelected(userData?.address?.country);
+                    setSelected(user?.address?.country);
                   }}
                   className="w-full p-2 text-white bg-blue-500 rounded-sm hover:bg-blue-600"
                 />
@@ -297,7 +296,7 @@ export default function SecondaryUserForm({
                   value="Cancel"
                   onClick={() => {
                     resetForm();
-                    setSelected(userData?.address?.country);
+                    setSelected(user?.address?.country);
                     setIsEditing(false);
                     setEnableSecondaryEdit(false);
                   }}

@@ -13,17 +13,16 @@ export default function PrimaryUserForm({
   setEnablePrimaryEdit,
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { userData, updateUserDetails, setReFetchUser } =
-    useContext(UserContext);
+  const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
   const { setError } = useContext(ErrorContext);
 
   const initialValues = {
-    fname: userData?.fname,
-    username: userData?.username,
-    pronoun: userData?.pronoun,
-    tag: userData?.tag,
-    bio: userData?.bio,
-    socialLinks: userData?.socialLinks,
+    fname: user?.fname,
+    username: user?.username,
+    pronoun: user?.pronoun,
+    tag: user?.tag,
+    bio: user?.bio,
+    socialLinks: user?.socialLinks,
   };
 
   const onSubmit = async (values) => {
@@ -118,7 +117,7 @@ export default function PrimaryUserForm({
                 setIsEditing(true);
               }}
             >
-              {!userData?.pronoun && (
+              {!user?.pronoun && (
                 <option value="" className="hidden">
                   Pronoun
                 </option>

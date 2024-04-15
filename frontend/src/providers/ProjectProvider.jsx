@@ -12,7 +12,7 @@ const ProjectProvider = ({ children }) => {
   const { setError } = useContext(ErrorContext);
   const [reFetchProjects, setReFetchProjects] = useState(false);
 
-  const res = useFetch("projects", reFetchProjects);
+  const projects = useFetch("projects", reFetchProjects);
 
   const addProject = async (url, newData) => await addData(url, newData);
 
@@ -21,12 +21,12 @@ const ProjectProvider = ({ children }) => {
 
   const deleteProject = async (url) => await deleteData(url);
 
-  if (res?.error === "unauthorized") {
+  if (projects?.error === "unauthorized") {
     setError("unauthorized");
     return null;
   }
 
-  if (res?.error === "serverError") {
+  if (projects?.error === "serverError") {
     setError("serverError");
     return null;
   }
@@ -34,7 +34,7 @@ const ProjectProvider = ({ children }) => {
   return (
     <ProjectContext.Provider
       value={{
-        projects: res?.apiData,
+        projects: projects?.data,
         addProject,
         deleteProject,
         setReFetchProjects,

@@ -16,7 +16,7 @@ export default function UserSettingsPage() {
   const [enablePrimaryEdit, setEnablePrimaryEdit] = useState(false);
   const [enableSecondaryEdit, setEnableSecondaryEdit] = useState(false);
 
-  const { userData, updateUserDetails, deleteUserData, setReFetchUser } =
+  const { user, updateUserDetails, deleteUserData, setReFetchUser } =
     useContext(UserContext);
 
   const updateProfilePic = async (downloadURL) => {
@@ -57,25 +57,23 @@ export default function UserSettingsPage() {
             setIsEditing={setIsEditing}
             updateImage={updateProfilePic}
             deleteImage={deleteProfilePic}
-            initialImage={userData?.profilePic}
-            firebasePath={`users/${userData?._id}/images/profilePic`}
+            initialImage={user?.profilePic}
+            firebasePath={`users/${user?._id}/images/profilePic`}
           />
           {!enablePrimaryEdit ? (
             <>
               <span className="text-xl font-semibold text-slate-800">
-                {userData?.fname || "Your Full Name"}
+                {user?.fname || "Your Full Name"}
               </span>
               <hr />
               <div className="flex justify-between text-sm">
-                <span>{userData?.username}</span>
-                <span className="pr-5">{userData?.pronoun}</span>
+                <span>{user?.username}</span>
+                <span className="pr-5">{user?.pronoun}</span>
               </div>
               <hr />
-              <div className="text-sm">
-                {userData?.tag || "Some Random User"}
-              </div>
+              <div className="text-sm">{user?.tag || "Some Random User"}</div>
               <hr />
-              <div className="text-sm">{userData?.bio || "Your Bio"}</div>
+              <div className="text-sm">{user?.bio || "Your Bio"}</div>
               <hr />
               <h3 className="text-xl font-semibold text text-slate-800">
                 Social Links
@@ -83,20 +81,20 @@ export default function UserSettingsPage() {
               <div className="flex flex-col gap-2 text-sm">
                 <div className="flex gap-2">
                   <img src={website} width={30} />
-                  <a href={userData?.socialLinks?.website}>
-                    {userData?.socialLinks?.website || "Website"}
+                  <a href={user?.socialLinks?.website}>
+                    {user?.socialLinks?.website || "Website"}
                   </a>
                 </div>
                 <div className="flex gap-2">
                   <img src={linkedIn} width={30} />
-                  <a href={userData?.socialLinks?.linkedIn}>
-                    {userData?.socialLinks?.linkedIn || "LinkedIn"}
+                  <a href={user?.socialLinks?.linkedIn}>
+                    {user?.socialLinks?.linkedIn || "LinkedIn"}
                   </a>
                 </div>
                 <div className="flex gap-2">
                   <img src={github} width={30} />
-                  <a href={userData?.socialLinks?.github}>
-                    {userData?.socialLinks?.github || "Github"}
+                  <a href={user?.socialLinks?.github}>
+                    {user?.socialLinks?.github || "Github"}
                   </a>
                 </div>
               </div>

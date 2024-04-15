@@ -20,7 +20,7 @@ export default function SecuritySettingsPage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isEditing]);
 
-  const { userData } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [isContactLoading, setIsContactLoading] = useState(false);
   const [isSecurityLoading, setIsSecurityLoading] = useState(false);
   const [enableContactEdit, setEnableContactEdit] = useState(false);
@@ -47,7 +47,7 @@ export default function SecuritySettingsPage() {
                 Primary Email
               </label>
               <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                {userData?.email || "Your primary email"}
+                {user?.email || "Your primary email"}
               </div>
             </div>
             {enableContactEdit ? (
@@ -63,17 +63,17 @@ export default function SecuritySettingsPage() {
                     Secondary Email
                   </label>
                   <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                    {userData?.secondaryEmail || "Your secondary email"}
+                    {user?.secondaryEmail || "Your secondary email"}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <span>Phone Number</span>
                   <div className="flex gap-1">
                     <div className="px-4 py-2 font-semibold text-black bg-blue-300 rounded-md">
-                      {userData?.phone?.countryCode || "+91"}
+                      {user?.phone?.countryCode || "+91"}
                     </div>
                     <div className="w-full p-2 text-black bg-blue-300 rounded-md">
-                      {userData?.phone?.number || "0000000000"}
+                      {user?.phone?.number || "0000000000"}
                     </div>
                   </div>
                 </div>

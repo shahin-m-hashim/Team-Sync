@@ -1,18 +1,16 @@
 /* eslint-disable react/prop-types */
 import { cn } from "@/lib/utils";
-import CircularStatusBar from "../CircularStatusBar";
 import StatusBarChart from "../StatusBarChart";
-import calcStatusCount from "@/helpers/calcStatusCount";
 import CircularProgress from "../CircularProgress";
+import CircularStatusBar from "../CircularStatusBar";
+import calcStatusCount from "@/helpers/calcStatusCount";
 import calcOverallProgress from "@/helpers/calcOverallProgress";
 
 export default function StatusCard({ list, renderList }) {
   const statusCount = calcStatusCount(list);
   const overallProgress = calcOverallProgress(list);
 
-  if (Object.keys(list).length === 0) {
-    statusCount.empty = true;
-  }
+  if (Object.keys(list).length === 0) statusCount.empty = true;
 
   return (
     <div

@@ -31,14 +31,14 @@ export const listReducer = (state, action) => {
       return [...state].sort((a, b) => compareStatus(b.status, a.status));
     case "CREATED_ASC":
       return [...state].sort((a, b) =>
-        moment(a.createdDate, "DD/MM/YYYY").diff(
-          moment(b.createdDate, "DD/MM/YYYY")
+        moment(a.createdAt, "DD/MM/YYYY").diff(
+          moment(b.createdAt, "DD/MM/YYYY")
         )
       );
     case "CREATED_DESC":
       return [...state].sort((a, b) =>
-        moment(b.createdDate, "DD/MM/YYYY").diff(
-          moment(a.createdDate, "DD/MM/YYYY")
+        moment(b.createdAt, "DD/MM/YYYY").diff(
+          moment(a.createdAt, "DD/MM/YYYY")
         )
       );
     case "DEADLINE_ASC":
