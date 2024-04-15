@@ -51,8 +51,6 @@ const getAllUserProjects = async (userId) => {
     if (project.leader?.id === userId) role = "Leader";
     else if (project.guide?.id === userId) role = "Guide";
 
-    if (project.status === "notStarted") project.status = "Not Started";
-
     return { ...project._doc, role, createdAt };
   });
 
