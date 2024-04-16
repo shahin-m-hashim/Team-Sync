@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
 import { cn } from "@/lib/utils";
 import EmptyListBody from "./EmptyListBody";
+import { useNavigate } from "react-router-dom";
 import noImg from "../../assets/images/noImg.svg";
 import attach from "../../assets/images/Attach.png";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
-import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function ListItem({
   _id,
@@ -39,9 +40,9 @@ function ListItem({
       {renderList !== "Task" ? (
         <div className="flex items-center pl-1">
           {icon ? (
-            <img src={icon} />
+            <img src={icon} width={25} className="object-cover object-center" />
           ) : (
-            <img src={noImg} className="w-5 bg-white" />
+            <img src={noImg} className="ml-1 bg-white size-5" />
           )}
         </div>
       ) : (
@@ -61,7 +62,7 @@ function ListItem({
         </div>
       ) : (
         <button className="pl-7">
-          <img src={attach} width={20} alt="attach icon" />
+          <img src={attach} width={20} />
         </button>
       )}
       {renderList !== "Task" ? (
@@ -120,19 +121,78 @@ function ListItem({
             </div>
           </div>
           <button className="pl-3">
-            <img src={submitIcon} width={30} alt="submit tasks icon" />
+            <img src={submitIcon} width={30} />
           </button>
         </>
       )}
-      <button
-        onClick={() => navigate(`${_id}/settings`)}
-        className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
-      >
-        <img src={settings} width={25} alt="settings icon" />
-      </button>
-      <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>
-        <img src={deleteIcon} width={25} alt="delete icon" />
-      </button>
+      {role === "Leader" ? (
+        <>
+          <button
+            onClick={() => navigate(`${_id}/settings`)}
+            className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
+          >
+            <img src={settings} width={25} />
+          </button>
+          <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>
+            <img src={deleteIcon} width={25} />
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            onClick={() =>
+              toast.error("You are not authorized to perform this action")
+            }
+            className={cn(renderList !== "Task" ? "pl-8" : "pl-5", "relative")}
+          >
+            <img src={settings} width={25} />
+            <svg
+              className="absolute top-0"
+              viewBox="0 0 24 24"
+              width="20"
+              height="24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M0 0L24 24"
+                stroke="#FF0000"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={() =>
+              toast.error("You are not authorized to perform this action")
+            }
+            className={cn(renderList !== "Task" ? "pl-10" : "pl-8", "relative")}
+          >
+            <img src={deleteIcon} width={25} />
+            <svg
+              className="absolute top-0"
+              viewBox="0 0 24 24"
+              width="20"
+              height="24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M0 0L24 24"
+                stroke="#FF0000"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -52,8 +52,9 @@ export default function UserSettingsPage() {
         <div className="relative flex flex-col justify-between px-6 py-5 bg-gray-500 size-full">
           <h2 className="text-2xl">General</h2>
           <ImageHandler
+            MAX_SIZE={2}
+            type="Profile Picture"
             defaultImage={defaultDp}
-            MAX_SIZE={2 * 1024 * 1024}
             setIsEditing={setIsEditing}
             updateImage={updateProfilePic}
             deleteImage={deleteProfilePic}

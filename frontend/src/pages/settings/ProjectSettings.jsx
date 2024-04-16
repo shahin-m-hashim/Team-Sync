@@ -1,150 +1,30 @@
 /* eslint-disable react/prop-types */
 
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import useFetch from "@/hooks/useFetch";
+import Loading from "@/components/Loading";
+import { deleteData, updateData } from "@/services/db";
+import { useParams } from "react-router-dom";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import GroupedUsers from "@/components/GroupedUsers";
 import ImageHandler from "@/components/ImageHandler";
-import ajmalDp from "../../assets/images/ajmalDp.png";
+import { useContext, useEffect, useState } from "react";
 import UserNavbar from "@/components/navbars/UserNavbar";
-import user1 from "../../assets/images/activities/user1.png";
-import user2 from "../../assets/images/activities/user2.png";
-import user3 from "../../assets/images/activities/user3.png";
-import user4 from "../../assets/images/activities/user4.png";
+import { ErrorContext } from "@/providers/ErrorProvider";
 import defaultIcon from "../../assets/images/defaultIcon.png";
 import CurrentCollaborators from "@/components/list/CurrentCollaborators";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import UpdateProjectDetailsForm from "@/components/forms/projects/UpdateProjectDetailsForm";
-import { useParams } from "react-router-dom";
-
-const existingProjectCollaborators = [
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-];
 
 const ProjectSettings = () => {
   const { projectId } = useParams();
+  const { id } = getLocalSecureItem("user", "low");
+  const { setError } = useContext(ErrorContext);
+  const [reFetchProjectSettings, setReFetchProjectSettings] = useState(false);
 
-  console.log("projectId", projectId);
-
-  const users = [
-    {
-      username: "ajmal236",
-      dp: ajmalDp,
-    },
-    {
-      username: "shahin128",
-      dp: user1,
-    },
-    {
-      username: "hari5436",
-      dp: user2,
-    },
-    {
-      username: "asma098",
-      dp: user3,
-    },
-    {
-      username: "thomson12",
-      dp: user4,
-    },
-    {
-      username: "shahin128",
-      dp: user1,
-    },
-    {
-      username: "hari5436",
-      dp: user2,
-    },
-    {
-      username: "asma098",
-      dp: user3,
-    },
-    {
-      username: "thomson12",
-      dp: user4,
-    },
-    {
-      username: "shahin128",
-      dp: user1,
-    },
-    {
-      username: "hari5436",
-      dp: user2,
-    },
-    {
-      username: "asma098",
-      dp: user3,
-    },
-    {
-      username: "thomson12",
-      dp: user4,
-    },
-  ];
-
-  const projectData = {
-    description: "",
-    name: "Project 1",
-    leader: "shahin123",
-    guide: "sindhiya123",
-  };
+  const projectSettings = useFetch(
+    `projects/${projectId}/settings`,
+    reFetchProjectSettings
+  );
 
   const [isEditing, setIsEditing] = useState(false);
   const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
@@ -165,6 +45,30 @@ const ProjectSettings = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isEditing]);
 
+  useEffect(() => {}, [projectSettings.data, reFetchProjectSettings]);
+
+  if (projectSettings?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (projectSettings?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
+
+  const updateProjectIcon = async (downloadURL) => {
+    await updateData(`projects/${projectId}/icon`, {
+      newProjectIcon: downloadURL,
+    });
+    setReFetchProjectSettings((prev) => !prev);
+  };
+
+  const deleteProjectIcon = async () => {
+    await deleteData(`projects/${projectId}/icon`);
+    setReFetchProjectSettings((prev) => !prev);
+  };
+
   return (
     <div className="relative h-full">
       <UserNavbar />
@@ -173,14 +77,15 @@ const ProjectSettings = () => {
         <div className="grid max-w-6xl grid-cols-2 mx-auto mt-7 gap-x-10">
           {showSendProjectInviteForm ? (
             <SendProjectInviteForm
-              users={users}
+              projectId={projectId}
+              setReFetchProjectSettings={setReFetchProjectSettings}
               setShowSendProjectInviteForm={setShowSendProjectInviteForm}
             />
-          ) : (
+          ) : projectSettings?.data ? (
             <div className="relative p-10 rounded-md bg-slate-700">
               {showCurrentCollaborators && (
                 <CurrentCollaborators
-                  existingCollaborators={existingProjectCollaborators}
+                  existingCollaborators={projectSettings?.data?.collaborators}
                 />
               )}
               <div className="mb-8 space-y-2">
@@ -191,19 +96,28 @@ const ProjectSettings = () => {
               </div>
               <div className="absolute top-5 right-5">
                 <ImageHandler
-                  firebasePath=""
-                  size="size-[120px]"
-                  defaultImage={defaultIcon}
+                  MAX_SIZE={10}
+                  btnSize="size-8"
+                  size="size-[100px]"
+                  type="Project"
                   setIsEditing={setIsEditing}
                   position="right-0 bottom-0"
+                  updateImage={updateProjectIcon}
+                  deleteImage={deleteProjectIcon}
+                  initialImage={projectSettings?.data?.icon}
+                  firebasePath={`users/${id}/projects/${projectId}/images/icon`}
+                  defaultImage={defaultIcon || projectSettings?.data?.icon}
                 />
               </div>
               {showUpdateProjectDetailsForm ? (
                 <UpdateProjectDetailsForm
+                  projectId={projectId}
+                  setIsEditing={setIsEditing}
+                  initialData={projectSettings?.data}
+                  setReFetchProjectSettings={setReFetchProjectSettings}
                   setShowUpdateProjectDetailsForm={
                     setShowUpdateProjectDetailsForm
                   }
-                  initialData={projectData}
                 />
               ) : (
                 <>
@@ -212,7 +126,7 @@ const ProjectSettings = () => {
                       Project Name
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {projectData?.name || "Your project name"}
+                      {projectSettings?.data?.name || "Your project name"}
                     </div>
                   </div>
                   <div className="mb-8">
@@ -220,7 +134,8 @@ const ProjectSettings = () => {
                       Project Description
                     </label>
                     <div className="w-full h-[6.5rem] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {projectData?.description || "Your project description"}
+                      {projectSettings?.data?.description ||
+                        "Your project description"}
                     </div>
                   </div>
                   <button
@@ -238,72 +153,82 @@ const ProjectSettings = () => {
                 </>
               )}
             </div>
+          ) : (
+            <div className="relative py-[17rem] rounded-md bg-slate-700">
+              <Loading />
+            </div>
           )}
 
-          <div className="p-10 rounded-md bg-slate-700">
-            <div className="mb-8 space-y-2">
-              <h1 className="text-xl font-semibold">Collaboration</h1>
-              <p className="text-xs text-gray-400">
-                View or invite new collaborators into your project
-              </p>
-            </div>
-            <div className="flex gap-3 mb-8">
-              <div className="flex-1">
-                <label className="block mb-4 text-sm font-medium">
-                  Project Leader
-                </label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                  {projectData?.leader || "Your project leader"}
+          {projectSettings?.data ? (
+            <div className="p-10 rounded-md bg-slate-700">
+              <div className="mb-8 space-y-2">
+                <h1 className="text-xl font-semibold">Collaboration</h1>
+                <p className="text-xs text-gray-400">
+                  View or invite new collaborators into your project
+                </p>
+              </div>
+              <div className="flex gap-3 mb-8">
+                <div className="flex-1">
+                  <label className="block mb-4 text-sm font-medium">
+                    Project Leader
+                  </label>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    {projectSettings?.data?.leader || "Your project leader"}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="block mb-4 text-sm font-medium">
+                    Project Guide
+                  </label>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
+                    {projectSettings?.data?.guide || "Your project guide"}
+                  </div>
                 </div>
               </div>
-              <div className="flex-1">
+              <div className="mb-8">
                 <label className="block mb-4 text-sm font-medium">
-                  Project Guide
+                  Project Collaborators
                 </label>
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                  {projectData?.guide || "Your project guide"}
-                </div>
+                <GroupedUsers
+                  limit={10}
+                  addType="invit"
+                  userType="collaborator"
+                  users={projectSettings?.data?.collaborators}
+                />
               </div>
-            </div>
-            <div className="mb-8">
-              <label className="block mb-4 text-sm font-medium">
-                Project Collaborators
+              <label className="block mb-8 text-sm font-medium">
+                Missing something ? Try the options below.
               </label>
-              <GroupedUsers
-                limit={10}
-                addType="invit"
-                userType="collaborator"
-                users={existingProjectCollaborators}
-              />
+              <button
+                className={cn(
+                  showCurrentCollaborators
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-green-500 hover:bg-green-600",
+                  "mb-4 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
+                )}
+                disabled={showSendProjectInviteForm}
+                onClick={() =>
+                  setShowCurrentCollaborators(!showCurrentCollaborators)
+                }
+              >
+                <span>
+                  {!showCurrentCollaborators ? "Manage" : "Close"} all
+                  collaborators
+                </span>
+              </button>
+              <button
+                disabled={showCurrentCollaborators}
+                onClick={() => setShowSendProjectInviteForm(true)}
+                className="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1.5 font-semibold text-black rounded-md disabled:bg-blue-300"
+              >
+                Invite New Collaborators
+              </button>
             </div>
-            <label className="block mb-8 text-sm font-medium">
-              Missing something ? Try the options below.
-            </label>
-            <button
-              className={cn(
-                showCurrentCollaborators
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-green-500 hover:bg-green-600",
-                "mb-4 flex w-full justify-center rounded-md disabled:bg-green-400  px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm"
-              )}
-              disabled={showSendProjectInviteForm}
-              onClick={() =>
-                setShowCurrentCollaborators(!showCurrentCollaborators)
-              }
-            >
-              <span>
-                {!showCurrentCollaborators ? "Manage" : "Close"} all
-                collaborators
-              </span>
-            </button>
-            <button
-              disabled={showCurrentCollaborators}
-              onClick={() => setShowSendProjectInviteForm(true)}
-              className="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1.5 font-semibold text-black rounded-md disabled:bg-blue-300"
-            >
-              Invite New Collaborators
-            </button>
-          </div>
+          ) : (
+            <div className="relative py-[17rem] rounded-md bg-slate-700">
+              <Loading />
+            </div>
+          )}
         </div>
       </div>
     </div>

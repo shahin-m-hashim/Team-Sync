@@ -55,10 +55,9 @@ export default function UserNavbar({ settings }) {
         </svg>
         <div className="relative">
           <img
-            alt="userDP"
             src={user?.profilePic || defaultDp}
             onClick={() => setShowDropDown(!showDropDown)}
-            className="size-8 rounded-[50%] object-cover object-center cursor-pointer"
+            className="size-7 rounded-[50%] object-cover object-center cursor-pointer"
           />
           {showDropDown && <UserNavbarDropDown name={user?.fname} />}
         </div>
