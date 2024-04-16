@@ -36,14 +36,8 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "user/:userId/dashboard",
-    element: (
-      <UserProvider>
-        <InvitationsProvider>
-          <Outlet />
-        </InvitationsProvider>
-      </UserProvider>
-    ),
+    path: "user/:userId",
+    element: <Outlet />,
     children: [
       {
         index: true,
@@ -59,11 +53,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: (
-              <ProjectProvider>
-                <Projects />
-              </ProjectProvider>
-            ),
+            element: <Projects />,
           },
           {
             path: ":projectId/teams",
@@ -129,7 +119,13 @@ function App() {
   return (
     <ErrorProvider>
       <FileProvider>
-        <RouterProvider router={router} />
+        <UserProvider>
+          <InvitationsProvider>
+            <ProjectProvider>
+              <RouterProvider router={router} />
+            </ProjectProvider>
+          </InvitationsProvider>
+        </UserProvider>
       </FileProvider>
     </ErrorProvider>
   );

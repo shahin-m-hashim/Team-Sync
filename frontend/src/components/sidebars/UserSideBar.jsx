@@ -37,10 +37,7 @@ export default function UserSideBar() {
         <MenuItem icon={subTeams} text="Sub Teams" />
         <MenuItem icon={tasks} text="Tasks" />
       </div>
-      <div
-        id="forUser"
-        className="inline-flex flex-col items-start gap-5 justify-evenly"
-      >
+      <div className="inline-flex flex-col items-start gap-5 justify-evenly">
         <MenuItem icon={techSupport} text="Support" />
         <button onClick={() => setUserStatus("LOGGED_OUT")}>
           <MenuItem icon={logoutIcon} text="Logout" />
