@@ -126,7 +126,9 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
     if (project.guide?.username === username)
       throw new Error("UserAlreadyInProjectAsAGuide");
 
-    if (project.members.some((member) => member.member.username === username)) {
+    if (
+      project.members?.some((member) => member.member?.username === username)
+    ) {
       throw new Error("UserAlreadyInProject");
     }
 
@@ -148,7 +150,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
       }
     );
 
-    const invitationMessage = `You have been invited to join the project ${project.name} as a ${role} by its leader ${project.leader.username}.`;
+    const invitationMessage = `You have been invited to join the project ${project?.name} as a ${role} by its leader ${project.leader.username}.`;
     const newInvitation = await invitations.create(
       [
         {
@@ -259,6 +261,13 @@ const setProjectIcon = async (projectId, newProjectIcon) => {
 };
 
 // DELETE
+const removeProjectIcon = async (projectId) => {
+  const project = await projects.findById(projectId);
+  if (!project) throw new Error("UnknownProject");
+  project.icon = "";
+  await project.save();
+};
+
 const removeProject = async (userId, projectId) => {
   let session = null;
   try {
@@ -340,6 +349,7 @@ module.exports = {
   createTeam,
   removeProject,
   setProjectIcon,
+  removeProjectIcon,
   setProjectDetails,
   getProjectSettings,
   sendProjectInvitation,
