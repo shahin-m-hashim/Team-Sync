@@ -9,6 +9,7 @@ const {
   fetchProject,
   deleteProject,
   updateProjectIcon,
+  deleteProjectIcon,
   inviteProjectMember,
   updateProjectDetails,
   fetchProjectSettings,
@@ -26,7 +27,7 @@ projectRouter.get(
 
 // POST Requests
 projectRouter.post(
-  "/projects/:projectId/invite/:username/role/:role",
+  "/projects/:projectId/invite",
   isProjectLeader,
   inviteProjectMember
 );
@@ -47,6 +48,12 @@ projectRouter.patch(
 );
 
 // DELETE Requests
+projectRouter.delete(
+  "/projects/:projectId/icon",
+  isProjectLeader,
+  deleteProjectIcon
+);
+
 projectRouter.delete("/projects/:projectId", isProjectLeader, deleteProject);
 
 module.exports = projectRouter;

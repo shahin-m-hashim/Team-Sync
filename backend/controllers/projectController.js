@@ -3,6 +3,7 @@ const {
   createTeam,
   removeProject,
   setProjectIcon,
+  removeProjectIcon,
   setProjectDetails,
   getProjectSettings,
   sendProjectInvitation,
@@ -36,7 +37,8 @@ const fetchProjectSettings = async (req, res, next) => {
 const inviteProjectMember = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { username, role, projectId } = req.project;
+    const { projectId } = req.project;
+    const { username, role } = req.body;
     await sendProjectInvitation(userId, projectId, username, role);
     res.status(200).json({
       success: true,
@@ -118,6 +120,20 @@ const updateProjectIcon = async (req, res, next) => {
 };
 
 // DELETE Requests
+
+const deleteProjectIcon = async (req, res, next) => {
+  try {
+    const { projectId } = req.project;
+    await removeProjectIcon(projectId);
+    res.status(200).json({
+      success: true,
+      message: "Project icon deleted successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const deleteProject = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -137,6 +153,7 @@ module.exports = {
   fetchProject,
   deleteProject,
   updateProjectIcon,
+  deleteProjectIcon,
   updateProjectDetails,
   inviteProjectMember,
   fetchProjectSettings,
