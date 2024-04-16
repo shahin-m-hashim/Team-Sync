@@ -6,7 +6,7 @@ import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import InvitationsCard from "../cards/InvitationCard";
+import InvitationsCard from "../cards/InvitationsCard";
 import { ProjectContext } from "@/providers/ProjectProvider";
 import AddProjectForm from "../forms/projects/AddProjectForm";
 import { useContext, useEffect, useReducer, useState } from "react";
