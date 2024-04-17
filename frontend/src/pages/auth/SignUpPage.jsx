@@ -1,14 +1,14 @@
 import { useFormik } from "formik";
+import { signup } from "@/services/auth";
 import rocket from "../../assets/images/rocket.png";
+import { Link, useNavigate } from "react-router-dom";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import showPass from "../../assets/images/ShowPass.png";
 import hidePass from "../../assets/images/HidePass.png";
-import { Link, useNavigate } from "react-router-dom";
-import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
-import { useContext, useEffect, useRef, useState } from "react";
-import { cn, getLocalSecureItem } from "@/lib/utils";
-import { signup } from "@/services/auth";
-import SuccessfullSignUpAlert from "@/components/toasts/SuccessfullSignUpAlert";
 import { ErrorContext } from "@/providers/ErrorProvider";
+import { useContext, useEffect, useRef, useState } from "react";
+import SuccessfullSignUpAlert from "@/components/toasts/SuccessfullSignUpAlert";
+import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
 
 export default function SignupPage() {
   const errorRef = useRef();
@@ -24,7 +24,7 @@ export default function SignupPage() {
   useEffect(() => {
     const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate(`/user/${user?.id}/projects`, { replace: true });
+      navigate(`/user/${user?.id}/dashboard`, { replace: true });
     } else {
       setRender(true);
       if (showSuccessfullSignUpAlert) {

@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
-import { cn } from "@/lib/utils";
+import { cn, getLocalSecureItem } from "@/lib/utils";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 import EmptyListBody from "./EmptyListBody";
-import { useNavigate } from "react-router-dom";
 import noImg from "../../assets/images/noImg.svg";
 import attach from "../../assets/images/Attach.png";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
-import { toast } from "react-toastify";
 
 function ListItem({
   _id,
@@ -23,7 +23,7 @@ function ListItem({
   renderList,
   deadlineDate,
 }) {
-  const navigate = useNavigate();
+  const user = getLocalSecureItem("user", "low");
 
   return (
     <div
@@ -127,12 +127,12 @@ function ListItem({
       )}
       {role === "Leader" ? (
         <>
-          <button
-            onClick={() => navigate(`${_id}/settings`)}
+          <Link
+            to={`/user/${user.id}/projects/${_id}/settings`}
             className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
           >
             <img src={settings} width={25} />
-          </button>
+          </Link>
           <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>
             <img src={deleteIcon} width={25} />
           </button>

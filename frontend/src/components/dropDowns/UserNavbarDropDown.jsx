@@ -10,7 +10,7 @@ const UserNavbarDropDown = ({ name }) => {
   const { setUserStatus } = useContext(UserContext);
 
   return (
-    <div className="absolute z-[51] divide-y divide-black rounded-lg shadow min-w-36 w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
+    <div className="absolute z-[51] text-left divide-y divide-black rounded-lg shadow min-w-36 w-max bg-slate-300 right-3 top-8 dark:bg-gray-700 dark:divide-gray-600">
       {name && (
         <div className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">
           <div>{name}</div>
@@ -22,7 +22,7 @@ const UserNavbarDropDown = ({ name }) => {
       >
         <li>
           <Link
-            to={`/user/${user?.id}/dashboard/projects`}
+            to={`/user/${user?.id}/dashboard`}
             className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
             Dashboard
@@ -34,38 +34,6 @@ const UserNavbarDropDown = ({ name }) => {
             className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
           >
             Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/project`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Project Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/team`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Team Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/subTeam`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Sub Team Settings
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={`/user/${user?.id}/settings/team`}
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-          >
-            Task Settings
           </Link>
         </li>
         <li>
