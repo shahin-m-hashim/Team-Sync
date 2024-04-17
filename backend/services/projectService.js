@@ -58,7 +58,7 @@ const getProjectSettings = async (projectId) => {
     .findById(projectId)
     .populate({
       path: "leader guide members",
-      select: "username profilePic",
+      select: "username profilePic id",
     })
     .populate({
       path: "teams",
@@ -154,13 +154,13 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
     const newInvitation = await invitations.create(
       [
         {
-          authenticity: inviteAcceptToken,
-          project: projectId,
-          invitedBy: userId,
-          invitedUser: invitedUser._id,
           role,
-          message: invitationMessage,
+          from: userId,
           status: "pending",
+          project: projectId,
+          to: invitedUser._id,
+          message: invitationMessage,
+          authenticity: inviteAcceptToken,
         },
       ],
       { session }
@@ -268,6 +268,88 @@ const removeProjectIcon = async (projectId) => {
   await project.save();
 };
 
+const removeCollaborator = async (projectId, collaboratorUsername, role) => {
+  let session = null;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const collaborator = await users
+      .findOne({ username: collaboratorUsername })
+      .session(session);
+    if (!collaborator) throw new Error("UnknownUser");
+
+    const project = await projects
+      .findById(projectId)
+      .populate({
+        path: "leader guide members",
+        select: "username",
+      })
+      .session(session);
+    if (!project) throw new Error("UnknownProject");
+
+    let notificationMessage = "";
+    if (role === "guide" && project.guide?.username === collaboratorUsername) {
+      project.guide = null;
+      collaborator.projects = collaborator.projects.pull(projectId);
+      notificationMessage = `You are no longer a guide of the project ${project.name}.`;
+    } else if (
+      role === "member" &&
+      project.members?.some(
+        (member) => member.username === collaboratorUsername
+      )
+    ) {
+      project.members.pull(collaborator._id);
+      collaborator.projects = collaborator.projects.pull(projectId);
+      notificationMessage = `You are no longer a member of the project ${project.name}.`;
+
+      const newActivity = await activities.create(
+        [
+          {
+            project: projectId,
+            type: "collaboratorRemoved",
+            message: `${collaboratorUsername} who was a ${role} of this project was removed by its leader ${project.leader?.username}`,
+          },
+        ],
+        { session }
+      );
+
+      project.activities.push(newActivity[0]._id);
+    } else {
+      throw new Error("UnknownCollaborator");
+    }
+
+    const newNotification = await notifications.create(
+      [
+        {
+          from: project.leader,
+          to: collaborator.id,
+          type: "kickedFromProject",
+          message: notificationMessage,
+          isRead: false,
+        },
+      ],
+      { session }
+    );
+
+    collaborator.notifications.push(newNotification[0]._id);
+
+    await Promise.all([
+      project.save({ session }),
+      collaborator.save({ session }),
+    ]);
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+    throw error;
+  }
+};
+
 const removeProject = async (userId, projectId) => {
   let session = null;
   try {
@@ -351,6 +433,7 @@ module.exports = {
   setProjectIcon,
   removeProjectIcon,
   setProjectDetails,
+  removeCollaborator,
   getProjectSettings,
   sendProjectInvitation,
 };

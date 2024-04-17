@@ -4,6 +4,7 @@ const {
   removeAccount,
   setProfilePic,
   getUserDetails,
+  setNotifications,
   getAllUserTeams,
   removeProfilePic,
   setPrimaryDetails,
@@ -198,13 +199,26 @@ const updateSecurityDetails = async (req, res, next) => {
 const handleInvitation = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { inviteId, status } = req.params;
-
-    await setInvitation(userId, inviteId, status);
+    const { id, status } = req.body;
+    await setInvitation(userId, id, status);
 
     res.status(200).json({
       success: true,
       message: "Invitation handled successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const handleNotifications = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    await setNotifications(userId);
+
+    res.status(200).json({
+      success: true,
+      message: "Notifications handled successfully",
     });
   } catch (e) {
     next(e);
@@ -249,6 +263,7 @@ module.exports = {
   deleteProfilePic,
   fetchUserDetails,
   fetchAllUserTeams,
+  handleNotifications,
   fetchAllUserSubTeams,
   fetchAllUserProjects,
   updatePrimaryDetails,

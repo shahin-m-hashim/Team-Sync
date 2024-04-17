@@ -5,6 +5,7 @@ const {
   setProjectIcon,
   removeProjectIcon,
   setProjectDetails,
+  removeCollaborator,
   getProjectSettings,
   sendProjectInvitation,
 } = require("../services/projectService");
@@ -120,7 +121,6 @@ const updateProjectIcon = async (req, res, next) => {
 };
 
 // DELETE Requests
-
 const deleteProjectIcon = async (req, res, next) => {
   try {
     const { projectId } = req.project;
@@ -128,6 +128,19 @@ const deleteProjectIcon = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Project icon deleted successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const kickCollaborator = async (req, res, next) => {
+  try {
+    const { projectId, collaboratorUsername, role } = req.params;
+    await removeCollaborator(projectId, collaboratorUsername, role);
+    res.status(200).json({
+      success: true,
+      message: "Collaborator kicked successfully",
     });
   } catch (e) {
     next(e);
@@ -152,6 +165,7 @@ module.exports = {
   addTeam,
   fetchProject,
   deleteProject,
+  kickCollaborator,
   updateProjectIcon,
   deleteProjectIcon,
   updateProjectDetails,
