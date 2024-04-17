@@ -25,6 +25,12 @@ const errorHandler = (error, req, res, next) => {
         error: "Project not found, Please create or join a project first.",
       });
 
+    case "UnknownCollaborator":
+      return res.status(404).json({
+        success: false,
+        error: "Collaborator not found.",
+      });
+
     case "UnknownTeam":
       return res.status(404).json({
         success: false,

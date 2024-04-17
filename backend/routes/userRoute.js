@@ -8,6 +8,7 @@ const {
   deleteProfilePic,
   handleInvitation,
   fetchAllUserTeams,
+  handleNotifications,
   fetchAllUserSubTeams,
   fetchAllUserProjects,
   updatePrimaryDetails,
@@ -34,12 +35,12 @@ userRouter.get("/notifications", fetchAllUserNotifications);
 
 // PATCH Requests
 userRouter.patch("/profilePic", updateProfilePic);
+userRouter.patch("/invitation", handleInvitation);
+userRouter.patch("/notifications", handleNotifications);
 userRouter.patch("/primaryDetails", updatePrimaryDetails);
-userRouter.patch("/secondaryDetails", updateSecondaryDetails);
 userRouter.patch("/contactDetails", updateContactDetails);
 userRouter.patch("/securityDetails", updateSecurityDetails);
-
-userRouter.patch("/invitations/:inviteId/status/:status", handleInvitation);
+userRouter.patch("/secondaryDetails", updateSecondaryDetails);
 
 // DELETE Requests
 userRouter.delete("/", deleteAccount);
