@@ -8,6 +8,7 @@ const {
   addTeam,
   fetchProject,
   deleteProject,
+  kickCollaborator,
   updateProjectIcon,
   deleteProjectIcon,
   inviteProjectMember,
@@ -52,6 +53,12 @@ projectRouter.delete(
   "/projects/:projectId/icon",
   isProjectLeader,
   deleteProjectIcon
+);
+
+projectRouter.delete(
+  "/projects/:projectId/collaborators/:collaboratorUsername/roles/:role",
+  isProjectLeader,
+  kickCollaborator
 );
 
 projectRouter.delete("/projects/:projectId", isProjectLeader, deleteProject);

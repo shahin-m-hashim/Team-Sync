@@ -34,7 +34,7 @@ const loginController = async (req, res, next) => {
     res.clearCookie("refJwt");
 
     const { email, password } = req.body;
-    const id = await loginUser(email, password);
+    const { id, username } = await loginUser(email, password);
 
     const accessToken = jwt.sign({ id }, process.env.JWT_ACCESS_KEY, {
       expiresIn: "1d",
@@ -58,7 +58,7 @@ const loginController = async (req, res, next) => {
       });
     } else throw new Error("TokenCreationFailure");
 
-    return res.status(200).json({ userId: id });
+    return res.status(200).json({ userId: id, username });
   } catch (e) {
     if (e.name === "ValidationError") {
       const customError = new Error("ValidationError");

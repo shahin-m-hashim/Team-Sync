@@ -18,7 +18,7 @@ const loginUser = async (email, password) => {
   user.status = "active";
   user.last_seen = null;
   await user.save();
-  return user.id;
+  return { id: user.id, username: user.username };
 };
 
 const logoutUser = async (userId) => {

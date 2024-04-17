@@ -6,6 +6,7 @@ const projects = require("../models/projectModel");
 const activities = require("../models/activityModel");
 const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
+
 // GET
 const getUserDetails = async (userId) => {
   const user = await users.findById(userId);
@@ -142,38 +143,52 @@ const getAllUserSubTeams = async (userId) => {
 };
 
 const getAllUserInvitations = async (userId) => {
-  const user = await users.findById(userId);
-  if (!user) {
-    throw new Error("UnknownUser");
-  }
+  const user = await users
+    .findById(userId)
+    .select({
+      invitations: 1,
+    })
+    .populate({
+      path: "invitations",
+      populate: {
+        path: "from project",
+        select: "username profilePic name -_id",
+      },
+      select: "role status isRead message createdAt",
+    });
 
-  const userInvitations = await invitations
-    .find({ invitedUser: userId })
-    .populate("invitedBy project");
+  if (!user) throw new Error("UnknownUser");
 
-  const formattedInvitations = userInvitations.map((invitation) => ({
-    id: invitation._id,
-    role: invitation.role,
-    status: invitation.status,
-    invitedBy: invitation.invitedBy.username,
-    project: invitation.project?.name || "N/A",
-    date: moment(invitation.createdAt).format("DD/MM/YYYY"),
+  const formattedInvitations = user.invitations?.map((invitation) => ({
+    ...invitation.toObject(),
     time: moment(invitation.createdAt).format("hh:mm A"),
+    date: moment(invitation.createdAt).format("DD/MM/YYYY"),
   }));
 
   return formattedInvitations;
 };
 
 const getAllUserNotifications = async (userId) => {
-  const user = await users.findById(userId);
+  const user = await users
+    .findById(userId)
+    .select({ notifications: 1 })
+    .populate({
+      path: "notifications",
+      populate: { path: "from", select: "profilePic username -_id" },
+      select: "type message isRead createdAt",
+    });
+
   if (!user) throw new Error("UnknownUser");
-  await user.populate("notifications");
 
   const formattedNotifications = user.notifications.map((notification) => {
-    return notification.message;
+    return {
+      ...notification.toObject(),
+      time: moment(notification.createdAt).format("hh:mm A"),
+      date: moment(notification.createdAt).format("DD/MM/YYYY"),
+    };
   });
 
-  return { notifications: [...formattedNotifications], total: user.NON };
+  return formattedNotifications;
 };
 
 // POST
@@ -249,13 +264,15 @@ const setSecurityDetails = async (userId, newSecurityDetails) => {
   await user.save();
 };
 
-const setInvitation = async (userId, inviteId, status) => {
+const setInvitation = async (userId, invitationId, status) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const invitation = await invitations.findById(inviteId).session(session);
-    if (!invitation || invitation.invitedUser.toString() !== userId)
+    const invitation = await invitations
+      .findById(invitationId)
+      .session(session);
+    if (!invitation || invitation.to.toString() !== userId)
       throw new Error("UnknownInvitation");
 
     if (invitation.status === "accepted" || invitation.status === "rejected")
@@ -272,15 +289,14 @@ const setInvitation = async (userId, inviteId, status) => {
     const project = await projects
       .findById(invitation.project.toString())
       .session(session);
+
     const projectLeader = await users
-      .findById(invitation.invitedBy.toString())
+      .findById(invitation.from.toString())
       .session(session);
+
     const invitedUser = await users.findById(invitedUserId).session(session);
 
-    if (
-      userId !== invitedUserId &&
-      userId !== invitation.invitedUser.toString()
-    ) {
+    if (userId !== invitedUserId && userId !== invitation.to.toString()) {
       throw new Error("UnknownInvitation");
     }
 
@@ -298,6 +314,7 @@ const setInvitation = async (userId, inviteId, status) => {
       const newActivity = await activities.create(
         [
           {
+            project: project._id,
             type: "collaboratorJoined",
             message: `${invitedUser.username} has joined this project ${project.name} as a ${invitation.role}`,
             image: invitedUser.profilePic,
@@ -311,10 +328,10 @@ const setInvitation = async (userId, inviteId, status) => {
       const newNotification = await notifications.create(
         [
           {
-            user: projectLeader.id,
+            to: projectLeader.id,
+            from: invitedUser.id,
             type: "projectInvitationAccepted",
             message: `${invitedUser.username} has accepted your invite to join the project ${project.name} as a ${invitation.role}`,
-            image: invitedUser.profilePic,
           },
         ],
         { session }
@@ -328,7 +345,8 @@ const setInvitation = async (userId, inviteId, status) => {
       const newNotification = await notifications.create(
         [
           {
-            user: projectLeader.id,
+            from: invitedUser.id,
+            to: projectLeader.id,
             type: "projectInvitationRejected",
             message: `${invitedUser.username} has rejected your invite to join the project ${project.name} as a ${invitation.role}`,
             image: invitedUser.profilePic,
@@ -357,6 +375,9 @@ const setInvitation = async (userId, inviteId, status) => {
   }
 };
 
+const setNotifications = async (userId) =>
+  await notifications.updateMany({ to: userId }, { $set: { isRead: true } });
+
 // DELETE
 const removeProfilePic = async (userId) => {
   const user = await users.findById(userId);
@@ -384,6 +405,7 @@ module.exports = {
   setProfilePic,
   getUserDetails,
   getAllUserTeams,
+  setNotifications,
   removeProfilePic,
   setPrimaryDetails,
   setContactDetails,
