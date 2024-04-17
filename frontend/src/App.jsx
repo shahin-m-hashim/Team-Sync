@@ -2,7 +2,6 @@ import Test from "./pages/Test";
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
 import DummyPage from "./pages/DummyPage";
-import DummyUserPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
 import Teams from "./components/dashBody/Teams";
 import SignupPage from "./pages/auth/SignUpPage";
@@ -11,7 +10,6 @@ import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
 import Projects from "./components/dashBody/Projects";
-import SubTeams from "./components/dashBody/SubTeams";
 import TeamSettings from "./pages/settings/TeamSettings";
 import ProjectProvider from "./providers/ProjectProvider";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
@@ -37,14 +35,22 @@ const router = createBrowserRouter([
   },
   {
     path: "user/:userId",
-    element: <Outlet />,
+    element: (
+      <UserProvider>
+        <InvitationsProvider>
+          <ProjectProvider>
+            <Outlet />
+          </ProjectProvider>
+        </InvitationsProvider>
+      </UserProvider>
+    ),
     children: [
       {
         index: true,
-        element: <DummyUserPage />,
+        element: <DummyPage />,
       },
       {
-        path: "projects",
+        path: "dashboard",
         element: (
           <UserDashboard>
             <Outlet />
@@ -56,12 +62,8 @@ const router = createBrowserRouter([
             element: <Projects />,
           },
           {
-            path: ":projectId/teams",
+            path: "projects/:projectId/teams",
             element: <Teams />,
-          },
-          {
-            path: ":projectId/subteams",
-            element: <SubTeams />,
           },
         ],
       },
@@ -119,13 +121,7 @@ function App() {
   return (
     <ErrorProvider>
       <FileProvider>
-        <UserProvider>
-          <InvitationsProvider>
-            <ProjectProvider>
-              <RouterProvider router={router} />
-            </ProjectProvider>
-          </InvitationsProvider>
-        </UserProvider>
+        <RouterProvider router={router} />
       </FileProvider>
     </ErrorProvider>
   );

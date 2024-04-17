@@ -1,13 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { login } from "@/services/auth";
-import { cn, getLocalSecureItem } from "@/lib/utils";
-import showPass from "../../assets/images/ShowPass.png";
 import rocket from "../../assets/images/rocket.png";
-import hidePass from "../../assets/images/HidePass.png";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
-import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
+import showPass from "../../assets/images/ShowPass.png";
+import hidePass from "../../assets/images/HidePass.png";
 import { ErrorContext } from "@/providers/ErrorProvider";
+import { useContext, useEffect, useRef, useState } from "react";
+import { loginValidationSchema as validationSchema } from "../../validations/authValidations";
 
 export default function LoginPage() {
   const errorRef = useRef();
@@ -21,7 +21,7 @@ export default function LoginPage() {
   useEffect(() => {
     const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate(`/user/${user?.id}/projects`, { replace: true });
+      navigate(`/user/${user?.id}/dashboard`, { replace: true });
     } else setRender(true);
   }, [navigate]);
 
@@ -40,7 +40,7 @@ export default function LoginPage() {
   const onSubmit = async (values) => {
     try {
       const userId = await login(values);
-      navigate(`/user/${userId}/projects`, { replace: true });
+      navigate(`/user/${userId}/dashboard`, { replace: true });
     } catch (e) {
       if (e.status === 500 || e.message === "Network Error") {
         setError("serverError");

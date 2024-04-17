@@ -29,8 +29,8 @@ export default function ImageHandler({
   const { setError } = useContext(ErrorContext);
   const { file, uploadFile, deleteFile } = useContext(FileContext);
 
+  const [image, setImage] = useState();
   const [imgFile, setImgFile] = useState();
-  const [image, setImage] = useState(initialImage);
   const [showDropDown, setShowDropDown] = useState(false);
   const [hasImageChanged, setHasImageChanged] = useState(false);
 
@@ -53,7 +53,7 @@ export default function ImageHandler({
   const handleCancelImage = () => {
     setIsEditing(false);
     setShowDropDown(false);
-    setImage(initialImage);
+    setImage(null);
     imgInputRef.current.value = "";
     imgErrorRef.current.style.display = "none";
     setHasImageChanged(false);
@@ -61,12 +61,6 @@ export default function ImageHandler({
 
   const handleSaveImage = async () => {
     if (!imgFile) return;
-
-    setIsEditing(false);
-    setShowDropDown(false);
-    setImage(initialImage);
-    imgInputRef.current.value = "";
-    imgErrorRef.current.style.display = "none";
 
     try {
       toast.info(`${type || "Image"} will be updated shortly...`);
@@ -88,7 +82,11 @@ export default function ImageHandler({
         console.log(`Error uploading ${type || "image"}:`, error);
       }
     } finally {
+      setIsEditing(false);
+      setShowDropDown(false);
       setHasImageChanged(false);
+      imgInputRef.current.value = "";
+      imgErrorRef.current.style.display = "none";
     }
   };
 
@@ -136,7 +134,7 @@ export default function ImageHandler({
             src={image || defaultImage}
             className={cn(
               size ? size : "size-[150px]",
-              "mx-auto rounded-[50%]  object-cover object-center"
+              "mx-auto rounded-full object-cover object-center"
             )}
           />
         ) : (
@@ -144,7 +142,7 @@ export default function ImageHandler({
             src={initialImage || defaultImage}
             className={cn(
               size ? size : "size-[150px]",
-              "mx-auto rounded-[50%]  object-cover object-center"
+              "mx-auto rounded-full object-cover object-center"
             )}
           />
         )}
@@ -155,17 +153,7 @@ export default function ImageHandler({
           Max file size is 2 MB
         </span>
         {file.uploadStatus === "uploading" && <Loading />}
-        {!image ? (
-          <img
-            src={addImage}
-            onClick={() => imgInputRef.current.click()}
-            className={cn(
-              btnSize ? btnSize : "size-10",
-              position ? position : "bottom-4 right-12",
-              "absolute p-1 bg-slate-800 rounded-3xl hover:cursor-pointer"
-            )}
-          />
-        ) : (
+        {initialImage || hasImageChanged ? (
           <div
             className={cn(
               "absolute",
@@ -177,7 +165,7 @@ export default function ImageHandler({
               onClick={() => setShowDropDown(!showDropDown)}
               className={cn(
                 btnSize ? btnSize : "size-10",
-                "p-2 bg-slate-800 rounded-3xl hover:cursor-pointer"
+                "p-2 bg-slate-800 rounded-full hover:cursor-pointer"
               )}
             />
             {showDropDown && (
@@ -190,6 +178,16 @@ export default function ImageHandler({
               />
             )}
           </div>
+        ) : (
+          <img
+            src={addImage}
+            onClick={() => imgInputRef.current.click()}
+            className={cn(
+              btnSize ? btnSize : "size-10",
+              position ? position : "bottom-4 right-12",
+              "absolute p-1 bg-slate-800 rounded-3xl hover:cursor-pointer"
+            )}
+          />
         )}
         <input
           type="file"
