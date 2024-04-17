@@ -11,7 +11,7 @@ export default function HomePage() {
   useEffect(() => {
     const user = getLocalSecureItem("user", "low");
     if (user?.status === "LOGGED_IN") {
-      navigate(`/user/${user?.id}/projects`, { replace: true });
+      navigate(`/user/${user?.id}/dashboard`, { replace: true });
     } else setRender(true);
   }, [navigate]);
 

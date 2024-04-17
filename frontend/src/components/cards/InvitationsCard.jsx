@@ -1,46 +1,94 @@
 /* eslint-disable react/prop-types */
 import Loading from "../Loading";
-import { useContext, useEffect } from "react";
+import { toast } from "react-toastify";
+import { updateData } from "@/services/db";
+import { useContext, useEffect, useState } from "react";
 import defaultDp from "../../assets/images/defaultDp.png";
+import InvitationsPopUp from "../popups/InvitationsPopUp";
 import noInvitations from "../../assets/images/no activity.png";
 import { InvitationsContext } from "@/providers/InvitationsProvider";
-import InvitationsPopUp from "../popups/InvitationsPopUp";
+import { cn } from "@/lib/utils";
+import { ProjectContext } from "@/providers/ProjectProvider";
 
-const Invitations = ({ invitations }) => {
-  console.log(invitations);
-
+const Invitations = ({ invitations, handleInvitation }) => {
   return (
     <div className="flex flex-col gap-2">
       {invitations?.slice(0, 3).map((invitation) => {
         return (
           <div
-            key={invitation?.id}
-            className="bg-[#D9D9D9] text-black gap-5 px-10 py-2 rounded-md flex items-center justify-between"
+            key={invitation?._id}
+            className={cn(
+              invitation?.isRead ? "bg-[#D9D9D9]" : "bg-[#cae6f9]",
+              "text-black gap-5 px-10 py-2 rounded-md flex items-center justify-between"
+            )}
           >
             <img
               className="object-cover object-center w-12"
-              src={invitation?.image || defaultDp}
+              src={invitation?.from?.profilePic || defaultDp}
             />
             <div className="flex flex-col gap-1">
               <span className="font-medium">
-                New invitation from {invitation?.invitedBy}
+                New invitation from {invitation?.from?.username}
               </span>
               <div className="flex gap-4">
                 <span>{invitation?.date}</span>
                 <span>{invitation?.time}</span>
               </div>
             </div>
-            {invitations.status !== "rejected" ? (
-              <>
-                <button className="flex items-center h-6 p-2 text-sm bg-green-500 rounded-md">
-                  ACCEPT
+
+            {invitation?.status === "accepted" && (
+              <div className="px-2 text-sm text-white bg-green-600">
+                ACCEPTED
+              </div>
+            )}
+            {invitation?.status === "rejected" && (
+              <div className="px-2 text-sm text-white bg-red-600">REJECTED</div>
+            )}
+            {invitation?.status === "expired" && (
+              <div className="px-2 text-sm text-white bg-yellow-600">
+                EXPIRED
+              </div>
+            )}
+
+            {invitation?.status === "pending" && (
+              <div className="flex gap-5">
+                <button
+                  onClick={() => handleInvitation(invitation?._id, "accept")}
+                >
+                  <svg
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-green-500 size-10"
+                  >
+                    <path
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </button>
-                <button className="flex items-center h-6 p-2 text-sm bg-red-500 rounded-md">
-                  REJECT
+                <button
+                  onClick={() => handleInvitation(invitation?._id, "reject")}
+                >
+                  <svg
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="text-red-500 size-10"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
-              </>
-            ) : (
-              <div className="px-2 bg-red-700">EXPIRED</div>
+              </div>
             )}
           </div>
         );
@@ -52,34 +100,72 @@ const Invitations = ({ invitations }) => {
 const NoInvitations = () => (
   <div className="flex items-center gap-10 px-10">
     <img src={noInvitations} />
-    <span className="flex-1 text-4xl font-light text-center">
+    <span className="flex-1 text-3xl font-light text-center">
       Currently, you have are no invitations !
     </span>
   </div>
 );
 
 export default function InvitationsCard() {
-  let { invitations } = useContext(InvitationsContext);
+  const { setReFetchProjects } = useContext(ProjectContext);
+  const [showAllInvitations, setShowAllInvitations] = useState(false);
+  const { invitations, setReFetchInvitations } = useContext(InvitationsContext);
 
-  useEffect(() => {}, [invitations]);
+  const handleInvitation = async (invitation, status) => {
+    try {
+      await updateData(`invitation`, {
+        id: invitation,
+        status: status,
+      });
+      toast.success("Invitation handled successfully");
+      setReFetchInvitations((prev) => !prev);
+      setReFetchProjects((prev) => !prev);
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.error || "Error handling invitation");
+    }
+  };
+
+  useEffect(() => {
+    console.log("invitations", invitations);
+  }, [invitations]);
 
   return invitations ? (
     <>
-      <InvitationsPopUp invitation={invitations[0]} />
+      {showAllInvitations && invitations?.length > 0 && (
+        <InvitationsPopUp
+          invitations={invitations}
+          NoInvitations={NoInvitations}
+          handleInvitation={handleInvitation}
+          setShowAllInvitations={setShowAllInvitations}
+        />
+      )}
       <div className="flex flex-col justify-evenly bg-[#141414] px-5 py-2 rounded-md">
         <div className="flex items-center justify-between">
           <div className="font-semibold">Project Invitations</div>
-          <button className="relative pr-6 text-blue-400 underline underline-offset-4">
-            View all invitations ?
-            {invitations?.length > 0 && (
-              <span className="absolute p-1 w-5 right-0 text-xs text-white bg-blue-400 rounded-[50%]">
-                {invitations.length}
-              </span>
-            )}
-          </button>
+          {invitations?.length > 0 && (
+            <button
+              onClick={() => setShowAllInvitations(true)}
+              className="relative pr-6 text-blue-400 underline underline-offset-4"
+            >
+              View all invitations ?
+              {invitations.filter((invitation) => !invitation?.isRead).length >
+                0 && (
+                <div className="absolute bottom-0 right-0 flex items-center justify-center px-2 py-1 text-xs font-semibold text-white bg-blue-500 rounded-full">
+                  {
+                    invitations.filter((invitation) => !invitation.isRead)
+                      .length
+                  }
+                </div>
+              )}
+            </button>
+          )}
         </div>
         {invitations?.length > 0 ? (
-          <Invitations invitations={invitations} />
+          <Invitations
+            invitations={invitations}
+            handleInvitation={handleInvitation}
+          />
         ) : (
           <NoInvitations />
         )}

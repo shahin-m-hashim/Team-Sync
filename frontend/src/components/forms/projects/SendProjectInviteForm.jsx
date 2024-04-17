@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import axios from "axios";
-import { cn } from "@/lib/utils";
+import { cn, getLocalSecureItem } from "@/lib/utils";
 import { toast } from "react-toastify";
 import { addData } from "@/services/db";
 import { useContext, useState } from "react";
@@ -11,6 +11,7 @@ import defaultDp from "../../../assets/images/defaultDp.png";
 import { InvitationsContext } from "@/providers/InvitationsProvider";
 
 const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
+  const user = getLocalSecureItem("user", "low");
   const { setReFetchInvitations } = useContext(InvitationsContext);
 
   const [formData, setFormData] = useState({
@@ -95,7 +96,10 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
             />
             {showSearchResults ? (
               <div className="h-[80%] overflow-auto">
-                {searchedUsers.length > 0 ? (
+                {searchedUsers.length > 0 &&
+                searchedUsers.some(
+                  (member) => member.username !== user.username
+                ) ? (
                   searchedUsers.map((member, index) => (
                     <button
                       key={index}

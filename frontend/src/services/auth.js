@@ -16,6 +16,7 @@ const login = async (credentials) => {
     {
       id: data.userId,
       status: "LOGGED_IN",
+      username: data.username,
     },
     "low"
   );

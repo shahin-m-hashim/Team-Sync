@@ -7,7 +7,7 @@ const ImageHandlerDropUpMenu = ({
   handleCancelImage,
 }) => {
   return (
-    <div className="absolute flex flex-col p-1 text-xs bottom-8 left-10 bg-slate-900">
+    <div className="absolute bottom-0 left-0 flex flex-col p-1 text-xs bg-slate-900">
       <div className="flex flex-col space-y-1">
         <button
           type="button"
