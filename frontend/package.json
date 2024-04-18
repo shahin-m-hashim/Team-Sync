@@ -31,6 +31,7 @@
     "react-international-phone": "^4.2.6",
     "react-router-dom": "^6.22.1",
     "react-toastify": "^10.0.5",
+    "socket.io-client": "^4.7.5",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",

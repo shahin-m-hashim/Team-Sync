@@ -1,9 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
+import { socket } from "@/App";
 import { useEffect, useState } from "react";
 import { getLocalSecureItem } from "@/lib/utils";
 
 const useFetch = (url, reFetch) => {
+  useEffect(() => {
+    socket.on("invitation", (data) => {
+      console.log("A new invitation received", data);
+    });
+
+    return () => {};
+  }, []);
+
   const user = getLocalSecureItem("user", "low");
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 

@@ -126,9 +126,7 @@ export default function InvitationsCard() {
     }
   };
 
-  useEffect(() => {
-    console.log("invitations", invitations);
-  }, [invitations]);
+  useEffect(() => {}, [invitations]);
 
   return invitations ? (
     <>
