@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
+import { socket } from "@/App";
 import useFetch from "@/hooks/useFetch";
 import { ErrorContext } from "./ErrorProvider";
-import { createContext, useContext, useState } from "react";
 import { addData, deleteData, updateData } from "@/services/db";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const ProjectContext = createContext();
 
@@ -20,6 +21,11 @@ const ProjectProvider = ({ children }) => {
     await updateData(url, newData);
 
   const deleteProject = async (url) => await deleteData(url);
+
+  useEffect(() => {
+    socket.on("project", (project) => setReFetchProjects(project));
+    return () => socket.off("project");
+  }, []);
 
   if (projects?.error === "unauthorized") {
     setError("unauthorized");

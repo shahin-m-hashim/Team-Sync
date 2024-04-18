@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 
+import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import Loading from "@/components/Loading";
 import { useParams } from "react-router-dom";
@@ -14,14 +15,12 @@ import defaultIcon from "../../assets/images/defaultIcon.png";
 import CurrentCollaborators from "@/components/list/CurrentCollaborators";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import UpdateProjectDetailsForm from "@/components/forms/projects/UpdateProjectDetailsForm";
-import { ProjectContext } from "@/providers/ProjectProvider";
-import { toast } from "react-toastify";
+import { socket } from "@/App";
 
 const ProjectSettings = () => {
   const { projectId } = useParams();
   const { setError } = useContext(ErrorContext);
   const { id } = getLocalSecureItem("user", "low");
-  const { setReFetchProjects } = useContext(ProjectContext);
   const [reFetchProjectSettings, setReFetchProjectSettings] = useState(false);
 
   const projectSettings = useFetch(
@@ -50,27 +49,24 @@ const ProjectSettings = () => {
 
   useEffect(() => {}, [projectSettings.data, reFetchProjectSettings]);
 
-  if (projectSettings?.error === "unauthorized") {
-    setError("unauthorized");
-    return null;
-  }
+  useEffect(() => {
+    socket.on("inviteAccepted", (invitation) =>
+      setReFetchProjectSettings(invitation)
+    );
 
-  if (projectSettings?.error === "serverError") {
-    setError("serverError");
-    return null;
-  }
+    return () => socket.off("inviteAccepted");
+  }, []);
 
   const updateProjectIcon = async (downloadURL) => {
     await updateData(`projects/${projectId}/icon`, {
       newProjectIcon: downloadURL,
     });
-    setReFetchProjects((prev) => !prev);
+
     setReFetchProjectSettings((prev) => !prev);
   };
 
   const deleteProjectIcon = async () => {
     await deleteData(`projects/${projectId}/icon`);
-    setReFetchProjects((prev) => !prev);
     setReFetchProjectSettings((prev) => !prev);
   };
 
@@ -85,6 +81,16 @@ const ProjectSettings = () => {
       toast.error(e.response.data.error || "Failed to kick collaborator");
     }
   };
+
+  if (projectSettings?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (projectSettings?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
 
   return (
     <div className="relative h-full">
