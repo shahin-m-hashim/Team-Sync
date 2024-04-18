@@ -28,7 +28,9 @@ const updateData = async (url, newData) => {
     });
   } catch (error) {
     if (error.response?.status === 401) {
-      if (error.response.data.error === "Invalid password, Please try again") {
+      if (
+        error.response?.data?.error === "Invalid password, Please try again."
+      ) {
         throw new Error("Invalid password");
       } else await reAuthorizeUpdate(url, newData);
     } else throw error;
@@ -59,7 +61,7 @@ const deleteAccount = async (password) => {
     });
   } catch (error) {
     if (error.response?.status === 401) {
-      if (error.response.data.error === "Invalid password, Please try again") {
+      if (error.response.data.error === "Invalid password, Please try again.") {
         throw new Error("Invalid password");
       } else await reAuthorizeAccountDelete(password);
     } else throw error;
