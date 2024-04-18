@@ -1,4 +1,8 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import Test from "./pages/Test";
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
 import DummyPage from "./pages/DummyPage";
@@ -19,6 +23,9 @@ import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import InvitationsProvider from "./providers/InvitationsProvider";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+
+const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
+export const socket = io(baseURL, { withCredentials: true });
 
 const router = createBrowserRouter([
   {
@@ -118,6 +125,11 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  useEffect(() => {
+    socket.on("connect", () => console.log(`Connected: ${socket.id}`));
+    socket.on("disconnect", () => console.log(`Disconnected`));
+  }, []);
+
   return (
     <ErrorProvider>
       <FileProvider>
