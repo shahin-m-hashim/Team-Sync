@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
@@ -113,30 +114,34 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
 
     const project = await projects
       .findById(projectId)
-      .populate("leader")
-      .populate("guide")
-      .populate("members.member")
+      .select("leader guide members invitations name")
+      .populate({
+        path: "leader guide members invitations",
+        select: "username to project status",
+      })
       .session(session);
 
     if (!project) throw new Error("UnknownProject");
 
-    const invitedUser = await users.findOne({ username }).session(session);
+    const invitedUser = await users
+      .findOne({ username })
+      .select("username invitations")
+      .session(session);
     if (!invitedUser) throw new Error("UnknownInvitedUser");
 
     if (project.guide?.username === username)
       throw new Error("UserAlreadyInProjectAsAGuide");
 
-    if (
-      project.members?.some((member) => member.member?.username === username)
-    ) {
-      throw new Error("UserAlreadyInProject");
+    if (project.members?.some((member) => member?.username === username)) {
+      throw new Error("UserAlreadyInProjectAsAMember");
     }
 
-    const existingInvitation = await invitations.findOne({
-      project: projectId,
-      to: invitedUser._id,
-      status: { $in: ["pending", "accepted"] },
-    });
+    const existingInvitation = project.invitations.find(
+      (invitation) =>
+        invitation.to.toString() === invitedUser.id.toString() &&
+        invitation.project.toString() === projectId &&
+        ["pending", "accepted"].includes(invitation.status)
+    );
 
     if (existingInvitation) throw new Error("UserAlreadyInvited");
 
@@ -169,6 +174,8 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
 
     invitedUser.invitations.push(newInvitation[0]._id);
     await invitedUser.save({ session });
+
+    io.emit("invitation", newInvitation[0]._id);
 
     await session.commitTransaction();
     session.endSession();
@@ -248,6 +255,8 @@ const setProjectDetails = async (projectId, newProjectDetails) => {
   project.name = name;
   project.description = description;
   await project.save();
+
+  io.emit("project", (project.id + project.updatedAt).toString());
 };
 
 const setProjectIcon = async (projectId, newProjectIcon) => {
@@ -255,6 +264,9 @@ const setProjectIcon = async (projectId, newProjectIcon) => {
   if (!project) throw new Error("UnknownProject");
   project.icon = newProjectIcon;
   await project.save();
+
+  io.emit("project", (project.id + project.updatedAt).toString());
+
   return project.icon;
 };
 
@@ -264,6 +276,8 @@ const removeProjectIcon = async (projectId) => {
   if (!project) throw new Error("UnknownProject");
   project.icon = "";
   await project.save();
+
+  io.emit("project", (project.id + project.updatedAt).toString());
 };
 
 const removeCollaborator = async (projectId, collaboratorUsername, role) => {
@@ -280,16 +294,24 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
     const project = await projects
       .findById(projectId)
       .populate({
-        path: "leader guide members",
-        select: "username",
+        path: "leader guide members invitations",
+        select: "username to project",
       })
       .session(session);
     if (!project) throw new Error("UnknownProject");
+
+    console.log("Project\n", project);
 
     let notificationMessage = "";
     if (role === "guide" && project.guide?.username === collaboratorUsername) {
       project.guide = null;
       collaborator.projects = collaborator.projects.pull(projectId);
+      project.invitations = project.invitations.filter(
+        (invitation) =>
+          invitation.project.toString() !== projectId ||
+          invitation.to.toString() !== collaborator._id.toString()
+      );
+
       notificationMessage = `You are no longer a guide of the project ${project.name}.`;
     } else if (
       role === "member" &&
@@ -299,6 +321,12 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
     ) {
       project.members.pull(collaborator._id);
       collaborator.projects = collaborator.projects.pull(projectId);
+      project.invitations = project.invitations.filter(
+        (invitation) =>
+          invitation.project.toString() !== projectId ||
+          invitation.to.toString() !== collaborator._id.toString()
+      );
+
       notificationMessage = `You are no longer a member of the project ${project.name}.`;
 
       const newActivity = await activities.create(
@@ -311,7 +339,6 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
         ],
         { session }
       );
-
       project.activities.push(newActivity[0]._id);
     } else {
       throw new Error("UnknownCollaborator");
@@ -339,6 +366,9 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    io.emit("project", (project.id + project.updatedAt).toString());
+    io.emit("notification", newNotification[0]._id);
   } catch (error) {
     if (session) {
       await session.abortTransaction();
