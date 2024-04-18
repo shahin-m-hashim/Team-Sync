@@ -239,7 +239,7 @@ const userSchema = new mongoose.Schema(
     },
     used_otps: [
       {
-        type: Date,
+        type: String,
       },
     ],
   },
@@ -247,9 +247,8 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+  if (this.isModified("password"))
     this.password = await bcrypt.hash(this.password, 12);
-  }
 
   this.NOTe = this.teams.length;
   this.NOTa = this.tasks.length;

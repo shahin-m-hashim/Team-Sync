@@ -1,24 +1,41 @@
 const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
+const { Server } = require("socket.io");
+const { createServer } = require("http");
 const cookieParser = require("cookie-parser");
 const requestLogger = require("./middlewares/logger");
-
-// Custom middlewares
 const errorHandler = require("./middlewares/errorHandler");
+const { verifyAccessToken } = require("./middlewares/token");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
-const { verifyAccessToken } = require("./middlewares/token");
+const app = express();
+const httpServer = createServer(app);
 
-// custom routes
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`A new client ${socket.id} is now connected to this server`);
+
+  socket.on("disconnect", () =>
+    console.log(`The client ${socket.id} has disconnected from the server`)
+  );
+});
+
+module.exports = { io };
+
+// Custom routes
 const authRoutes = require("./routes/authRoute");
 const userRoutes = require("./routes/userRoute");
 const publicRoutes = require("./routes/publicRoute");
 const projectRoutes = require("./routes/projectRoute");
 
-const app = express();
-
-// set the view engine to ejs
+// Set the view engine to ejs
 app.set("view engine", "ejs");
 
 // Body parser middlewares
@@ -31,7 +48,7 @@ app.use(cookieParser());
 // CORS middleware
 app.use(cors({ credentials: true, origin: process.env.CLIENT_URL }));
 
-// Custom middleware for logging request paths
+// Logging middleware
 app.use(requestLogger);
 
 // Public Routes
@@ -55,7 +72,8 @@ const startApp = async () => {
       process.env.MONGODB_URI + "?retryWrites=true&w=majority"
     );
     console.log("Database connected successfully");
-    app.listen(process.env.PORT, () => {
+
+    httpServer.listen(process.env.PORT, () => {
       console.log("Server is running on port:", process.env.PORT);
     });
   } catch (error) {
