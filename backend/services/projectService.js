@@ -134,13 +134,11 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
 
     const existingInvitation = await invitations.findOne({
       project: projectId,
-      invitedUser: invitedUser._id,
+      to: invitedUser._id,
       status: { $in: ["pending", "accepted"] },
     });
 
-    if (existingInvitation) {
-      throw new Error("UserAlreadyInvited");
-    }
+    if (existingInvitation) throw new Error("UserAlreadyInvited");
 
     const inviteAcceptToken = jwt.sign(
       { invitedUserId: invitedUser._id },
