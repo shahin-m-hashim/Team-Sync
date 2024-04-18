@@ -89,9 +89,9 @@ const subTeamSchema = new mongoose.Schema(
 subTeamSchema.index({ name: 1, parent: 1 }, { unique: true });
 
 subTeamSchema.pre("save", async function (next) {
-  this.NOT = this.tasks.length;
-  this.NOM = this.members.length;
-  this.NOA = this.activities.length;
+  this.NOT = this.tasks?.length;
+  this.NOM = this.members?.length;
+  this.NOA = this.activities?.length;
   next();
 });
 

@@ -1,6 +1,7 @@
 const moment = require("moment");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const projects = require("../models/projectModel");
@@ -297,6 +298,8 @@ const setInvitation = async (userId, invitationId, status) => {
 
     const invitedUser = await users.findById(invitedUserId).session(session);
 
+    let newNotification;
+
     if (userId !== invitedUserId && userId !== invitation.to.toString()) {
       throw new Error("UnknownInvitation");
     }
@@ -326,7 +329,7 @@ const setInvitation = async (userId, invitationId, status) => {
 
       project.activities.push(newActivity[0]._id);
 
-      const newNotification = await notifications.create(
+      newNotification = await notifications.create(
         [
           {
             to: projectLeader.id,
@@ -338,12 +341,13 @@ const setInvitation = async (userId, invitationId, status) => {
         { session }
       );
 
+      invitation.isRead = true;
       projectLeader.notifications.push(newNotification[0]._id);
     }
 
     if (status === "reject") {
       invitation.status = "rejected";
-      const newNotification = await notifications.create(
+      newNotification = await notifications.create(
         [
           {
             from: invitedUser.id,
@@ -355,10 +359,9 @@ const setInvitation = async (userId, invitationId, status) => {
         ],
         { session }
       );
+      invitation.isRead = true;
       projectLeader.notifications.push(newNotification[0]._id);
     }
-
-    invitation.isRead = true;
 
     await Promise.all([
       invitation.save({ session }),
@@ -369,6 +372,12 @@ const setInvitation = async (userId, invitationId, status) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    io.emit("notification", newNotification[0]._id);
+    io.emit(
+      "inviteAccepted",
+      (invitation.id + invitation.updatedAt).toString()
+    );
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

@@ -84,9 +84,9 @@ const teamSchema = new mongoose.Schema(
 teamSchema.index({ name: 1, parent: 1 }, { unique: true });
 
 teamSchema.pre("save", async function (next) {
-  this.NOS = this.subTeams.length;
-  this.NOA = this.activities.length;
-  this.NOM = this.members.length;
+  this.NOM = this.members?.length;
+  this.NOS = this.subTeams?.length;
+  this.NOA = this.activities?.length;
   next();
 });
 

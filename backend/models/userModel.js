@@ -250,13 +250,13 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password"))
     this.password = await bcrypt.hash(this.password, 12);
 
-  this.NOTe = this.teams.length;
-  this.NOTa = this.tasks.length;
-  this.NOP = this.projects.length;
-  this.NOST = this.subTeams.length;
-  this.NOC = this.connections.length;
-  this.NOI = this.invitations.length;
-  this.NON = this.notifications.length;
+  this.NOTe = this.teams?.length;
+  this.NOTa = this.tasks?.length;
+  this.NOP = this.projects?.length;
+  this.NOST = this.subTeams?.length;
+  this.NOC = this.connections?.length;
+  this.NOI = this.invitations?.length;
+  this.NON = this.notifications?.length;
 
   this.phone.countryCode = this.phone.countryCode || "+91";
   this.address.country = this.address.country || "IN";

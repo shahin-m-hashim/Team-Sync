@@ -88,10 +88,10 @@ const projectSchema = new mongoose.Schema(
 );
 
 projectSchema.pre("save", async function (next) {
-  this.NOT = this.teams.length;
-  this.NOM = this.members.length;
-  this.NOA = this.activities.length;
-  this.NOI = this.invitations.length;
+  this.NOT = this.teams?.length;
+  this.NOM = this.members?.length;
+  this.NOA = this.activities?.length;
+  this.NOI = this.invitations?.length;
   next();
 });
 
