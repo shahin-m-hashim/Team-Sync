@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 
+import { socket } from "@/App";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
@@ -31,6 +32,14 @@ export default function UserNavbar({ settings }) {
       toast.error("Something went wrong");
     }
   };
+
+  useEffect(() => {
+    socket.on("notification", (notification) =>
+      setReFetchNotifications(notification)
+    );
+
+    return () => socket.off("notification");
+  }, []);
 
   if (notifications?.error === "unauthorized") {
     setError("unauthorized");

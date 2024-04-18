@@ -1,18 +1,16 @@
 /* eslint-disable react/prop-types */
 
 import axios from "axios";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { addData } from "@/services/db";
-import { useContext, useState } from "react";
 const baseURL = import.meta.env.VITE_APP_BASE_URL;
 import { cn, getLocalSecureItem } from "@/lib/utils";
 import invite from "../../../assets/images/invite.png";
 import defaultDp from "../../../assets/images/defaultDp.png";
-import { InvitationsContext } from "@/providers/InvitationsProvider";
 
 const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
   const user = getLocalSecureItem("user", "low");
-  const { setReFetchInvitations } = useContext(InvitationsContext);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -65,7 +63,6 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
         username: "",
         role: "member",
       });
-      setReFetchInvitations((prev) => !prev);
     }
   };
 
@@ -125,7 +122,7 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
                           member?.tag?.slice(0, 10) + "..."}
                       </div>
                       <img
-                        className="size-8"
+                        className="object-cover object-center rounded-full size-8"
                         src={member?.profilePic || defaultDp}
                       />
                     </button>
