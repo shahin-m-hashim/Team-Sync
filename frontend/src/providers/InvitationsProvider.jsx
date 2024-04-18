@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
+import { socket } from "@/App";
 import useFetch from "@/hooks/useFetch";
 import { ErrorContext } from "./ErrorProvider";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const InvitationsContext = createContext();
 
@@ -12,6 +13,11 @@ const InvitationsProvider = ({ children }) => {
   const [reFetchInvitations, setReFetchInvitations] = useState(false);
 
   const invitations = useFetch("invitations", reFetchInvitations);
+
+  useEffect(() => {
+    socket.on("invitation", (project) => setReFetchInvitations(project));
+    return () => socket.off("invitation");
+  }, []);
 
   if (invitations?.error === "unauthorized") {
     setError("unauthorized");
