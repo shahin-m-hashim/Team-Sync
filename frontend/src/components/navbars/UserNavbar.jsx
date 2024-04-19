@@ -34,11 +34,11 @@ export default function UserNavbar({ settings }) {
   };
 
   useEffect(() => {
-    socket.on("notification", (notification) =>
+    socket.on("notifications", (notification) =>
       setReFetchNotifications(notification)
     );
 
-    return () => socket.off("notification");
+    return () => socket.off("notifications");
   }, []);
 
   if (notifications?.error === "unauthorized") {

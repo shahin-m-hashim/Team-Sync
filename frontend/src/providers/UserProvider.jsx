@@ -15,6 +15,7 @@ const UserProvider = ({ children }) => {
   const { setError } = useContext(ErrorContext);
   const [userStatus, setUserStatus] = useState();
   const [reFetchUser, setReFetchUser] = useState(false);
+  const [reFetchProjects, setReFetchProjects] = useState(false);
 
   const user = useFetch("user", reFetchUser);
 
@@ -55,11 +56,13 @@ const UserProvider = ({ children }) => {
   return (
     <UserContext.Provider
       value={{
-        user: user?.data,
         setUserStatus,
         deleteUserData,
         setReFetchUser,
+        reFetchProjects,
+        user: user?.data,
         updateUserDetails,
+        setReFetchProjects,
       }}
     >
       {children}

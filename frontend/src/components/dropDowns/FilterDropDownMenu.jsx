@@ -41,7 +41,7 @@ export default function FilterDropDownMenu({
   );
 
   return (
-    <div className="absolute text-center top-9 right-[-10px] flex flex-col justify-evenly p-2 py-0 rounded-xl min-w-[200px] h-[150px] bg-[#4D4D4D]">
+    <div className="absolute z-10 text-center top-9 right-[-10px] flex flex-col justify-evenly p-2 py-0 rounded-xl min-w-[200px] h-[150px] bg-[#4D4D4D]">
       <FilterOption filterBy="Name" />
       <FilterOption filterBy="Created" />
       {renderList !== "Task" && <FilterOption filterBy="Progress" />}

@@ -15,7 +15,6 @@ import FileProvider from "./providers/FileProvider";
 import ErrorProvider from "./providers/ErrorProvider";
 import Projects from "./components/dashBody/Projects";
 import TeamSettings from "./pages/settings/TeamSettings";
-import ProjectProvider from "./providers/ProjectProvider";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
 import SubTeamSettings from "./pages/settings/SubTeamSettings";
@@ -23,6 +22,7 @@ import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import InvitationsProvider from "./providers/InvitationsProvider";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import SubTeams from "./components/dashBody/SubTeams";
 
 const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
 export const socket = io(baseURL, { withCredentials: true });
@@ -45,9 +45,7 @@ const router = createBrowserRouter([
     element: (
       <UserProvider>
         <InvitationsProvider>
-          <ProjectProvider>
-            <Outlet />
-          </ProjectProvider>
+          <Outlet />
         </InvitationsProvider>
       </UserProvider>
     ),
@@ -69,8 +67,28 @@ const router = createBrowserRouter([
             element: <Projects />,
           },
           {
-            path: "projects/:projectId/teams",
-            element: <Teams />,
+            path: "projects/:projectId",
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: <Teams />,
+              },
+              {
+                path: "teams/:teamId",
+                element: <Outlet />,
+                children: [
+                  {
+                    index: true,
+                    element: <SubTeams />,
+                  },
+                  {
+                    path: "subteams/:subTeamId",
+                    element: <Teams />,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
@@ -88,7 +106,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:projectId/teams/:teamId/subteams/:subTeamId/tasks/:taskId/settings",
-        element: <ProjectSettings />,
+        element: <Outlet />,
       },
       {
         path: "settings",

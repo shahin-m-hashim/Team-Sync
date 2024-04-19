@@ -1,40 +1,56 @@
 /* eslint-disable react/prop-types */
-import { cn, getLocalSecureItem } from "@/lib/utils";
+
+import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
 import EmptyListBody from "./EmptyListBody";
 import noImg from "../../assets/images/noImg.svg";
 import attach from "../../assets/images/Attach.png";
+import { Link, useNavigate } from "react-router-dom";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
 
 function ListItem({
-  _id,
+  id,
   name,
   icon,
   role,
+  parent,
   status,
+  userId,
   assignee,
   priority,
   progress,
   createdAt,
   renderList,
+  grandParent,
   deadlineDate,
 }) {
-  const user = getLocalSecureItem("user", "low");
+  const navigate = useNavigate();
 
   return (
     <div
-      id={_id}
+      id={id}
       className={cn(
         renderList !== "Task"
           ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
           : "grid-cols-[160px,120px,155px,115px,120px,120px,120px,70px,70px,70px]",
-        "grid items-center gap-3 border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
+        "relative cursor-pointer grid items-center gap-3  border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
       )}
     >
+      <div
+        onClick={() => {
+          if (renderList === "Project") {
+            navigate(`projects/${id}`);
+          } else if (renderList === "Team") {
+            navigate(`teams/${id}`);
+          } else {
+            navigate(`subteams/${id}`);
+          }
+        }}
+        className="absolute top-0 bottom-0 left-0 bg-transparent right-60"
+      />
       <span>{name}</span>
       <span>{createdAt}</span>
       {renderList !== "Task" ? (
@@ -128,7 +144,13 @@ function ListItem({
       {role === "Leader" ? (
         <>
           <Link
-            to={`/user/${user.id}/projects/${_id}/settings`}
+            to={
+              renderList === "Project"
+                ? `/user/${userId}/projects/${id}/settings`
+                : renderList === "Team"
+                  ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
+                  : `/user/${userId}/projects/${parent}/teams/${grandParent}/subteams/${id}/settings`
+            }
             className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
           >
             <img src={settings} width={25} />
@@ -143,7 +165,10 @@ function ListItem({
             onClick={() =>
               toast.error("You are not authorized to perform this action")
             }
-            className={cn(renderList !== "Task" ? "pl-8" : "pl-5", "relative")}
+            className={cn(
+              renderList !== "Task" ? "pl-8" : "pl-5",
+              "relative cursor-not-allowed"
+            )}
           >
             <img src={settings} width={25} />
             <svg
@@ -169,7 +194,10 @@ function ListItem({
             onClick={() =>
               toast.error("You are not authorized to perform this action")
             }
-            className={cn(renderList !== "Task" ? "pl-10" : "pl-8", "relative")}
+            className={cn(
+              renderList !== "Task" ? "pl-10" : "pl-8",
+              "relative cursor-not-allowed"
+            )}
           >
             <img src={deleteIcon} width={25} />
             <svg
@@ -197,10 +225,20 @@ function ListItem({
   );
 }
 
-export default function ListBody({ renderList, list, listNameSearchTxt }) {
+export default function ListBody({
+  list,
+  userId,
+  renderList,
+  listNameSearchTxt,
+}) {
   return list.length > 0 ? (
-    list.map((project) => (
-      <ListItem key={project._id} {...project} renderList={renderList} />
+    list.map((item) => (
+      <ListItem
+        {...item}
+        key={item.id}
+        userId={userId}
+        renderList={renderList}
+      />
     ))
   ) : (
     <EmptyListBody name={renderList} listNameSearchTxt={listNameSearchTxt} />

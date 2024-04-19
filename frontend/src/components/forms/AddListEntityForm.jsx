@@ -2,15 +2,15 @@
 import { useRef, useState } from "react";
 import closeIcon from "@/assets/images/Close.png";
 
-export default function AddEntityForm({
-  error,
+export default function AddListEntityForm({
   renderList,
   description,
-  handleSubmit,
-  setShowAddForm,
+  handleAddEntity,
+  setShowAddEntityForm,
 }) {
   const lengthErrorRef = useRef();
   const requiredErrorRef = useRef();
+
   const [doc, setDoc] = useState({
     name: "",
     description: "",
@@ -24,7 +24,7 @@ export default function AddEntityForm({
       lengthErrorRef.current.style.display = "block";
       return;
     }
-    handleSubmit(doc);
+    handleAddEntity(doc);
   };
 
   return (
@@ -34,7 +34,7 @@ export default function AddEntityForm({
           <span className="ml-2 text-xl text-center">
             Create Your {renderList}
           </span>
-          <button onClick={() => setShowAddForm(false)}>
+          <button onClick={() => setShowAddEntityForm(false)}>
             <img src={closeIcon} alt="Close" />
           </button>
         </div>
@@ -75,7 +75,6 @@ export default function AddEntityForm({
         <div className="text-green-500 mt-[-5px]">
           You can add in members later
         </div>
-        {error && <div className="text-red-500">{error}</div>}
         <button
           onClick={() => validateAndSubmit()}
           className="rounded-lg  font-bold w-full px-3 py-2 bg-[#3085e5] text-black"

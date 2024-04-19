@@ -2,14 +2,15 @@
 
 import axios from "axios";
 import { useState } from "react";
-import { toast } from "react-toastify";
-import { addData } from "@/services/db";
 const baseURL = import.meta.env.VITE_APP_BASE_URL;
 import { cn, getLocalSecureItem } from "@/lib/utils";
 import invite from "../../../assets/images/invite.png";
 import defaultDp from "../../../assets/images/defaultDp.png";
 
-const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
+const SendProjectInviteForm = ({
+  sendCollaboratorInvite,
+  setShowSendProjectInviteForm,
+}) => {
   const user = getLocalSecureItem("user", "low");
 
   const [formData, setFormData] = useState({
@@ -41,29 +42,15 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
 
   const handleSendInvite = async (e) => {
     e.preventDefault();
+    sendCollaboratorInvite(formData);
+
     setSearchedUsers([]);
     setShowSearchResults(false);
     setShowSearchFrom(true);
-
-    try {
-      await addData(`projects/${projectId}/invite`, {
-        username: formData.username,
-        role: formData.role,
-      });
-
-      toast.success(
-        `${formData.username} invited as ${formData.role} successfully.`
-      );
-    } catch (e) {
-      toast.error(
-        e.response.data.error || "Error inviting user, try again later."
-      );
-    } finally {
-      setFormData({
-        username: "",
-        role: "member",
-      });
-    }
+    setFormData({
+      username: "",
+      role: "member",
+    });
   };
 
   const handleCancel = () => {
@@ -78,7 +65,7 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
   };
 
   return (
-    <div className="relative p-10 rounded-md bg-slate-700">
+    <div className="relative h-full p-10 rounded-md bg-slate-700">
       <form
         onSubmit={handleSendInvite}
         className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-4 bg-slate-700"
@@ -122,8 +109,8 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
                           member?.tag?.slice(0, 10) + "..."}
                       </div>
                       <img
-                        className="object-cover object-center rounded-full size-8"
                         src={member?.profilePic || defaultDp}
+                        className="object-cover object-center rounded-full size-8"
                       />
                     </button>
                   ))
@@ -146,11 +133,11 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
                 <div className="text-lg font-medium text-red-600">Roles</div>
                 <div>Leader: Has full control</div>
                 <div>Guide: Has view permissions</div>
-                <div>Member: Has view and submission controls</div>
+                <div>Member: Has view and task permissions</div>
                 <button
                   type="button"
                   onClick={() => setShowSendProjectInviteForm(false)}
-                  className="flex w-full items-center gap-2 mt-2 justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-600"
+                  className="flex w-full items-center gap-2 mt-2 justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500"
                 >
                   Done Inviting ? Exit Search
                 </button>
@@ -160,7 +147,7 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
         ) : (
           <>
             <div className="my-8">
-              <label className="block mb-4 text-sm font-medium">
+              <label className="block mt-[-7px] mb-4 text-xl font-medium">
                 Inviting collaborator
               </label>
               <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
@@ -175,17 +162,15 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
               <div className="flex flex-col gap-5 my-6">
                 <div>Leader: Has full control</div>
                 <div>Guide: Has view permissions</div>
-                <div>Member: Has view and submission controls</div>
+                <div>Member: Has view and task permissions</div>
               </div>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, role: "member" })}
                   className={cn(
-                    "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6",
-                    formData.role === "member"
-                      ? "bg-yellow-500 text-black"
-                      : "bg-blue-600 text-white"
+                    "flex w-full justify-center text-black rounded-md px-3 py-1.5 text-sm font-semibold leading-6",
+                    formData.role === "member" ? "bg-yellow-500" : "bg-blue-600"
                   )}
                 >
                   <span>Member</span>
@@ -194,10 +179,8 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
                   type="button"
                   onClick={() => setFormData({ ...formData, role: "guide" })}
                   className={cn(
-                    "flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6",
-                    formData.role === "guide"
-                      ? "bg-yellow-500 text-black"
-                      : "bg-blue-600 text-white"
+                    "flex w-full justify-center text-black rounded-md px-3 py-1.5 text-sm font-semibold leading-6",
+                    formData.role === "guide" ? "bg-yellow-500" : "bg-blue-600"
                   )}
                 >
                   <span>Guide</span>
@@ -207,7 +190,7 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
             <div className="flex gap-2 px-4">
               <button
                 type="submit"
-                className="flex w-full items-center gap-2 justify-center rounded-md bg-green-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-600"
+                className="flex w-full items-center gap-2 justify-center rounded-md bg-green-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-green-500"
               >
                 <img src={invite} />
                 <span>Send Invite</span>
@@ -215,7 +198,7 @@ const SendProjectInviteForm = ({ projectId, setShowSendProjectInviteForm }) => {
               <button
                 type="button"
                 onClick={() => handleCancel()}
-                className="flex w-full items-center gap-2 justify-center rounded-md bg-red-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-600"
+                className="flex w-full items-center gap-2 justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-red-500"
               >
                 <span>Cancel</span>
               </button>

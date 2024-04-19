@@ -1,171 +1,149 @@
 /* eslint-disable react/prop-types */
 
 import { toast } from "react-toastify";
+import useFetch from "@/hooks/useFetch";
+import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
-import ajmalDp from "../../assets/images/ajmalDp.png";
-import user1 from "../../assets/images/activities/user1.png";
-import user2 from "../../assets/images/activities/user2.png";
-import user3 from "../../assets/images/activities/user3.png";
-import user4 from "../../assets/images/activities/user4.png";
+import { deleteData, updateData } from "@/services/db";
+import { useContext, useEffect, useState } from "react";
+import { ErrorContext } from "@/providers/ErrorProvider";
 import { teamValidationSchema } from "@/validations/entityValidations";
 
-const projectMembers = [
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-];
-
-const existingTeamCollaborators = [
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-  {
-    username: "ajmal236",
-    dp: ajmalDp,
-  },
-  {
-    username: "shahin128",
-    dp: user1,
-  },
-  {
-    username: "hari5436",
-    dp: user2,
-  },
-  {
-    username: "asma098",
-    dp: user3,
-  },
-  {
-    username: "thomson12",
-    dp: user4,
-  },
-];
-
-const teamData = {
-  description: "",
-  name: "Team 1",
-  guide: "ajmal236",
-  leader: "shahin123",
-};
-
 const TeamSettings = () => {
-  const handleAddTeamCollaborator = (teamCollaborator) => {
-    console.log("teamCollaborator: ", teamCollaborator);
-    toast.success(
-      `${teamCollaborator.username} added as ${teamCollaborator.role} successfully`
-    );
+  const { setError } = useContext(ErrorContext);
+  const { userId, projectId, teamId } = useParams();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [reFetchTeamSettings, setReFetchTeamSettings] = useState(false);
+
+  const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
+    useState(false);
+
+  const [showCurrentTeamCollaborators, setShowCurrentTeamCollaborators] =
+    useState(false);
+
+  const [showUpdateTeamDetailsForm, setShowUpdateTeamDetailsForm] =
+    useState(false);
+
+  const teamSettings = useFetch(
+    `projects/${projectId}/teams/${teamId}/settings`,
+    reFetchTeamSettings
+  );
+
+  useEffect(() => {}, [teamSettings?.data, reFetchTeamSettings]);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      return (e.returnValue = "Are you sure you want to leave?");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing]);
+
+  const handleAddTeamCollaborator = async (values) => {
+    try {
+      await updateData(`projects/${projectId}/teams/${teamId}/add`, values);
+      showUpdateTeamDetailsForm(false);
+      setIsEditing(false);
+
+      setReFetchTeamSettings((prev) => !prev);
+      toast.success("Collaborator added successfully");
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to add collaborator");
+    }
   };
 
-  const handleUpdateTeamDetails = (newTeamDetails) => {
-    console.log("updatedTeam: ", newTeamDetails);
-    toast.success("Team updated successfully");
+  const kickTeamCollaborator = async (username, role) => {
+    try {
+      await deleteData(
+        `projects/${projectId}/collaborators/${username}/roles/${role.toLowerCase()}`
+      );
+      toast.success("Collaborator kicked successfully");
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to kick collaborator");
+    }
   };
+
+  const handleUpdateTeamDetails = async (updatedTeamDetails) => {
+    try {
+      const { data } = await updateData(
+        `projects/${projectId}/teams/${teamId}/details`,
+        { updatedTeamDetails }
+      );
+      setIsEditing(false);
+      setShowUpdateTeamDetailsForm(false);
+
+      setReFetchTeamSettings((prev) => !prev);
+      toast.success(data?.message || "Update successfull");
+    } catch (e) {
+      console.log(e);
+      toast.error(
+        e.response?.data?.error || "An Unknown error occurred. Try again later."
+      );
+    }
+  };
+
+  const updateTeamIcon = async (downloadURL) => {
+    try {
+      const { data } = await updateData(
+        `projects/${projectId}/teams/${teamId}/icon`,
+        {
+          updatedTeamIcon: downloadURL,
+        }
+      );
+      setIsEditing(false);
+      setReFetchTeamSettings((prev) => !prev);
+      toast.success(data?.message || "Update successfull");
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to update team icon");
+    }
+  };
+
+  const deleteTeamIcon = async () => {
+    try {
+      await deleteData(`projects/${projectId}/teams/${teamId}/icon`);
+      setReFetchTeamSettings((prev) => !prev);
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete team icon");
+    }
+  };
+
+  if (teamSettings?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (teamSettings?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
 
   return (
-    <EntitySettings
-      entity="team"
-      entityData={teamData}
-      memberParent="project"
-      members={projectMembers}
-      validationSchema={teamValidationSchema}
-      existingCollaborators={existingTeamCollaborators}
-      handleUpdateEntityDetails={handleUpdateTeamDetails}
-      handleSubmitAddCollaborator={handleAddTeamCollaborator}
-    />
+    teamSettings && (
+      <EntitySettings
+        entity="team"
+        parent="project"
+        setIsEditing={setIsEditing}
+        updateEntityIcon={updateTeamIcon}
+        deleteEntityIcon={deleteTeamIcon}
+        entitySettings={teamSettings?.data}
+        validationSchema={teamValidationSchema}
+        kickCollaborator={kickTeamCollaborator}
+        setReFetchEntitySettings={setReFetchTeamSettings}
+        handleUpdateEntityDetails={handleUpdateTeamDetails}
+        showCurrentCollaborators={showCurrentTeamCollaborators}
+        showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}
+        handleAddEntityCollaborator={handleAddTeamCollaborator}
+        showAddEntityCollaboratorForm={showAddTeamCollaboratorForm}
+        setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
+        setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}
+        setShowAddEntityCollaboratorForm={setShowAddTeamCollaboratorForm}
+        entityIconPath={`users/${userId}/projects/${projectId}/teams/${teamId}/icon`}
+      />
+    )
   );
 };
 

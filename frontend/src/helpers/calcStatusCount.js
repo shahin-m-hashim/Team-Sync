@@ -1,4 +1,4 @@
-function calcStatusCount(list = []) {
+function calcStatusCount(list) {
   const statusCount = {
     notStarted: 0,
     pending: 0,

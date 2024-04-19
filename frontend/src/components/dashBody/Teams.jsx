@@ -1,124 +1,68 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import { socket } from "@/App";
+import Loading from "../Loading";
+import { toast } from "react-toastify";
+import useFetch from "@/hooks/useFetch";
+import { addData } from "@/services/db";
 import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
+import { useParams } from "react-router-dom";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
-import AddTeamForm from "../forms/teams/AddTeamForm";
 import ListHeader from "@/components/list/ListHeader";
-import { useEffect, useReducer, useState } from "react";
+import { ErrorContext } from "@/providers/ErrorProvider";
+import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
-import google from "../../assets/images/project icons/Google.png";
-import youtube from "../../assets/images/project icons/Youtube.png";
-import facebook from "../../assets/images/project icons/Facebook.png";
-import instagram from "../../assets/images/project icons/Instagram.png";
-
-const initialTeams = [
-  {
-    name: "Team 3",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Project 6",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 40,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Team 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Project 8",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 75,
-    status: "Pending",
-    role: "Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "27/01/2024",
-    icon: facebook,
-    progress: 15,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 2",
-    createdDate: "15/03/2024",
-    icon: google,
-    progress: 85,
-    status: "Pending",
-    role: "guide",
-  },
-  {
-    name: "Team 10",
-    createdDate: "22/04/2024",
-    icon: youtube,
-    progress: 35,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Team 7",
-    createdDate: "7/05/2024",
-    icon: facebook,
-    progress: 40,
-    status: "Not Started",
-    role: "guide",
-  },
-  {
-    name: "Team 9",
-    createdDate: "27/02/2024",
-    icon: youtube,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 1",
-    createdDate: "2/03/2024",
-    icon: google,
-    progress: 75,
-    status: "Pending",
-    role: "guide",
-  },
-];
-
-const leaderTeams = initialTeams.filter((team) => team.role === "Leader");
+import { useContext, useEffect, useReducer, useState } from "react";
+import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
 export default function Teams() {
+  const { userId, projectId } = useParams();
+  const { setError } = useContext(ErrorContext);
+
+  const [reFetchTeams, setReFetchTeams] = useState(false);
+  const [showAddTeamForm, setShowAddTeamForm] = useState(false);
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
-  const [listOnlyAdminTeams, setListOnlyAdminTeams] = useState(false);
+  const [listOnlyLeaderTeams, setListOnlyLeaderTeams] = useState(false);
+
+  const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
+    useState(false);
+
+  const teams = useFetch(`projects/${projectId}/teams`, reFetchTeams);
+  const leaderTeams = teams?.data?.filter((team) => team.role === "Leader");
+
+  const [initialTeams, dispatch] = useReducer(listReducer, teams?.data);
+  const setTeams = (action) => dispatch(action);
+
+  const handleAddTeam = async (teamDetails) => {
+    try {
+      await addData(`projects/${projectId}/team`, { teamDetails });
+      setShowAddTeamForm(false);
+      toast.success("Team added successfully");
+    } catch (e) {
+      toast.error(
+        e.response.data.error || "An unexpected error occurred, try again later"
+      );
+    }
+  };
 
   const resetTeamList = () => {
     setTeamNameSearchTxt("");
-    setListOnlyAdminTeams(false);
+    setListOnlyLeaderTeams(false);
     setTeamFilterBtnTxt("Filter");
     setTeams({
       type: "RESET",
-      initialState: initialTeams,
+      initialState: teams?.data,
     });
   };
-
-  const [teams, dispatch] = useReducer(listReducer, initialTeams);
-  const setTeams = (action) => dispatch(action);
 
   useEffect(() => {
     setTeamNameSearchTxt("");
     setTeamFilterBtnTxt("Filter");
-    if (listOnlyAdminTeams) {
+    if (listOnlyLeaderTeams) {
       setTeams({
         type: "SWITCH",
         payload: leaderTeams,
@@ -126,55 +70,90 @@ export default function Teams() {
     } else {
       setTeams({
         type: "SWITCH",
-        payload: initialTeams,
+        payload: teams?.data,
       });
     }
-  }, [listOnlyAdminTeams]);
+  }, [teams?.data, listOnlyLeaderTeams]);
 
-  const [showAddTeamForm, setShowAddTeamForm] = useState(false);
+  useEffect(() => {
+    socket.on("teams", (team) => setReFetchTeams(team));
+    return () => socket.off("teams");
+  }, []);
+
+  if (teams?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (teams?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
 
   return (
     <>
       {showAddTeamForm && (
-        <AddTeamForm setShowAddTeamForm={setShowAddTeamForm} />
-      )}
-      <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
-        <DetailCard
-          details={{
-            name: "Team 1",
-            leader: "Shahin123",
-            guide: "Sindhiya",
-            nom: 20,
-          }}
+        <AddListEntityForm
           renderList="Team"
+          handleAddEntity={handleAddTeam}
+          setShowAddEntityForm={setShowAddTeamForm}
+          description="Your Team is where you can organize your sub teams, add members and work with them effortlessly."
         />
-        <StatusCard list={teams} renderList="Team" />
+      )}
+      {showSendProjectInviteForm && (
+        <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
+          <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
+            <SendProjectInviteForm
+              projectId={projectId}
+              setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+            />
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
+        <DetailCard
+          renderList="Team"
+          projectId={projectId}
+          setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+        />
+        {initialTeams ? (
+          <StatusCard list={initialTeams} renderList="Team" />
+        ) : (
+          <div className="relative bg-[#141414]">
+            <Loading />
+          </div>
+        )}
       </div>
       <div>
         <ListHeader
-          setList={setTeams}
           renderList="Team"
-          resetList={resetTeamList}
+          setList={setTeams}
+          initialList={teams?.data}
           leaderList={leaderTeams}
-          initialList={initialTeams}
-          setShowAddForm={setShowAddTeamForm}
+          resetList={resetTeamList}
           filterBtnTxt={teamFilterBtnTxt}
-          switchList={listOnlyAdminTeams}
-          setSwitchList={setListOnlyAdminTeams}
+          switchList={listOnlyLeaderTeams}
+          setSwitchList={setListOnlyLeaderTeams}
           listNameSearchTxt={teamNameSearchTxt}
           setFilterBtnTxt={setTeamFilterBtnTxt}
+          setShowAddEntityForm={setShowAddTeamForm}
           setListNameSearchTxt={setTeamNameSearchTxt}
         />
       </div>
       <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
-        <ListSubHeader renderList={"Team"} />
-        <div>
+        <ListSubHeader renderList="Team" />
+        {initialTeams ? (
           <ListBody
-            list={teams}
+            userId={userId}
             renderList={"Team"}
+            list={initialTeams || []}
             listNameSearchTxt={teamNameSearchTxt}
           />
-        </div>
+        ) : (
+          <div className="relative h-full">
+            <Loading />
+          </div>
+        )}
       </div>
     </>
   );

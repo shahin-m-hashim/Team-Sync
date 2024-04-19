@@ -23,7 +23,7 @@ const updateData = async (url, newData) => {
   const user = getLocalSecureItem("user", "low");
 
   try {
-    await axios.patch(`${baseURL}/user/${user?.id}/${url}`, newData, {
+    return await axios.patch(`${baseURL}/user/${user?.id}/${url}`, newData, {
       withCredentials: true,
     });
   } catch (error) {
@@ -41,7 +41,7 @@ const deleteData = async (url) => {
   // console.log("Deleting data...");
   const user = getLocalSecureItem("user", "low");
   try {
-    await axios.delete(`${baseURL}/user/${user?.id}/${url}`, {
+    return await axios.delete(`${baseURL}/user/${user?.id}/${url}`, {
       withCredentials: true,
     });
   } catch (error) {
