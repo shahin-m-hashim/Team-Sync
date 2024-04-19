@@ -11,39 +11,20 @@ const notifications = require("../models/notificationModel");
 
 // GET
 const getUserDetails = async (userId) => {
-  const user = await users.findById(userId);
+  const user = await users
+    .findById(userId)
+    .select(
+      "address socialLinks phone role status profilePic username fname tag bio pronoun organization occupation secondaryEmail last_seen"
+    );
   if (!user) throw new Error("UnknownUser");
-  const {
-    password,
-    createdAt,
-    updatedAt,
-    used_otps,
-    projects,
-    NOP,
-    teams,
-    NOTe,
-    subTeams,
-    NOST,
-    tasks,
-    NOTa,
-    invitations,
-    NOI,
-    notifications,
-    NON,
-    connections,
-    NOC,
-    __v,
-    ...userData
-  } = user._doc;
-  return userData;
+  return user;
 };
 
 const getAllUserProjects = async (userId) => {
-  const user = await users.findById(userId).populate({
+  const user = await users.findById(userId).select("projects").populate({
     path: "projects",
-    populate: { path: "leader guide" },
+    select: "name createdAt icon progress status leader guide members",
   });
-
   if (!user) throw new Error("UnknownUser");
 
   const formattedProjects = user.projects.map((project) => {
@@ -51,105 +32,83 @@ const getAllUserProjects = async (userId) => {
 
     const createdAt = moment(project.createdAt).format("DD/MM/YYYY");
 
-    if (project.leader?.id === userId) role = "Leader";
-    else if (project.guide?.id === userId) role = "Guide";
+    if (project.guide?.toString() === userId) role = "Guide";
+    if (project.leader?.toString() === userId) role = "Leader";
 
-    return { ...project._doc, role, createdAt };
+    return {
+      role,
+      createdAt,
+      id: project._id,
+      name: project.name,
+      icon: project.icon,
+      status: project.status,
+      progress: project.progress,
+    };
   });
 
   return formattedProjects;
 };
 
 const getAllUserTeams = async (userId) => {
-  const user = await users.findById(userId);
+  const user = await users.findById(userId).select("teams").populate({
+    path: "teams",
+    select: "name createdAt icon progress status leader guide members",
+  });
   if (!user) throw new Error("UnknownUser");
 
-  await user.populate("teams");
+  const formattedTeams = user.teams.map((team) => {
+    let role = "Member";
 
-  const formattedTeams = user.teams.map(async (team) => {
-    await team.populate("leader");
-    await team.populate("guide");
-    await team.populate("parent");
+    const createdAt = moment(team.createdAt).format("DD/MM/YYYY");
 
-    const {
-      name,
-      icon,
-      leader,
-      guide,
-      createdAt,
-      NOM,
-      parent,
-      progress,
-      status,
-    } = team;
-
-    const formattedDate = moment(createdAt).format("DD/MM/YYYY");
+    if (team.leader?.toString() === userId) role = "Guide";
+    if (team.leader?.toString() === userId) role = "Leader";
 
     return {
-      name,
-      icon,
-      leader: leader?.username,
-      guide: guide?.username || "N/A",
-      parent: parent?.name,
-      NOM,
-      createdAt: formattedDate,
-      status,
-      progress,
+      role,
+      createdAt,
+      name: team.name,
+      icon: team.icon,
+      status: team.status,
+      progress: team.progress,
     };
   });
 
-  return { teams: await Promise.all(formattedTeams), total: user.NOTe };
+  return formattedTeams;
 };
 
 const getAllUserSubTeams = async (userId) => {
-  const user = await users.findById(userId);
+  const user = await users.findById(userId).select("subTeams").populate({
+    path: "subTeams",
+    select: "name createdAt icon progress status leader guide members",
+  });
   if (!user) throw new Error("UnknownUser");
-  await user.populate("subTeams");
 
-  const formattedSubTeams = user.subTeams.map((subTeam) => {
-    subTeam
-      .populate("leader")
-      .populate("guide")
-      .populate("parent")
-      .populate("grandParent");
+  const formattedSubTeams = user.projects.map((project) => {
+    let role = "Member";
 
-    const {
-      name,
-      icon,
-      leader,
-      guide,
-      createdAt,
-      NOM,
-      parent,
-      grandParent,
-      progress,
-      status,
-    } = subTeam;
-    const formattedDate = moment(createdAt).format("DD/MM/YYYY");
+    const createdAt = moment(project.createdAt).format("DD/MM/YYYY");
+
+    if (project.leader?.toString() === userId) role = "Guide";
+    if (project.leader?.toString() === userId) role = "Leader";
 
     return {
-      name,
-      icon,
-      createdAt: formattedDate,
-      leader: leader.username,
-      guide: guide.username,
-      NOM,
-      parent: parent.name,
-      grandParent: grandParent.name,
-      progress,
-      status,
+      role,
+      createdAt,
+      name: project.name,
+      icon: project.icon,
+      status: project.status,
+      progress: project.progress,
     };
   });
 
-  return { subTeams: [...formattedSubTeams], total: user.NOST };
+  return formattedSubTeams;
 };
 
 const getAllUserInvitations = async (userId) => {
   const user = await users
     .findById(userId)
-    .select({
-      invitations: 1,
-    })
+    .select("invitations")
     .populate({
       path: "invitations",
       populate: {
@@ -173,7 +132,7 @@ const getAllUserInvitations = async (userId) => {
 const getAllUserNotifications = async (userId) => {
   const user = await users
     .findById(userId)
-    .select({ notifications: 1 })
+    .select("notifications")
     .populate({
       path: "notifications",
       populate: { path: "from", select: "profilePic username -_id" },
@@ -373,11 +332,8 @@ const setInvitation = async (userId, invitationId, status) => {
     await session.commitTransaction();
     session.endSession();
 
-    io.emit("notification", newNotification[0]._id);
-    io.emit(
-      "inviteAccepted",
-      (invitation.id + invitation.updatedAt).toString()
-    );
+    io.emit("notifications", newNotification[0]._id);
+    io.emit("invitations", (invitation.id + invitation.updatedAt).toString());
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
