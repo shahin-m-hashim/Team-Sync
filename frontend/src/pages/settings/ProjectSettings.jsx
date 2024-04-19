@@ -4,14 +4,14 @@ import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
+import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import { addData, deleteData, updateData } from "@/services/db";
 import { projectValidationSchema } from "@/validations/entityValidations";
 
 const ProjectSettings = () => {
   const { userId, projectId } = useParams();
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [reFetchProjectSettings, setReFetchProjectSettings] = useState(false);

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext, useRef, useState } from "react";
 import showPass from "../../assets/images/ShowPass.png";
 import hidePass from "../../assets/images/HidePass.png";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 import Loading from "../Loading";
 
 /* eslint-disable react/prop-types */
@@ -12,7 +12,7 @@ export default function DeleteAccount({ setShowDeleteModal }) {
   const navigate = useNavigate();
   const passwordRef = useRef();
 
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

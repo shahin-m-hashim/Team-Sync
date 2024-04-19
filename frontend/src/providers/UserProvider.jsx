@@ -4,15 +4,16 @@
 import useFetch from "@/hooks/useFetch";
 import { logout } from "@/services/auth";
 import Loading from "@/components/Loading";
-import { ErrorContext } from "./ErrorProvider";
+import ReLoginPage from "@/pages/ReLoginPage";
+import { createContext, useState } from "react";
 import LoggedOutPage from "@/pages/LoggedOutPage";
+import ServerErrorPage from "@/pages/ServerErrorPage";
 import { deleteData, updateData } from "@/services/db";
-import { createContext, useContext, useState } from "react";
 
 export const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
-  const { setError } = useContext(ErrorContext);
+  const [error, setError] = useState();
   const [userStatus, setUserStatus] = useState();
   const [reFetchUser, setReFetchUser] = useState(false);
   const [reFetchProjects, setReFetchProjects] = useState(false);
@@ -30,44 +31,36 @@ const UserProvider = ({ children }) => {
       return <LoggedOutPage />;
     } catch (e) {
       if (e.response.status === 500) {
-        setError("serverError");
+        return <ServerErrorPage />;
       }
     }
-  }
-
-  if (user?.error === "unauthorized") {
-    setError("unauthorized");
-    return null;
-  }
-
-  if (user?.error === "serverError") {
-    setError("serverError");
-    return null;
-  }
-
-  if (user?.isLoading) {
-    return (
+  } else if (user?.error === "unauthorized" || error === "unauthorized") {
+    localStorage.clear();
+    return <ReLoginPage />;
+  } else if (user?.error === "serverError" || error === "serverError") {
+    return <ServerErrorPage />;
+  } else {
+    return user?.isLoading ? (
       <div className="h-screen">
         <Loading />
       </div>
+    ) : (
+      <UserContext.Provider
+        value={{
+          setError,
+          setUserStatus,
+          deleteUserData,
+          setReFetchUser,
+          reFetchProjects,
+          user: user?.data,
+          updateUserDetails,
+          setReFetchProjects,
+        }}
+      >
+        {children}
+      </UserContext.Provider>
     );
   }
-
-  return (
-    <UserContext.Provider
-      value={{
-        setUserStatus,
-        deleteUserData,
-        setReFetchUser,
-        reFetchProjects,
-        user: user?.data,
-        updateUserDetails,
-        setReFetchProjects,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  );
 };
 
 export default UserProvider;

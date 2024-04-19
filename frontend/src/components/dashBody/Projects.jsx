@@ -13,13 +13,12 @@ import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
 import InvitationsCard from "../cards/InvitationsCard";
 import { UserContext } from "@/providers/UserProvider";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import { useContext, useEffect, useReducer, useState } from "react";
 
 export default function Projects() {
   const { userId } = useParams();
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { reFetchProjects, setReFetchProjects } = useContext(UserContext);
 
   const [showAddProjectForm, setShowAddProjectForm] = useState(false);

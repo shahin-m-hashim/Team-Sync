@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import { useContext, useEffect, useReducer, useState } from "react";
@@ -20,7 +20,7 @@ import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
 export default function Teams() {
   const { userId, projectId } = useParams();
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
 
   const [reFetchTeams, setReFetchTeams] = useState(false);
   const [showAddTeamForm, setShowAddTeamForm] = useState(false);

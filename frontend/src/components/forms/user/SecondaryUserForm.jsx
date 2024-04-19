@@ -1,21 +1,20 @@
 /* eslint-disable react/prop-types */
 
 import { cn } from "@/lib/utils";
-import Loading from "../../Loading";
 import { useFormik } from "formik";
+import Loading from "../../Loading";
+import { toast } from "react-toastify";
 import { useContext, useState } from "react";
 import ReactFlagsSelect from "react-flags-select";
 import { UserContext } from "@/providers/UserProvider";
 import { secondaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
-import { toast } from "react-toastify";
-import { ErrorContext } from "@/providers/ErrorProvider";
 
 export default function SecondaryUserForm({
   setIsEditing,
   enableSecondaryEdit,
   setEnableSecondaryEdit,
 }) {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
 

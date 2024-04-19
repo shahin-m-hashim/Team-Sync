@@ -35,7 +35,10 @@ export default function DetailCard({
           />
         </div>
         <div className="flex items-center w-10 gap-3">
-          <span>Guide&nbsp;:&nbsp;{projectDetails?.data?.guide?.username}</span>
+          <span>
+            Guide&nbsp;:&nbsp;
+            {projectDetails?.data?.guide?.username || <span>NA</span>}
+          </span>
           <img
             src={projectDetails?.data?.guide?.profilePic}
             className="object-cover object-center rounded-full"

@@ -1,41 +1,28 @@
 import { useFormik } from "formik";
+import { toast } from "react-toastify";
 import { signup } from "@/services/auth";
+import ServerErrorPage from "../ServerErrorPage";
 import rocket from "../../assets/images/rocket.png";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cn, getLocalSecureItem } from "@/lib/utils";
 import showPass from "../../assets/images/ShowPass.png";
 import hidePass from "../../assets/images/HidePass.png";
-import { ErrorContext } from "@/providers/ErrorProvider";
-import { useContext, useEffect, useRef, useState } from "react";
-import SuccessfullSignUpAlert from "@/components/toasts/SuccessfullSignUpAlert";
 import { signupValidationSchema as validationSchema } from "../../validations/authValidations";
 
 export default function SignupPage() {
   const errorRef = useRef();
   const navigate = useNavigate();
-  const { setError } = useContext(ErrorContext);
-  const [showSuccessfullSignUpAlert, setShowSuccessfullSignUpAlert] =
-    useState(false);
+
+  const user = getLocalSecureItem("user", "low");
+  const [serverError, setServerError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
 
-  const [render, setRender] = useState(false);
-
   useEffect(() => {
-    const user = getLocalSecureItem("user", "low");
-    if (user?.status === "LOGGED_IN") {
+    if (user?.status === "LOGGED_IN")
       navigate(`/user/${user?.id}/dashboard`, { replace: true });
-    } else {
-      setRender(true);
-      if (showSuccessfullSignUpAlert) {
-        const timeoutId = setTimeout(() => {
-          navigate("/login", { replace: true });
-        }, 2500);
-
-        return () => clearTimeout(timeoutId);
-      }
-    }
-  }, [navigate, showSuccessfullSignUpAlert]);
+  }, [navigate, user?.id, user?.status]);
 
   const initialValues = {
     username: "",
@@ -60,10 +47,10 @@ export default function SignupPage() {
         email,
         password,
       });
-      setShowSuccessfullSignUpAlert(true);
+      toast.success("Account Created Successfully");
     } catch (e) {
-      if (e.status === 500 || e.message === "Network Error") {
-        setError("serverError");
+      if (e.status === 500) {
+        setServerError(true);
       } else {
         errorRef.current.innerText = e.response.data.error;
         if (e.response.data.validationErrors) {
@@ -76,22 +63,23 @@ export default function SignupPage() {
 
   const {
     errors,
-    handleSubmit,
     touched,
-    getFieldProps,
     isValid,
-    isSubmitting,
     resetForm,
+    handleSubmit,
+    isSubmitting,
+    getFieldProps,
   } = useFormik({
     initialValues,
     validationSchema,
     onSubmit,
   });
 
-  return (
-    render && (
+  if (serverError) {
+    return <ServerErrorPage />;
+  } else if (user?.status !== "LOGGED_IN") {
+    return (
       <div className="relative h-screen">
-        {showSuccessfullSignUpAlert && <SuccessfullSignUpAlert />}
         <div className="h-screen lg:grid lg:grid-cols-2">
           <div className="flex flex-col justify-center flex-1 min-h-full lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -255,6 +243,8 @@ export default function SignupPage() {
           />
         </div>
       </div>
-    )
-  );
+    );
+  } else {
+    return null;
+  }
 }
