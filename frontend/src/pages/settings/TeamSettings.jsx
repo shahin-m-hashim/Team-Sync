@@ -6,11 +6,11 @@ import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 import { teamValidationSchema } from "@/validations/entityValidations";
 
 const TeamSettings = () => {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { userId, projectId, teamId } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -88,15 +88,11 @@ const TeamSettings = () => {
 
   const updateTeamIcon = async (downloadURL) => {
     try {
-      const { data } = await updateData(
-        `projects/${projectId}/teams/${teamId}/icon`,
-        {
-          updatedTeamIcon: downloadURL,
-        }
-      );
+      await updateData(`projects/${projectId}/teams/${teamId}/icon`, {
+        updatedTeamIcon: downloadURL,
+      });
       setIsEditing(false);
       setReFetchTeamSettings((prev) => !prev);
-      toast.success(data?.message || "Update successfull");
     } catch (e) {
       toast.error(e.response.data.error || "Failed to update team icon");
     }

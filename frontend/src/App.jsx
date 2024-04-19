@@ -12,17 +12,15 @@ import SignupPage from "./pages/auth/SignUpPage";
 import UserDashboard from "./pages/UserDashboard";
 import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
-import ErrorProvider from "./providers/ErrorProvider";
 import Projects from "./components/dashBody/Projects";
+import SubTeams from "./components/dashBody/SubTeams";
 import TeamSettings from "./pages/settings/TeamSettings";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
 import SubTeamSettings from "./pages/settings/SubTeamSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
-import InvitationsProvider from "./providers/InvitationsProvider";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import SubTeams from "./components/dashBody/SubTeams";
 
 const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
 export const socket = io(baseURL, { withCredentials: true });
@@ -44,9 +42,7 @@ const router = createBrowserRouter([
     path: "user/:userId",
     element: (
       <UserProvider>
-        <InvitationsProvider>
-          <Outlet />
-        </InvitationsProvider>
+        <Outlet />
       </UserProvider>
     ),
     children: [
@@ -149,11 +145,9 @@ function App() {
   }, []);
 
   return (
-    <ErrorProvider>
-      <FileProvider>
-        <RouterProvider router={router} />
-      </FileProvider>
-    </ErrorProvider>
+    <FileProvider>
+      <RouterProvider router={router} />
+    </FileProvider>
   );
 }
 

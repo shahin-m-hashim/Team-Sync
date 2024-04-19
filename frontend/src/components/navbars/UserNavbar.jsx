@@ -7,7 +7,6 @@ import useFetch from "@/hooks/useFetch";
 import { updateData } from "@/services/db";
 import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import defaultDp from "../../assets/images/defaultDp.png";
 import NotificationsPopUp from "../popups/NotificationsPopUp";
 import UserNavbarDropDown from "../dropDowns/UserNavbarDropDown";
@@ -17,7 +16,7 @@ export default function UserNavbar({ settings }) {
   const [showDropDown, setShowDropDown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const [reFetchNotifications, setReFetchNotifications] = useState(false);
 
   const notifications = useFetch("notifications", reFetchNotifications);

@@ -3,7 +3,7 @@ import { projectValidationSchema as validationSchema } from "@/validations/entit
 import { updateData } from "@/services/db";
 import { toast } from "react-toastify";
 import { useContext } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 
 /* eslint-disable react/prop-types */
 const UpdateProjectDetailsForm = ({
@@ -13,7 +13,7 @@ const UpdateProjectDetailsForm = ({
   setReFetchProjectSettings,
   setShowUpdateProjectDetailsForm,
 }) => {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
 
   const initialValues = {
     name: initialData?.name || "",

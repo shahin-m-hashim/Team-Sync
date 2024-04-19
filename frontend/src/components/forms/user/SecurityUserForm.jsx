@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 import { toast } from "react-toastify";
 import { useContext, useRef, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import showPass from "../../../assets/images/ShowPass.png";
 import hidePass from "../../../assets/images/HidePass.png";
 import { securitySettingsValidationSchema as validationSchema } from "@/validations/authValidations";
@@ -14,7 +13,7 @@ const SecurityUserForm = ({
   setIsSecurityLoading,
   setEnableSecurityEdit,
 }) => {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { updateUserDetails, setReFetchUser } = useContext(UserContext);
 
   const initialValues = {

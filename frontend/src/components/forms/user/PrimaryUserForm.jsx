@@ -5,7 +5,6 @@ import Loading from "../../Loading";
 import { toast } from "react-toastify";
 import { useContext, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import { primaryUserDataValidationSchema as validationSchema } from "@/validations/userValidations";
 
 export default function PrimaryUserForm({
@@ -14,7 +13,7 @@ export default function PrimaryUserForm({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
 
   const initialValues = {
     fname: user?.fname,

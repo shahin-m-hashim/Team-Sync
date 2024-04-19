@@ -5,7 +5,6 @@ import "react-international-phone/style.css";
 import { UserContext } from "@/providers/UserProvider";
 import { PhoneInput } from "react-international-phone";
 import { PhoneNumberUtil } from "google-libphonenumber";
-import { ErrorContext } from "@/providers/ErrorProvider";
 
 const phoneUtil = PhoneNumberUtil.getInstance();
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -23,7 +22,7 @@ const ContactUserForm = ({
   setIsContactLoading,
   setEnableContactEdit,
 }) => {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { user, updateUserDetails, setReFetchUser } = useContext(UserContext);
 
   const initialValues = {

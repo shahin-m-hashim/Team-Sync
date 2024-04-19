@@ -6,11 +6,11 @@ import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 import { teamValidationSchema } from "@/validations/entityValidations";
 
 const TeamSettings = () => {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { userId, projectId, teamId, subTeamId } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
