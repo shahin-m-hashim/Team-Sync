@@ -1,4 +1,4 @@
-const calcOverallProgress = (list = []) => {
+const calcOverallProgress = (list) => {
   let totalProgress = 0;
   let progressPercentage = 0;
   list.forEach((item) => (totalProgress += item.progress));
