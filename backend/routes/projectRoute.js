@@ -1,25 +1,37 @@
 const teamRoutes = require("./teamRoute");
 const projectRouter = require("express").Router();
 
-const { isProjectLeader } = require("../middlewares/RBAC");
+const {
+  isProjectLeader,
+  isProjectCollaborator,
+} = require("../middlewares/RBAC");
+
 const { passProject } = require("../middlewares/passParams");
 
 const {
   addTeam,
   fetchProject,
   deleteProject,
-  kickCollaborator,
+  fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
   inviteProjectMember,
   updateProjectDetails,
   fetchProjectSettings,
+  kickProjectCollaborator,
 } = require("../controllers/projectController");
 
 projectRouter.use("/projects/:projectId", passProject, teamRoutes);
 
 // GET Requests
-projectRouter.get("/projects/:projectId", isProjectLeader, fetchProject);
+projectRouter.get("/projects/:projectId", isProjectCollaborator, fetchProject);
+
+projectRouter.get(
+  "/projects/:projectId/teams",
+  isProjectCollaborator,
+  fetchProjectTeams
+);
+
 projectRouter.get(
   "/projects/:projectId/settings",
   isProjectLeader,
@@ -58,7 +70,7 @@ projectRouter.delete(
 projectRouter.delete(
   "/projects/:projectId/collaborators/:collaboratorUsername/roles/:role",
   isProjectLeader,
-  kickCollaborator
+  kickProjectCollaborator
 );
 
 projectRouter.delete("/projects/:projectId", isProjectLeader, deleteProject);

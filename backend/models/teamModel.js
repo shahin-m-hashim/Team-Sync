@@ -5,8 +5,8 @@ const { isValidFirebaseUrl } = require("../utils/validator");
 const teamSchema = new mongoose.Schema(
   {
     parent: {
-      type: mongoose.Schema.Types.ObjectId,
       ref: "projects",
+      type: mongoose.Schema.Types.ObjectId,
       required: [true, "Parent project is required"],
     },
     name: {
