@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import editImage from "../assets/images/edit.png";
 import addImage from "../assets/images/addImage.png";
 import { FileContext } from "@/providers/FileProvider";
-import { ErrorContext } from "@/providers/ErrorProvider";
+import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useRef, useState } from "react";
 import ImageHandlerDropUpMenu from "./dropDowns/ImageHandlerDropUpMenu";
 
@@ -26,7 +26,7 @@ export default function ImageHandler({
   const imgInputRef = useRef();
   const imgErrorRef = useRef();
 
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { file, uploadFile, deleteFile } = useContext(FileContext);
 
   const [image, setImage] = useState();
@@ -36,7 +36,6 @@ export default function ImageHandler({
 
   const handleImageChange = (e) => {
     setIsEditing(true);
-    setHasImageChanged(true);
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > MAX_SIZE * 1024 * 1024) {
@@ -46,8 +45,9 @@ export default function ImageHandler({
       imgErrorRef.current.style.display = "none";
     }
     setImgFile(file);
-    setImage(URL.createObjectURL(file));
     setShowDropDown(true);
+    setHasImageChanged(true);
+    setImage(URL.createObjectURL(file));
   };
 
   const handleCancelImage = () => {
@@ -65,6 +65,7 @@ export default function ImageHandler({
     try {
       toast.info(`${type || "Image"} will be updated shortly...`);
       await uploadFile(imgFile, firebasePath, updateImage);
+      toast.success(`${type || "Image"} updated successfully !!!`);
     } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");

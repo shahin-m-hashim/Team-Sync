@@ -5,6 +5,7 @@ import ResetListBtn from "./ResetListBtn";
 import FilterButton from "../FilterButton";
 import SwitchListBtn from "./SwitchListBtn";
 import add from "../../assets/images/Add.png";
+import { useLocation } from "react-router-dom";
 
 export default function ListHeader({
   setList,
@@ -20,6 +21,12 @@ export default function ListHeader({
   setShowAddEntityForm,
   setListNameSearchTxt,
 }) {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const role = params.get("role");
+
+  console.log(role);
+
   return (
     <div className="grid bg-[#141414] grid-cols-[200px,1fr,180px] items-center text-white py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
       <div className="flex flex-col gap-1">
@@ -48,7 +55,13 @@ export default function ListHeader({
       <div className="inline-flex justify-end gap-5">
         <ResetListBtn resetList={resetList} />
         <SwitchListBtn switchList={switchList} setSwitchList={setSwitchList} />
-        <button onClick={() => setShowAddEntityForm(true)}>
+        <button
+          disabled={role !== "Leader"}
+          className={
+            role !== "Leader" ? "cursor-not-allowed" : "cursor-pointer"
+          }
+          onClick={() => setShowAddEntityForm(true)}
+        >
           <img src={add} className="size-10" />
         </button>
       </div>

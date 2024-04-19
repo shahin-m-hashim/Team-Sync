@@ -8,7 +8,6 @@ import useFetch from "@/hooks/useFetch";
 import { updateData } from "@/services/db";
 import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
-import { ErrorContext } from "@/providers/ErrorProvider";
 import defaultDp from "../../assets/images/defaultDp.png";
 import InvitationsPopUp from "../popups/InvitationsPopUp";
 import noInvitations from "../../assets/images/no activity.png";
@@ -110,7 +109,7 @@ const NoInvitations = () => (
 );
 
 export default function InvitationsCard() {
-  const { setError } = useContext(ErrorContext);
+  const { setError } = useContext(UserContext);
   const { setReFetchProjects } = useContext(UserContext);
 
   const [reFetchInvitations, setReFetchInvitations] = useState(false);

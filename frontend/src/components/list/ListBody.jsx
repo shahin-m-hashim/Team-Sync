@@ -42,11 +42,11 @@ function ListItem({
       <div
         onClick={() => {
           if (renderList === "Project") {
-            navigate(`projects/${id}`);
+            navigate(`projects/${id}?role=${role}`);
           } else if (renderList === "Team") {
-            navigate(`teams/${id}`);
+            navigate(`teams/${id}?role=${role}`);
           } else {
-            navigate(`subteams/${id}`);
+            navigate(`subteams/${id}?role=${role}`);
           }
         }}
         className="absolute top-0 bottom-0 left-0 bg-transparent right-60"

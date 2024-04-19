@@ -151,7 +151,7 @@ const EntitySettings = ({
                   <h1 className="text-xl font-semibold">Collaboration</h1>
                   <p className="text-xs text-gray-400">
                     View or {entity !== "Project" ? "add" : "invite"} new
-                    collaborators into your project
+                    collaborators into your {entity}
                   </p>
                 </div>
                 <div className="flex gap-3 mb-8">
@@ -160,7 +160,7 @@ const EntitySettings = ({
                       {capitalizeFirstLetterOfEachWord(entity)} Leader
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {entitySettings?.leader || "Your project leader"}
+                      {entitySettings?.leader || `Your ${entity} leader`}
                     </div>
                   </div>
                   <div className="flex-1">
@@ -168,7 +168,7 @@ const EntitySettings = ({
                       {capitalizeFirstLetterOfEachWord(entity)} Guide
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {entitySettings?.guide || "Your project guide"}
+                      {entitySettings?.guide || `Your ${entity} guide`}
                     </div>
                   </div>
                 </div>
