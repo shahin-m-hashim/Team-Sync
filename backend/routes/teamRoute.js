@@ -1,29 +1,50 @@
 const teamRouter = require("express").Router();
 const subTeamRoutes = require("./subTeamRoute");
 
-const { isTeamLeader } = require("../middlewares/RBAC");
 const { passTeam } = require("../middlewares/passParams");
+const { isTeamLeader, isProjectCollaborator } = require("../middlewares/RBAC");
 
 const {
+  fetchTeam,
   addSubTeam,
   updateTeamIcon,
+  deleteTeamIcon,
+  fetchTeamSubTeams,
   updateTeamDetails,
+  fetchTeamSettings,
   addTeamCollaborator,
+  kickTeamCollaborator,
 } = require("../controllers/teamController");
 
 teamRouter.use("/teams/:teamId", passTeam, subTeamRoutes);
 
-// POST Requests
-teamRouter.post(
-  "/teams/:teamId/add/:username/role/:role",
-  isTeamLeader,
-  addTeamCollaborator
+// GET Requests
+teamRouter.get("/teams/:teamId", isProjectCollaborator, fetchTeam);
+
+teamRouter.get(
+  "/teams/:teamId/subTeams",
+  isProjectCollaborator,
+  fetchTeamSubTeams
 );
+
+teamRouter.get("/teams/:teamId/settings", isTeamLeader, fetchTeamSettings);
+
+// POST Requests
+teamRouter.post("/teams/:teamId/add", isTeamLeader, addTeamCollaborator);
 
 teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
 
 // PATCH Requests
 teamRouter.patch("/teams/:teamId/icon", isTeamLeader, updateTeamIcon);
 teamRouter.patch("/teams/:teamId/details", isTeamLeader, updateTeamDetails);
+
+// DELETE Requests
+teamRouter.delete("/teams/:teamId/icon", isTeamLeader, deleteTeamIcon);
+
+teamRouter.delete(
+  "/teams/:teamId/collaborators/:collaboratorUsername/roles/:role",
+  isTeamLeader,
+  kickTeamCollaborator
+);
 
 module.exports = teamRouter;

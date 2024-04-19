@@ -1,3 +1,4 @@
+const moment = require("moment");
 const jwt = require("jsonwebtoken");
 const { io } = require("../server");
 const mongoose = require("mongoose");
@@ -10,53 +11,51 @@ const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
 
 // GET
-const getProject = async (userId, projectId) => {
+const getProject = async (projectId) => {
   const project = await projects
     .findById(projectId)
-    .populate({
-      path: "leader",
-      select: "username profilePic",
-    })
-    .populate({
-      path: "guide",
-      select: "username profilePic",
-    })
-    .populate({
-      path: "members",
-      select: "profilePic",
-    })
-    .populate({
-      path: "teams",
-      select: "name createdAt icon progress status leader guide",
-    })
-    .populate("activities")
-    .exec();
+    .select("icon name description leader guide members NOM")
+    .populate({ path: "leader guide members", select: "username profilePic" });
 
   if (!project) throw new Error("UnknownProject");
 
-  const teams = project.teams?.map((team) => {
-    let role = "member";
-    if (team.leader && team.leader.toString() === userId) role = "leader";
-    if (team.guide && team.guide.toString() === userId) role = "guide";
+  return project;
+};
 
-    return { role, ...team.toObject() };
+const getProjectTeams = async (userId, projectId) => {
+  const project = await projects.findById(projectId).select("teams").populate({
+    path: "teams",
+    select: "parent name createdAt icon progress status leader guide members",
+  });
+  if (!project) throw new Error("UnknownProject");
+
+  const formattedTeams = project.teams.map((team) => {
+    let role = "Member";
+
+    const createdAt = moment(team.createdAt).format("DD/MM/YYYY");
+
+    if (team.guide?.toString() === userId) role = "Guide";
+    if (team.leader?.toString() === userId) role = "Leader";
+
+    return {
+      role,
+      createdAt,
+      id: team._id,
+      name: team.name,
+      icon: team.icon,
+      parent: team.parent,
+      status: team.status,
+      progress: team.progress,
+    };
   });
 
-  return {
-    icon: project.icon,
-    name: project.name,
-    description: project.description,
-    leader: project.leader?.username,
-    guide: project.guide?.username,
-    members: project.members?.map((member) => member.profilePic),
-    NOM: project.NOM,
-    teams,
-  };
+  return formattedTeams;
 };
 
 const getProjectSettings = async (projectId) => {
   const project = await projects
     .findById(projectId)
+    .select("icon name description leader guide members")
     .populate({
       path: "leader guide members",
       select: "username profilePic id",
@@ -64,13 +63,9 @@ const getProjectSettings = async (projectId) => {
     .populate({
       path: "teams",
       select: "name createdAt icon progress status leader guide",
-    })
-    .populate("activities")
-    .exec();
+    });
 
-  if (!project) {
-    throw new Error("UnknownProject");
-  }
+  if (!project) throw new Error("UnknownProject");
 
   const collaborators = [
     {
@@ -94,13 +89,13 @@ const getProjectSettings = async (projectId) => {
   }
 
   return {
+    collaborators,
     icon: project.icon,
     name: project.name,
+    NOC: collaborators.length,
+    guide: project.guide?.username,
     description: project.description,
     leader: project.leader?.username,
-    guide: project.guide?.username,
-    collaborators,
-    NOC: collaborators.length,
   };
 };
 
@@ -175,7 +170,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
     invitedUser.invitations.push(newInvitation[0]._id);
     await invitedUser.save({ session });
 
-    io.emit("invitation", newInvitation[0]._id);
+    io.emit("invitations", newInvitation[0]._id);
 
     await session.commitTransaction();
     session.endSession();
@@ -237,6 +232,7 @@ const createTeam = async (userId, projectId, teamDetails) => {
     await session.commitTransaction();
     session.endSession();
 
+    io.emit("teams", newTeam[0]._id);
     return newTeam[0]._id;
   } catch (error) {
     if (session) {
@@ -248,24 +244,24 @@ const createTeam = async (userId, projectId, teamDetails) => {
 };
 
 // PATCH
-const setProjectDetails = async (projectId, newProjectDetails) => {
+const setProjectDetails = async (projectId, updatedProjectDetails) => {
   const project = await projects.findById(projectId);
   if (!project) throw new Error("UnknownProject");
-  const { name, description } = newProjectDetails;
+  const { name, description } = updatedProjectDetails;
   project.name = name;
   project.description = description;
   await project.save();
 
-  io.emit("project", (project.id + project.updatedAt).toString());
+  io.emit("projects", (project.id + project.updatedAt).toString());
 };
 
-const setProjectIcon = async (projectId, newProjectIcon) => {
+const setProjectIcon = async (projectId, updatedProjectIcon) => {
   const project = await projects.findById(projectId);
   if (!project) throw new Error("UnknownProject");
-  project.icon = newProjectIcon;
+  project.icon = updatedProjectIcon;
   await project.save();
 
-  io.emit("project", (project.id + project.updatedAt).toString());
+  io.emit("projects", (project.id + project.updatedAt).toString());
 
   return project.icon;
 };
@@ -277,7 +273,7 @@ const removeProjectIcon = async (projectId) => {
   project.icon = "";
   await project.save();
 
-  io.emit("project", (project.id + project.updatedAt).toString());
+  io.emit("projects", (project.id + project.updatedAt).toString());
 };
 
 const removeCollaborator = async (projectId, collaboratorUsername, role) => {
@@ -367,8 +363,8 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
     await session.commitTransaction();
     session.endSession();
 
-    io.emit("project", (project.id + project.updatedAt).toString());
-    io.emit("notification", newNotification[0]._id);
+    io.emit("projects", (project.id + project.updatedAt).toString());
+    io.emit("notifications", newNotification[0]._id);
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -459,6 +455,7 @@ module.exports = {
   createTeam,
   removeProject,
   setProjectIcon,
+  getProjectTeams,
   removeProjectIcon,
   setProjectDetails,
   removeCollaborator,

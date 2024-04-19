@@ -3,6 +3,7 @@ const {
   createTeam,
   removeProject,
   setProjectIcon,
+  getProjectTeams,
   removeProjectIcon,
   setProjectDetails,
   removeCollaborator,
@@ -13,11 +14,20 @@ const {
 // GET Requests
 const fetchProject = async (req, res, next) => {
   try {
+    const { projectId } = req.project;
+    const project = await getProject(projectId);
+    res.status(200).json(project);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchProjectTeams = async (req, res, next) => {
+  try {
     const { userId } = req.user;
     const { projectId } = req.project;
-
-    const project = await getProject(userId, projectId);
-    res.status(200).json(project);
+    const teams = await getProjectTeams(userId, projectId);
+    res.status(200).json(teams);
   } catch (e) {
     next(e);
   }
@@ -85,8 +95,11 @@ const addTeam = async (req, res, next) => {
 const updateProjectDetails = async (req, res, next) => {
   try {
     const { projectId } = req.project;
-    const { newProjectDetails } = req.body;
-    await setProjectDetails(projectId, newProjectDetails);
+    const { updatedProjectDetails } = req.body;
+
+    console.log("Updated project details: ", updatedProjectDetails);
+
+    await setProjectDetails(projectId, updatedProjectDetails);
     res.status(200).json({
       success: true,
       message: "Project details updated successfully",
@@ -106,9 +119,12 @@ const updateProjectDetails = async (req, res, next) => {
 const updateProjectIcon = async (req, res, next) => {
   try {
     const { projectId } = req.project;
-    const { newProjectIcon } = req.body;
-    const updatedProjectIcon = await setProjectIcon(projectId, newProjectIcon);
-    res.status(200).json({ updatedProjectIcon });
+    const { updatedProjectIcon } = req.body;
+    await setProjectIcon(projectId, updatedProjectIcon);
+    res.status(200).json({
+      success: true,
+      message: "Project icon updated successfully",
+    });
   } catch (e) {
     if (e.name === "ValidationError") {
       const customError = new Error("ValidationError");
@@ -134,7 +150,7 @@ const deleteProjectIcon = async (req, res, next) => {
   }
 };
 
-const kickCollaborator = async (req, res, next) => {
+const kickProjectCollaborator = async (req, res, next) => {
   try {
     const { projectId, collaboratorUsername, role } = req.params;
     await removeCollaborator(projectId, collaboratorUsername, role);
@@ -165,10 +181,11 @@ module.exports = {
   addTeam,
   fetchProject,
   deleteProject,
-  kickCollaborator,
+  fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
-  updateProjectDetails,
   inviteProjectMember,
+  updateProjectDetails,
   fetchProjectSettings,
+  kickProjectCollaborator,
 };
