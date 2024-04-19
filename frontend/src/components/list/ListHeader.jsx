@@ -15,9 +15,9 @@ export default function ListHeader({
   initialList,
   filterBtnTxt,
   setSwitchList,
-  setShowAddForm,
   setFilterBtnTxt,
   listNameSearchTxt,
+  setShowAddEntityForm,
   setListNameSearchTxt,
 }) {
   return (
@@ -45,11 +45,11 @@ export default function ListHeader({
           setListNameSearchTxt={setListNameSearchTxt}
         />
       </div>
-      <div className="inline-flex gap-5">
+      <div className="inline-flex justify-end gap-5">
         <ResetListBtn resetList={resetList} />
         <SwitchListBtn switchList={switchList} setSwitchList={setSwitchList} />
-        <button onClick={() => setShowAddForm(true)}>
-          <img src={add} className="size-10" alt="addToList" />
+        <button onClick={() => setShowAddEntityForm(true)}>
+          <img src={add} className="size-10" />
         </button>
       </div>
     </div>

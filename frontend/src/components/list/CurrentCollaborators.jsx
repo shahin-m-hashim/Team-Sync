@@ -5,12 +5,12 @@ import defaultDp from "../../assets/images/defaultDp.png";
 const CurrentCollaborators = ({
   collaborators,
   kickCollaborator,
-  setShowCollaborators,
+  setShowCurrentCollaborators,
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-4 mb-8 rounded-md bg-slate-700">
       <button
-        onClick={() => setShowCollaborators(false)}
+        onClick={() => setShowCurrentCollaborators(false)}
         className="absolute top-2 right-2 bg-slate-600 p-1 rounded-[50%]"
       >
         <svg

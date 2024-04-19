@@ -1,125 +1,72 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+import { socket } from "@/App";
+import Loading from "../Loading";
+import { toast } from "react-toastify";
+import useFetch from "@/hooks/useFetch";
+import { addData } from "@/services/db";
 import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
+import { useParams } from "react-router-dom";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import { useEffect, useReducer, useState } from "react";
+import { ErrorContext } from "@/providers/ErrorProvider";
+import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
-import AddSubTeamForm from "../forms/subTeams/AddSubTeamForm";
-import google from "../../assets/images/project icons/Google.png";
-import youtube from "../../assets/images/project icons/Youtube.png";
-import facebook from "../../assets/images/project icons/Facebook.png";
-import instagram from "../../assets/images/project icons/Instagram.png";
-
-const initialSubTeams = [
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Sub Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Sub Team 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "BACKEND",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "Project 1",
-    createdDate: "01/02/2024",
-    icon: google,
-    progress: 0,
-    status: "Not Started",
-    role: "Leader",
-  },
-  {
-    name: "Sub Team 3",
-    createdDate: "10/03/2024",
-    icon: facebook,
-    progress: 20,
-    status: "Pending",
-    role: "Member",
-  },
-  {
-    name: "Sub Team 4",
-    createdDate: "25/01/2024",
-    icon: instagram,
-    progress: 100,
-    status: "Done",
-    role: "Co-Leader",
-  },
-  {
-    name: "Team 5",
-    createdDate: "18/06/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-  {
-    name: "BACKEND",
-    createdDate: "27/01/2024",
-    icon: youtube,
-    progress: 50,
-    status: "Stopped",
-    role: "Leader",
-  },
-];
-
-const leaderSubTeams = initialSubTeams.filter(
-  (subTeam) => subTeam.role === "Leader"
-);
+import { useContext, useEffect, useReducer, useState } from "react";
+import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
 export default function SubTeams() {
-  const [subTeamNameSearchTxt, setSubTeamNameSearchTxt] = useState("");
-  const [subTeamFilterBtnTxt, setSubTeamFilterBtnTxt] = useState("Filter");
+  const { setError } = useContext(ErrorContext);
+  const { userId, projectId, teamId } = useParams();
+
+  const [reFetchSubTeams, setReFetchSubTeams] = useState(false);
+  const [showAddTeamForm, setShowAddTeamForm] = useState(false);
+  const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
+  const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyAdminSubTeams, setListOnlyAdminSubTeams] = useState(false);
 
-  const resetSubTeamList = () => {
-    setSubTeamNameSearchTxt("");
+  const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
+    useState(false);
+
+  const subTeams = useFetch(`projects/${projectId}/SubTeams`, reFetchSubTeams);
+
+  const leaderSubTeams = subTeams?.data?.filter(
+    (team) => team.role === "Leader"
+  );
+
+  const handleAddTeam = async (subTeamDetails) => {
+    try {
+      await addData(`projects/${projectId}/SubTeams/${teamId}/subTeam`, {
+        subTeamDetails,
+      });
+      setShowAddTeamForm(false);
+      toast.success("Sub Team added successfully");
+    } catch (e) {
+      toast.error(
+        e.response.data.error || "An unexpected error occurred, try again later"
+      );
+    }
+  };
+
+  const resetTeamList = () => {
+    setTeamNameSearchTxt("");
     setListOnlyAdminSubTeams(false);
-    setSubTeamFilterBtnTxt("Filter");
+    setTeamFilterBtnTxt("Filter");
     setSubTeams({
       type: "RESET",
-      initialState: initialSubTeams,
+      initialState: subTeams?.data,
     });
   };
 
-  const [subTeams, dispatch] = useReducer(listReducer, [...initialSubTeams]);
+  const [initialSubTeams, dispatch] = useReducer(listReducer, SubTeams?.data);
   const setSubTeams = (action) => dispatch(action);
 
   useEffect(() => {
-    setSubTeamNameSearchTxt("");
-    setSubTeamFilterBtnTxt("Filter");
+    setTeamNameSearchTxt("");
+    setTeamFilterBtnTxt("Filter");
     if (listOnlyAdminSubTeams) {
       setSubTeams({
         type: "SWITCH",
@@ -128,52 +75,90 @@ export default function SubTeams() {
     } else {
       setSubTeams({
         type: "SWITCH",
-        payload: initialSubTeams,
+        payload: subTeams?.data,
       });
     }
-  }, [listOnlyAdminSubTeams]);
+  }, [subTeams?.data, listOnlyAdminSubTeams]);
 
-  const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
+  useEffect(() => {
+    socket.on("SubTeams", (team) => setReFetchSubTeams(team));
+    return () => socket.off("SubTeams");
+  }, []);
+
+  if (subTeams?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (subTeams?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
 
   return (
     <>
-      {showAddSubTeamForm && (
-        <AddSubTeamForm setShowAddSubTeamForm={setShowAddSubTeamForm} />
-      )}
-      <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
-        <DetailCard
-          details={{
-            name: "Project 1",
-            leader: "Shahin123",
-            guide: "Sindhiya",
-            nom: 20,
-          }}
+      {showAddTeamForm && (
+        <AddListEntityForm
+          renderList="Sub Team"
+          handleAddEntity={handleAddTeam}
+          setShowAddEntityForm={setShowAddTeamForm}
+          description="Your Sub Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."
         />
-        <StatusCard list={subTeams} renderList="Sub Team" />
+      )}
+      {showAddTeamCollaboratorForm && (
+        <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
+          <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
+            <SendProjectInviteForm
+              projectId={projectId}
+              setShowSendProjectInviteForm={setShowAddTeamCollaboratorForm}
+            />
+          </div>
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
+        <DetailCard
+          renderList="Team"
+          projectId={projectId}
+          setShowSendProjectInviteForm={setShowAddTeamCollaboratorForm}
+        />
+        {initialSubTeams ? (
+          <StatusCard list={initialSubTeams} renderList="Team" />
+        ) : (
+          <div className="relative bg-[#141414]">
+            <Loading />
+          </div>
+        )}
       </div>
       <div>
         <ListHeader
-          setList={setSubTeams}
           renderList="Sub Team"
-          resetList={resetSubTeamList}
+          setList={setSubTeams}
+          initialList={SubTeams}
           leaderList={leaderSubTeams}
-          initialList={initialSubTeams}
-          filterBtnTxt={subTeamFilterBtnTxt}
+          resetList={resetTeamList}
+          filterBtnTxt={teamFilterBtnTxt}
           switchList={listOnlyAdminSubTeams}
-          setShowAddForm={setShowAddSubTeamForm}
           setSwitchList={setListOnlyAdminSubTeams}
-          listNameSearchTxt={subTeamNameSearchTxt}
-          setFilterBtnTxt={setSubTeamFilterBtnTxt}
-          setListNameSearchTxt={setSubTeamNameSearchTxt}
+          listNameSearchTxt={teamNameSearchTxt}
+          setFilterBtnTxt={setTeamFilterBtnTxt}
+          setShowAddEntityForm={setShowAddTeamForm}
+          setListNameSearchTxt={setTeamNameSearchTxt}
         />
       </div>
       <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList="Sub Team" />
-        <ListBody
-          list={subTeams}
-          renderList="Sub Team"
-          listNameSearchTxt={subTeamNameSearchTxt}
-        />
+        {initialSubTeams ? (
+          <ListBody
+            userId={userId}
+            renderList={"Sub Team"}
+            list={initialSubTeams || []}
+            listNameSearchTxt={teamNameSearchTxt}
+          />
+        ) : (
+          <div className="relative h-full">
+            <Loading />
+          </div>
+        )}
       </div>
     </>
   );

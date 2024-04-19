@@ -1,14 +1,17 @@
 /* eslint-disable react/prop-types */
+
+import { socket } from "@/App";
 import Loading from "../Loading";
+import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
+import useFetch from "@/hooks/useFetch";
 import { updateData } from "@/services/db";
+import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
+import { ErrorContext } from "@/providers/ErrorProvider";
 import defaultDp from "../../assets/images/defaultDp.png";
 import InvitationsPopUp from "../popups/InvitationsPopUp";
 import noInvitations from "../../assets/images/no activity.png";
-import { InvitationsContext } from "@/providers/InvitationsProvider";
-import { cn } from "@/lib/utils";
-import { ProjectContext } from "@/providers/ProjectProvider";
 
 const Invitations = ({ invitations, handleInvitation }) => {
   return (
@@ -107,13 +110,17 @@ const NoInvitations = () => (
 );
 
 export default function InvitationsCard() {
-  const { setReFetchProjects } = useContext(ProjectContext);
+  const { setError } = useContext(ErrorContext);
+  const { setReFetchProjects } = useContext(UserContext);
+
+  const [reFetchInvitations, setReFetchInvitations] = useState(false);
   const [showAllInvitations, setShowAllInvitations] = useState(false);
-  const { invitations, setReFetchInvitations } = useContext(InvitationsContext);
+
+  const invitations = useFetch("invitations", reFetchInvitations);
 
   const handleInvitation = async (invitation, status) => {
     try {
-      await updateData(`invitation`, {
+      await updateData("invitation", {
         id: invitation,
         status: status,
       });
@@ -121,18 +128,32 @@ export default function InvitationsCard() {
       setReFetchInvitations((prev) => !prev);
       setReFetchProjects((prev) => !prev);
     } catch (e) {
-      console.log(e);
       toast.error(e.response.data.error || "Error handling invitation");
     }
   };
 
-  useEffect(() => {}, [invitations]);
+  useEffect(() => {}, [invitations?.data]);
 
-  return invitations ? (
+  useEffect(() => {
+    socket.on("invitations", (project) => setReFetchInvitations(project));
+    return () => socket.off("invitations");
+  }, []);
+
+  if (invitations?.error === "unauthorized") {
+    setError("unauthorized");
+    return null;
+  }
+
+  if (invitations?.error === "serverError") {
+    setError("serverError");
+    return null;
+  }
+
+  return invitations?.data ? (
     <>
-      {showAllInvitations && invitations?.length > 0 && (
+      {showAllInvitations && invitations?.data?.length > 0 && (
         <InvitationsPopUp
-          invitations={invitations}
+          invitations={invitations?.data}
           NoInvitations={NoInvitations}
           handleInvitation={handleInvitation}
           setShowAllInvitations={setShowAllInvitations}
@@ -141,27 +162,28 @@ export default function InvitationsCard() {
       <div className="flex flex-col justify-evenly bg-[#141414] px-5 py-2 rounded-md">
         <div className="flex items-center justify-between">
           <div className="font-semibold">Project Invitations</div>
-          {invitations?.length > 0 && (
+          {invitations?.data?.length > 0 && (
             <button
               onClick={() => setShowAllInvitations(true)}
               className="relative pr-6 text-blue-400 underline underline-offset-4"
             >
               View all invitations ?
-              {invitations.filter((invitation) => !invitation?.isRead).length >
-                0 && (
+              {invitations?.data?.filter((invitation) => !invitation?.isRead)
+                .length > 0 && (
                 <div className="absolute bottom-0 right-0 flex items-center justify-center px-2 py-1 text-xs font-semibold text-white bg-blue-500 rounded-full">
                   {
-                    invitations.filter((invitation) => !invitation.isRead)
-                      .length
+                    invitations?.data?.filter(
+                      (invitation) => !invitation.isRead
+                    ).length
                   }
                 </div>
               )}
             </button>
           )}
         </div>
-        {invitations?.length > 0 ? (
+        {invitations?.data?.length > 0 ? (
           <Invitations
-            invitations={invitations}
+            invitations={invitations?.data}
             handleInvitation={handleInvitation}
           />
         ) : (

@@ -65,7 +65,6 @@ export default function ImageHandler({
     try {
       toast.info(`${type || "Image"} will be updated shortly...`);
       await uploadFile(imgFile, firebasePath, updateImage);
-      toast.success("Update successful!");
     } catch (error) {
       if (error.response?.status === 401) {
         setError("unauthorized");
@@ -78,8 +77,7 @@ export default function ImageHandler({
         setError("serverError");
         await deleteFile(firebasePath);
       } else {
-        toast.error(`${type || "Image"} update failed !!!`);
-        console.log(`Error uploading ${type || "image"}:`, error);
+        throw error;
       }
     } finally {
       setIsEditing(false);
