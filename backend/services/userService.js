@@ -84,21 +84,21 @@ const getAllUserSubTeams = async (userId) => {
   });
   if (!user) throw new Error("UnknownUser");
 
-  const formattedSubTeams = user.projects.map((project) => {
+  const formattedSubTeams = user.subTeams.map((subTeam) => {
     let role = "Member";
 
-    const createdAt = moment(project.createdAt).format("DD/MM/YYYY");
+    const createdAt = moment(subTeam.createdAt).format("DD/MM/YYYY");
 
-    if (project.leader?.toString() === userId) role = "Guide";
-    if (project.leader?.toString() === userId) role = "Leader";
+    if (subTeam.leader?.toString() === userId) role = "Guide";
+    if (subTeam.leader?.toString() === userId) role = "Leader";
 
     return {
       role,
       createdAt,
-      name: project.name,
-      icon: project.icon,
-      status: project.status,
-      progress: project.progress,
+      name: subTeam.name,
+      icon: subTeam.icon,
+      status: subTeam.status,
+      progress: subTeam.progress,
     };
   });
 
@@ -135,7 +135,7 @@ const getAllUserNotifications = async (userId) => {
     .select("notifications")
     .populate({
       path: "notifications",
-      populate: { path: "from", select: "profilePic username -_id" },
+      populate: { path: "from", select: "profilePic username" },
       select: "type message isRead createdAt",
     });
 

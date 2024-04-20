@@ -229,7 +229,7 @@ const errorHandler = (error, req, res, next) => {
     case "ForbiddenAction":
       return res.status(403).json({
         success: false,
-        error: "Forbidden. You do not have permission to perform this action.",
+        error: "You do not have permission to perform this action.",
       });
 
     default:

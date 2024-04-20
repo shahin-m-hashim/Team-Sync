@@ -43,7 +43,7 @@ const isTeamLeader = async (req, res, next) => {
 
     if (
       userId === team.leader.toString() &&
-      team.parent.toString() === projectId
+      projectId === team.parent.toString()
     ) {
       req.team = req.params;
       next();
@@ -78,6 +78,7 @@ const isProjectCollaborator = async (req, res, next) => {
     const project = await projects
       .findById(projectId)
       .select("leader guide members");
+
     if (!project) throw new Error("UnknownProject");
 
     if (
@@ -92,10 +93,56 @@ const isProjectCollaborator = async (req, res, next) => {
   }
 };
 
+const isTeamCollaborator = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { teamId } = req.params;
+
+    const team = await teams.findById(teamId).select("leader guide members");
+
+    if (!team) throw new Error("UnknownTeam");
+
+    if (
+      userId === team.leader?.toString() ||
+      userId === team.guide?.toString() ||
+      team.members.includes(userId)
+    ) {
+      next();
+    } else throw new Error("ForbiddenAction");
+  } catch (e) {
+    next(e);
+  }
+};
+
+const isSubTeamCollaborator = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { subTeamId } = req.params;
+
+    const subTeam = await subteams
+      .findById(teamId)
+      .select("leader guide members");
+
+    if (!subTeam) throw new Error("UnknownSubTeam");
+
+    if (
+      userId === subTeam.leader?.toString() ||
+      userId === subTeam.guide?.toString() ||
+      subTeam.members.includes(userId)
+    ) {
+      next();
+    } else throw new Error("ForbiddenAction");
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   isTeamLeader,
   isProjectLeader,
   isSubTeamLeader,
   isRegisteredUser,
+  isTeamCollaborator,
   isProjectCollaborator,
+  isSubTeamCollaborator,
 };

@@ -4,6 +4,12 @@ const { isValidFirebaseUrl } = require("../utils/validator");
 
 const activitySchema = new mongoose.Schema(
   {
+    entity: {
+      type: String,
+      enum: ["project", "team", "subTeam"],
+      default: "project",
+      required: true,
+    },
     type: {
       type: String,
       enum: [
@@ -27,11 +33,6 @@ const activitySchema = new mongoose.Schema(
       default: "",
       required: true,
     },
-    message: {
-      type: String,
-      default: "",
-      required: true,
-    },
     image: {
       type: String,
       validate: {
@@ -41,9 +42,14 @@ const activitySchema = new mongoose.Schema(
       },
       default: "",
     },
-    link: {
+    message: {
       type: String,
       default: "",
+      required: true,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

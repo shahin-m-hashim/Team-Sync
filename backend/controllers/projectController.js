@@ -8,6 +8,7 @@ const {
   setProjectDetails,
   removeCollaborator,
   getProjectSettings,
+  getProjectActivities,
   sendProjectInvitation,
 } = require("../services/projectService");
 
@@ -17,6 +18,16 @@ const fetchProject = async (req, res, next) => {
     const { projectId } = req.project;
     const project = await getProject(projectId);
     res.status(200).json(project);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchProjectActivities = async (req, res, next) => {
+  try {
+    const { projectId } = req.project;
+    const activities = await getProjectActivities(projectId);
+    res.status(200).json(activities);
   } catch (e) {
     next(e);
   }
@@ -187,5 +198,6 @@ module.exports = {
   inviteProjectMember,
   updateProjectDetails,
   fetchProjectSettings,
+  fetchProjectActivities,
   kickProjectCollaborator,
 };

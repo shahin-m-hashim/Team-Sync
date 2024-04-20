@@ -22,6 +22,28 @@ const getProject = async (projectId) => {
   return project;
 };
 
+const getProjectActivities = async (projectId) => {
+  const project = await projects
+    .findById(projectId)
+    .select("activities")
+    .populate({
+      path: "activities",
+      select: "-type -__v -updatedAt",
+    });
+
+  if (!project) throw new Error("UnknownProject");
+
+  const formattedProjectActivities = project.activities.map((activity) => {
+    return {
+      ...activity.toObject(),
+      time: moment(activity.createdAt).format("hh:mm A"),
+      date: moment(activity.createdAt).format("DD/MM/YYYY"),
+    };
+  });
+
+  return formattedProjectActivities;
+};
+
 const getProjectTeams = async (userId, projectId) => {
   const project = await projects.findById(projectId).select("teams").populate({
     path: "teams",
@@ -296,8 +318,6 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
       .session(session);
     if (!project) throw new Error("UnknownProject");
 
-    console.log("Project\n", project);
-
     let notificationMessage = "";
     if (role === "guide" && project.guide?.username === collaboratorUsername) {
       project.guide = null;
@@ -460,5 +480,6 @@ module.exports = {
   setProjectDetails,
   removeCollaborator,
   getProjectSettings,
+  getProjectActivities,
   sendProjectInvitation,
 };
