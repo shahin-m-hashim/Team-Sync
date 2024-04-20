@@ -18,6 +18,7 @@ const {
   inviteProjectMember,
   updateProjectDetails,
   fetchProjectSettings,
+  fetchProjectActivities,
   kickProjectCollaborator,
 } = require("../controllers/projectController");
 
@@ -25,6 +26,12 @@ projectRouter.use("/projects/:projectId", passProject, teamRoutes);
 
 // GET Requests
 projectRouter.get("/projects/:projectId", isProjectCollaborator, fetchProject);
+
+projectRouter.get(
+  "/projects/:projectId/activities",
+  isProjectCollaborator,
+  fetchProjectActivities
+);
 
 projectRouter.get(
   "/projects/:projectId/teams",
