@@ -9,6 +9,7 @@ import { addData } from "@/services/db";
 import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
+import { setLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
@@ -19,7 +20,7 @@ import { useContext, useEffect, useReducer, useState } from "react";
 import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
 export default function Teams() {
-  const { userId, projectId } = useParams();
+  const { projectId } = useParams();
   const { setError } = useContext(UserContext);
 
   const [reFetchTeams, setReFetchTeams] = useState(false);
@@ -31,7 +32,20 @@ export default function Teams() {
   const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
     useState(false);
 
+  const projectDetails = useFetch(`projects/${projectId}`);
   const teams = useFetch(`projects/${projectId}/teams`, reFetchTeams);
+
+  if (teams?.data) {
+    setLocalSecureItem(
+      "teams",
+      teams?.data?.map((team) => ({
+        team: team.id,
+        role: team.role,
+      })),
+      "medium"
+    );
+  }
+
   const leaderTeams = teams?.data?.filter((team) => team.role === "Leader");
 
   const [initialTeams, dispatch] = useReducer(listReducer, teams?.data);
@@ -97,7 +111,7 @@ export default function Teams() {
           renderList="Team"
           handleAddEntity={handleAddTeam}
           setShowAddEntityForm={setShowAddTeamForm}
-          description="Your Team is where you can organize your sub teams, add members and work with them effortlessly."
+          description="Your team is where you can organize your sub teams, add members and work with them effortlessly."
         />
       )}
       {showSendProjectInviteForm && (
@@ -113,8 +127,8 @@ export default function Teams() {
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
         <DetailCard
           renderList="Team"
-          projectId={projectId}
-          setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+          parentDetails={projectDetails}
+          setShowAddCollaboratorForm={setShowSendProjectInviteForm}
         />
         {initialTeams ? (
           <StatusCard list={initialTeams} renderList="Team" />
@@ -128,14 +142,14 @@ export default function Teams() {
         <ListHeader
           renderList="Team"
           setList={setTeams}
-          initialList={teams?.data}
           leaderList={leaderTeams}
+          initialList={teams?.data}
           resetList={resetTeamList}
           filterBtnTxt={teamFilterBtnTxt}
           switchList={listOnlyLeaderTeams}
-          setSwitchList={setListOnlyLeaderTeams}
           listNameSearchTxt={teamNameSearchTxt}
           setFilterBtnTxt={setTeamFilterBtnTxt}
+          setSwitchList={setListOnlyLeaderTeams}
           setShowAddEntityForm={setShowAddTeamForm}
           setListNameSearchTxt={setTeamNameSearchTxt}
         />
@@ -144,7 +158,6 @@ export default function Teams() {
         <ListSubHeader renderList="Team" />
         {initialTeams ? (
           <ListBody
-            userId={userId}
             renderList={"Team"}
             list={initialTeams || []}
             listNameSearchTxt={teamNameSearchTxt}

@@ -5,7 +5,9 @@ import ResetListBtn from "./ResetListBtn";
 import FilterButton from "../FilterButton";
 import SwitchListBtn from "./SwitchListBtn";
 import add from "../../assets/images/Add.png";
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getLocalSecureItem } from "@/lib/utils";
+import { useParams } from "react-router-dom";
 
 export default function ListHeader({
   setList,
@@ -21,11 +23,26 @@ export default function ListHeader({
   setShowAddEntityForm,
   setListNameSearchTxt,
 }) {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const role = params.get("role");
+  const { projectId, teamId } = useParams();
+  const [showAddEntityBtn, setShowAddEntityBtn] = useState(true);
 
-  console.log(role);
+  useEffect(() => {
+    if (renderList === "Team") {
+      const projects = getLocalSecureItem("projects", "medium");
+      projects?.forEach((project) => {
+        if (project.project === projectId && project.role !== "Leader")
+          setShowAddEntityBtn(false);
+      });
+    } else if (renderList === "Sub Team") {
+      const teams = getLocalSecureItem("teams", "medium");
+      teams?.forEach((team) => {
+        if (team.team === teamId && team.role !== "Leader")
+          setShowAddEntityBtn(false);
+      });
+    }
+
+    return () => setShowAddEntityBtn(true);
+  }, [projectId, renderList]);
 
   return (
     <div className="grid bg-[#141414] grid-cols-[200px,1fr,180px] items-center text-white py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
@@ -56,10 +73,8 @@ export default function ListHeader({
         <ResetListBtn resetList={resetList} />
         <SwitchListBtn switchList={switchList} setSwitchList={setSwitchList} />
         <button
-          disabled={role !== "Leader"}
-          className={
-            role !== "Leader" ? "cursor-not-allowed" : "cursor-pointer"
-          }
+          disabled={!showAddEntityBtn}
+          className={showAddEntityBtn ? "cursor-pointer" : "cursor-not-allowed"}
           onClick={() => setShowAddEntityForm(true)}
         >
           <img src={add} className="size-10" />

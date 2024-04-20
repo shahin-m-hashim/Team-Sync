@@ -45,7 +45,7 @@ export default function AddListEntityForm({
             <input
               type="text"
               value={doc.name}
-              placeholder={`Enter your ${renderList} name`}
+              placeholder={`Enter your ${renderList.toLowerCase()} name`}
               onClick={() => {
                 lengthErrorRef.current.style.display = "none";
                 requiredErrorRef.current.style.display = "none";
@@ -60,7 +60,7 @@ export default function AddListEntityForm({
             <textarea
               value={doc.description}
               rows={5}
-              placeholder={`Enter your ${renderList} description`}
+              placeholder={`Enter your ${renderList.toLowerCase()} description`}
               onChange={(e) => setDoc({ ...doc, description: e.target.value })}
               className="bg-[#5030E5] mt-3 px-3 py-2 rounded-lg w-full placeholder:text-[#BDBDBD]"
             />

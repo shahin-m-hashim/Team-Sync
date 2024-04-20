@@ -121,7 +121,6 @@ const EntitySettings = ({
               <>
                 {entity === "project" ? (
                   <SendProjectInviteForm
-                    sendCollaboratorInvite={handleAddEntityCollaborator}
                     setShowSendProjectInviteForm={
                       setShowAddEntityCollaboratorForm
                     }
@@ -130,7 +129,7 @@ const EntitySettings = ({
                   <AddEntityCollaboratorForm
                     entity={entity}
                     parent={parent}
-                    members={entitySettings?.parentMembers || []}
+                    parentMembers={entitySettings?.parentMembers || []}
                     handleAddEntityCollaborator={handleAddEntityCollaborator}
                     setShowAddEntityCollaboratorForm={
                       setShowAddEntityCollaboratorForm

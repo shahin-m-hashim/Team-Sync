@@ -16,34 +16,54 @@ import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import { useContext, useEffect, useReducer, useState } from "react";
-import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
+import AddEntityCollaboratorForm from "../forms/AddEntityCollaboratorForm";
 
 export default function SubTeams() {
   const { setError } = useContext(UserContext);
-  const { userId, projectId, teamId } = useParams();
+  const { projectId, teamId } = useParams();
 
   const [reFetchSubTeams, setReFetchSubTeams] = useState(false);
-  const [showAddTeamForm, setShowAddTeamForm] = useState(false);
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
-  const [listOnlyAdminSubTeams, setListOnlyAdminSubTeams] = useState(false);
+  const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
+  const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
 
-  const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
+  const [showAddSubTeamCollaboratorForm, setShowAddSubTeamCollaboratorForm] =
     useState(false);
 
-  const subTeams = useFetch(`projects/${projectId}/SubTeams`, reFetchSubTeams);
+  const teamDetails = useFetch(`projects/${projectId}/teams/${teamId}`);
+  const teamSettings = useFetch(
+    `projects/${projectId}/teams/${teamId}/settings`
+  );
+  const subTeams = useFetch(
+    `projects/${projectId}/teams/${teamId}/subTeams`,
+    reFetchSubTeams
+  );
 
   const leaderSubTeams = subTeams?.data?.filter(
     (team) => team.role === "Leader"
   );
 
-  const handleAddTeam = async (subTeamDetails) => {
+  const handleAddSubTeamCollaborator = async (values) => {
     try {
-      await addData(`projects/${projectId}/SubTeams/${teamId}/subTeam`, {
+      await addData(`projects/${projectId}/teams/${teamId}/add`, values);
+      setShowAddSubTeamCollaboratorForm(false);
+      setReFetchSubTeams((prev) => !prev);
+      toast.success("Sub Team collaborator added successfully");
+    } catch (e) {
+      toast.error(
+        e.response.data.error || "Failed to add sub team collaborator"
+      );
+    }
+  };
+
+  const handleAddSubTeam = async (subTeamDetails) => {
+    try {
+      await addData(`projects/${projectId}/teams/${teamId}/subTeam`, {
         subTeamDetails,
       });
-      setShowAddTeamForm(false);
-      toast.success("Sub Team added successfully");
+      setShowAddSubTeamForm(false);
+      toast.success("Sub team added successfully");
     } catch (e) {
       toast.error(
         e.response.data.error || "An unexpected error occurred, try again later"
@@ -51,9 +71,9 @@ export default function SubTeams() {
     }
   };
 
-  const resetTeamList = () => {
+  const resetSubTeamList = () => {
     setTeamNameSearchTxt("");
-    setListOnlyAdminSubTeams(false);
+    setListOnlyLeaderSubTeams(false);
     setTeamFilterBtnTxt("Filter");
     setSubTeams({
       type: "RESET",
@@ -67,7 +87,7 @@ export default function SubTeams() {
   useEffect(() => {
     setTeamNameSearchTxt("");
     setTeamFilterBtnTxt("Filter");
-    if (listOnlyAdminSubTeams) {
+    if (listOnlyLeaderSubTeams) {
       setSubTeams({
         type: "SWITCH",
         payload: leaderSubTeams,
@@ -78,11 +98,11 @@ export default function SubTeams() {
         payload: subTeams?.data,
       });
     }
-  }, [subTeams?.data, listOnlyAdminSubTeams]);
+  }, [subTeams?.data, listOnlyLeaderSubTeams]);
 
   useEffect(() => {
-    socket.on("SubTeams", (team) => setReFetchSubTeams(team));
-    return () => socket.off("SubTeams");
+    socket.on("subTeams", (team) => setReFetchSubTeams(team));
+    return () => socket.off("subTeams");
   }, []);
 
   if (subTeams?.error === "unauthorized") {
@@ -97,29 +117,34 @@ export default function SubTeams() {
 
   return (
     <>
-      {showAddTeamForm && (
+      {showAddSubTeamForm && (
         <AddListEntityForm
           renderList="Sub Team"
-          handleAddEntity={handleAddTeam}
-          setShowAddEntityForm={setShowAddTeamForm}
-          description="Your Sub Team is where you can create your tasks, add members, assign tasks and work with them effortlessly."
+          handleAddEntity={handleAddSubTeam}
+          setShowAddEntityForm={setShowAddSubTeamForm}
+          description="Your sub team is where you can add members, create and assign tasks to work with them effortlessly."
         />
       )}
-      {showAddTeamCollaboratorForm && (
+      {showAddSubTeamCollaboratorForm && (
         <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
-            <SendProjectInviteForm
-              projectId={projectId}
-              setShowSendProjectInviteForm={setShowAddTeamCollaboratorForm}
+            <AddEntityCollaboratorForm
+              entity="team"
+              parent="project"
+              parentMembers={teamSettings?.data?.parentMembers}
+              handleAddEntityCollaborator={handleAddSubTeamCollaborator}
+              setShowAddEntityCollaboratorForm={
+                setShowAddSubTeamCollaboratorForm
+              }
             />
           </div>
         </div>
       )}
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
         <DetailCard
-          renderList="Team"
-          projectId={projectId}
-          setShowSendProjectInviteForm={setShowAddTeamCollaboratorForm}
+          renderList="Sub Team"
+          parentDetails={teamDetails}
+          setShowAddCollaboratorForm={setShowAddSubTeamCollaboratorForm}
         />
         {initialSubTeams ? (
           <StatusCard list={initialSubTeams} renderList="Team" />
@@ -133,23 +158,23 @@ export default function SubTeams() {
         <ListHeader
           renderList="Sub Team"
           setList={setSubTeams}
-          initialList={SubTeams}
+          projectId={projectId}
           leaderList={leaderSubTeams}
-          resetList={resetTeamList}
+          resetList={resetSubTeamList}
+          initialList={subTeams?.data}
           filterBtnTxt={teamFilterBtnTxt}
-          switchList={listOnlyAdminSubTeams}
-          setSwitchList={setListOnlyAdminSubTeams}
+          switchList={listOnlyLeaderSubTeams}
           listNameSearchTxt={teamNameSearchTxt}
           setFilterBtnTxt={setTeamFilterBtnTxt}
-          setShowAddEntityForm={setShowAddTeamForm}
+          setSwitchList={setListOnlyLeaderSubTeams}
           setListNameSearchTxt={setTeamNameSearchTxt}
+          setShowAddEntityForm={setShowAddSubTeamForm}
         />
       </div>
       <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
         <ListSubHeader renderList="Sub Team" />
         {initialSubTeams ? (
           <ListBody
-            userId={userId}
             renderList={"Sub Team"}
             list={initialSubTeams || []}
             listNameSearchTxt={teamNameSearchTxt}
