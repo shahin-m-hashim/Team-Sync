@@ -6,6 +6,7 @@ const {
   setTeamDetails,
   getTeamSubTeams,
   getTeamSettings,
+  getTeamActivities,
   setTeamCollaborator,
   removeTeamCollaborator,
 } = require("../services/teamService");
@@ -14,9 +15,18 @@ const {
 const fetchTeam = async (req, res, next) => {
   try {
     const { teamId } = req.team;
-    const { projectId } = req.project;
-    const project = await getTeam(teamId, projectId);
+    const project = await getTeam(teamId);
     res.status(200).json(project);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchTeamActivities = async (req, res, next) => {
+  try {
+    const { teamId } = req.team;
+    const activities = await getTeamActivities(teamId);
+    res.status(200).json(activities);
   } catch (e) {
     next(e);
   }
@@ -26,8 +36,9 @@ const fetchTeamSubTeams = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { teamId } = req.team;
-    const teams = await getTeamSubTeams(teamId, userId);
-    res.status(200).json(teams);
+
+    const subTeams = await getTeamSubTeams(teamId, userId);
+    res.status(200).json(subTeams);
   } catch (e) {
     next(e);
   }
@@ -167,6 +178,7 @@ module.exports = {
   fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamSettings,
+  fetchTeamActivities,
   addTeamCollaborator,
   kickTeamCollaborator,
 };

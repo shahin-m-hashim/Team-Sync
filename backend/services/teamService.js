@@ -20,14 +20,33 @@ const getTeam = async (teamId) => {
   return team;
 };
 
+const getTeamActivities = async (teamId) => {
+  const team = await teams.findById(teamId).select("activities").populate({
+    path: "activities",
+    select: "-type -__v -updatedAt",
+  });
+
+  if (!team) throw new Error("UnknownTeam");
+
+  const formattedTeamActivities = team.activities.map((activity) => {
+    return {
+      ...activity.toObject(),
+      time: moment(activity.createdAt).format("hh:mm A"),
+      date: moment(activity.createdAt).format("DD/MM/YYYY"),
+    };
+  });
+
+  return formattedTeamActivities;
+};
+
 const getTeamSubTeams = async (teamId, userId) => {
-  const team = await teams.findById(teamId).select("teams").populate({
-    path: "teams",
+  const team = await teams.findById(teamId).select("subTeams").populate({
+    path: "subTeams",
     select: "parent name createdAt icon progress status leader guide members",
   });
   if (!team) throw new Error("UnknownTeam");
 
-  const formattedTeams = team.subTeams.map((subTeam) => {
+  const formattedSubTeams = team.subTeams.map((subTeam) => {
     let role = "Member";
 
     const createdAt = moment(subTeam.createdAt).format("DD/MM/YYYY");
@@ -318,6 +337,7 @@ const createSubTeam = async (userId, teamId, subTeamDetails) => {
     await session.commitTransaction();
     session.endSession();
 
+    io.emit("subTeams", newSubTeam[0]._id);
     return newSubTeam[0]._id;
   } catch (error) {
     if (session) {
@@ -473,6 +493,7 @@ module.exports = {
   setTeamDetails,
   getTeamSubTeams,
   getTeamSettings,
+  getTeamActivities,
   setTeamCollaborator,
   removeTeamCollaborator,
 };

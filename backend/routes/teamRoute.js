@@ -2,7 +2,7 @@ const teamRouter = require("express").Router();
 const subTeamRoutes = require("./subTeamRoute");
 
 const { passTeam } = require("../middlewares/passParams");
-const { isTeamLeader, isProjectCollaborator } = require("../middlewares/RBAC");
+const { isTeamLeader, isTeamCollaborator } = require("../middlewares/RBAC");
 
 const {
   fetchTeam,
@@ -12,6 +12,7 @@ const {
   fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamSettings,
+  fetchTeamActivities,
   addTeamCollaborator,
   kickTeamCollaborator,
 } = require("../controllers/teamController");
@@ -19,12 +20,18 @@ const {
 teamRouter.use("/teams/:teamId", passTeam, subTeamRoutes);
 
 // GET Requests
-teamRouter.get("/teams/:teamId", isProjectCollaborator, fetchTeam);
+teamRouter.get("/teams/:teamId", isTeamCollaborator, fetchTeam);
 
 teamRouter.get(
   "/teams/:teamId/subTeams",
-  isProjectCollaborator,
+  isTeamCollaborator,
   fetchTeamSubTeams
+);
+
+teamRouter.get(
+  "/teams/:teamId/activities",
+  isTeamCollaborator,
+  fetchTeamActivities
 );
 
 teamRouter.get("/teams/:teamId/settings", isTeamLeader, fetchTeamSettings);

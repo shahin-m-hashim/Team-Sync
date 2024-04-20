@@ -61,7 +61,7 @@ const teamSchema = new mongoose.Schema(
     subTeams: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "teams",
+        ref: "subteams",
       },
     ],
     NOS: {
