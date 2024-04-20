@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
-import { useParams } from "react-router-dom";
+import { setLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
 import { listReducer } from "@/helpers/listReducer";
@@ -17,7 +17,6 @@ import AddListEntityForm from "../forms/AddListEntityForm";
 import { useContext, useEffect, useReducer, useState } from "react";
 
 export default function Projects() {
-  const { userId } = useParams();
   const { setError } = useContext(UserContext);
   const { reFetchProjects, setReFetchProjects } = useContext(UserContext);
 
@@ -27,6 +26,18 @@ export default function Projects() {
   const [listOnlyLeaderProjects, setListOnlyLeaderProjects] = useState(false);
 
   const projects = useFetch("projects", reFetchProjects);
+
+  if (projects.data) {
+    setLocalSecureItem(
+      "projects",
+      projects?.data?.map((project) => ({
+        project: project.id,
+        role: project.role,
+      })),
+      "medium"
+    );
+  }
+
   const leaderProjects = projects?.data?.filter(
     (project) => project.role === "Leader"
   );
@@ -129,7 +140,6 @@ export default function Projects() {
         <ListSubHeader renderList="Project" />
         {initialProjects ? (
           <ListBody
-            userId={userId}
             renderList="Project"
             list={initialProjects}
             listNameSearchTxt={projectNameSearchTxt}

@@ -50,20 +50,20 @@ const TeamSettings = () => {
       setIsEditing(false);
 
       setReFetchTeamSettings((prev) => !prev);
-      toast.success("Collaborator added successfully");
+      toast.success("Team collaborator added successfully");
     } catch (e) {
-      toast.error(e.response.data.error || "Failed to add collaborator");
+      toast.error(e.response.data.error || "Failed to add team collaborator");
     }
   };
 
   const kickTeamCollaborator = async (username, role) => {
     try {
       await deleteData(
-        `projects/${projectId}/collaborators/${username}/roles/${role.toLowerCase()}`
+        `projects/${projectId}/collaborators/${username}/teams/${teamId}/roles/${role.toLowerCase()}`
       );
-      toast.success("Collaborator kicked successfully");
+      toast.success("Team collaborator kicked successfully");
     } catch (e) {
-      toast.error(e.response.data.error || "Failed to kick collaborator");
+      toast.error(e.response.data.error || "Failed to kick team collaborator");
     }
   };
 

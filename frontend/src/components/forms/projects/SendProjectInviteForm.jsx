@@ -2,15 +2,17 @@
 
 import axios from "axios";
 import { useState } from "react";
+import { toast } from "react-toastify";
+import { addData } from "@/services/db";
 const baseURL = import.meta.env.VITE_APP_BASE_URL;
 import { cn, getLocalSecureItem } from "@/lib/utils";
 import invite from "../../../assets/images/invite.png";
 import defaultDp from "../../../assets/images/defaultDp.png";
+import { useParams } from "react-router-dom";
 
-const SendProjectInviteForm = ({
-  sendCollaboratorInvite,
-  setShowSendProjectInviteForm,
-}) => {
+const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
+  const { projectId } = useParams();
+
   const user = getLocalSecureItem("user", "low");
 
   const [formData, setFormData] = useState({
@@ -42,15 +44,29 @@ const SendProjectInviteForm = ({
 
   const handleSendInvite = async (e) => {
     e.preventDefault();
-    sendCollaboratorInvite(formData);
-
     setSearchedUsers([]);
     setShowSearchResults(false);
     setShowSearchFrom(true);
-    setFormData({
-      username: "",
-      role: "member",
-    });
+
+    try {
+      await addData(`projects/${projectId}/invite`, {
+        username: formData.username,
+        role: formData.role,
+      });
+
+      toast.success(
+        `${formData.username} invited as ${formData.role} successfully.`
+      );
+    } catch (e) {
+      toast.error(
+        e.response.data.error || "Error inviting user, try again later."
+      );
+    } finally {
+      setFormData({
+        username: "",
+        role: "member",
+      });
+    }
   };
 
   const handleCancel = () => {

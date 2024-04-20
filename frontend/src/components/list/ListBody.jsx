@@ -1,14 +1,13 @@
 /* eslint-disable react/prop-types */
 
 import { cn } from "@/lib/utils";
-import { toast } from "react-toastify";
 import EmptyListBody from "./EmptyListBody";
 import noImg from "../../assets/images/noImg.svg";
 import attach from "../../assets/images/Attach.png";
-import { Link, useNavigate } from "react-router-dom";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
 import submitIcon from "../../assets/images/submitTask.png";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
 
 function ListItem({
@@ -142,95 +141,42 @@ function ListItem({
         </>
       )}
       {role === "Leader" ? (
-        <>
-          <Link
-            to={
-              renderList === "Project"
-                ? `/user/${userId}/projects/${id}/settings`
-                : renderList === "Team"
-                  ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
-                  : `/user/${userId}/projects/${parent}/teams/${grandParent}/subteams/${id}/settings`
-            }
-            className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
-          >
-            <img src={settings} width={25} />
-          </Link>
-          <button className={cn(renderList !== "Task" ? "pl-10" : "pl-8")}>
-            <img src={deleteIcon} width={25} />
-          </button>
-        </>
+        <Link
+          to={
+            renderList === "Project"
+              ? `/user/${userId}/projects/${id}/settings`
+              : renderList === "Team"
+                ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
+                : `/user/${userId}/projects/${parent}/teams/${grandParent}/subteams/${id}/settings`
+          }
+          className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
+        >
+          <img src={settings} width={25} />
+        </Link>
       ) : (
-        <>
-          <button
-            onClick={() =>
-              toast.error("You are not authorized to perform this action")
-            }
-            className={cn(
-              renderList !== "Task" ? "pl-8" : "pl-5",
-              "relative cursor-not-allowed"
-            )}
-          >
-            <img src={settings} width={25} />
-            <svg
-              className="absolute top-0"
-              viewBox="0 0 24 24"
-              width="20"
-              height="24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M0 0L24 24"
-                stroke="#FF0000"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() =>
-              toast.error("You are not authorized to perform this action")
-            }
-            className={cn(
-              renderList !== "Task" ? "pl-10" : "pl-8",
-              "relative cursor-not-allowed"
-            )}
-          >
-            <img src={deleteIcon} width={25} />
-            <svg
-              className="absolute top-0"
-              viewBox="0 0 24 24"
-              width="20"
-              height="24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M0 0L24 24"
-                stroke="#FF0000"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </>
+        <img
+          src={settings}
+          className={cn(
+            renderList !== "Task" ? "pl-8" : "pl-5",
+            role === "Leader" ? "cursor-pointer" : "cursor-not-allowed"
+          )}
+        />
       )}
+      <button
+        className={cn(
+          renderList !== "Task" ? "pl-10" : "pl-8",
+          role === "Leader" ? "cursor-pointer" : "cursor-not-allowed"
+        )}
+      >
+        <img src={deleteIcon} width={25} />
+      </button>
     </div>
   );
 }
 
-export default function ListBody({
-  list,
-  userId,
-  renderList,
-  listNameSearchTxt,
-}) {
+export default function ListBody({ list, renderList, listNameSearchTxt }) {
+  const { userId } = useParams();
+
   return list.length > 0 ? (
     list.map((item) => (
       <ListItem

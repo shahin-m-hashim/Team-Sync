@@ -5,8 +5,8 @@ import useFetch from "@/hooks/useFetch";
 import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { UserContext } from "@/providers/UserProvider";
+import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
-import { addData, deleteData, updateData } from "@/services/db";
 import { projectValidationSchema } from "@/validations/entityValidations";
 
 const ProjectSettings = () => {
@@ -42,19 +42,6 @@ const ProjectSettings = () => {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isEditing]);
-
-  const sendCollaboratorInvite = async (invitedUser) => {
-    try {
-      await addData(`projects/${projectId}/invite`, invitedUser);
-      toast.success(
-        `${invitedUser.username} invited as ${invitedUser.role} successfully.`
-      );
-    } catch (e) {
-      toast.error(
-        e.response.data.error || "Error inviting user, try again later."
-      );
-    }
-  };
 
   const kickProjectCollaborator = async (username, role) => {
     try {
@@ -117,7 +104,6 @@ const ProjectSettings = () => {
         entitySettings={projectSettings?.data}
         validationSchema={projectValidationSchema}
         kickCollaborator={kickProjectCollaborator}
-        handleAddEntityCollaborator={sendCollaboratorInvite}
         setReFetchEntitySettings={setReFetchProjectSettings}
         handleUpdateEntityDetails={handleUpdateProjectDetails}
         showAddEntityCollaboratorForm={showSendProjectInviteForm}

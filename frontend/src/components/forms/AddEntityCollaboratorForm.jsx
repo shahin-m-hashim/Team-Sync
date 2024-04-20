@@ -9,7 +9,7 @@ import { capitalizeFirstLetter } from "@/helpers/stringHandler";
 const AddEntityCollaboratorForm = ({
   entity,
   parent,
-  members,
+  parentMembers,
   handleAddEntityCollaborator,
   setShowAddEntityCollaboratorForm,
 }) => {
@@ -26,7 +26,7 @@ const AddEntityCollaboratorForm = ({
 
   const handleSearch = (e) => {
     const searchTxt = e.target.value;
-    const filtered = members.filter((member) =>
+    const filtered = parentMembers.filter((member) =>
       member.username.toLowerCase().includes(searchTxt.toLowerCase())
     );
     if (e.target.value === "") {
@@ -112,8 +112,8 @@ const AddEntityCollaboratorForm = ({
                 </>
               ) : (
                 <>
-                  {members.length > 0 ? (
-                    members.map((member) => (
+                  {parentMembers.length > 0 ? (
+                    parentMembers.map((member) => (
                       <button
                         id={member._id}
                         key={member._id}
