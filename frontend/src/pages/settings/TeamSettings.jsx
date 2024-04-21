@@ -26,7 +26,7 @@ const TeamSettings = () => {
     useState(false);
 
   const teamSettings = useFetch(
-    `projects/${projectId}/teams/${teamId}/settings`,
+    `projects/${projectId}/teams/${teamId}/details`,
     reFetchTeamSettings
   );
 
@@ -43,23 +43,10 @@ const TeamSettings = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isEditing]);
 
-  const handleAddTeamCollaborator = async (values) => {
-    try {
-      await updateData(`projects/${projectId}/teams/${teamId}/add`, values);
-      showUpdateTeamDetailsForm(false);
-      setIsEditing(false);
-
-      setReFetchTeamSettings((prev) => !prev);
-      toast.success("Team collaborator added successfully");
-    } catch (e) {
-      toast.error(e.response.data.error || "Failed to add team collaborator");
-    }
-  };
-
   const kickTeamCollaborator = async (username, role) => {
     try {
       await deleteData(
-        `projects/${projectId}/collaborators/${username}/teams/${teamId}/roles/${role.toLowerCase()}`
+        `projects/${projectId}/teams/${teamId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
       toast.success("Team collaborator kicked successfully");
     } catch (e) {
@@ -132,7 +119,6 @@ const TeamSettings = () => {
         handleUpdateEntityDetails={handleUpdateTeamDetails}
         showCurrentCollaborators={showCurrentTeamCollaborators}
         showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}
-        handleAddEntityCollaborator={handleAddTeamCollaborator}
         showAddEntityCollaboratorForm={showAddTeamCollaboratorForm}
         setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
         setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}

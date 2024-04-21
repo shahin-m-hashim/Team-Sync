@@ -3,30 +3,34 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { addData } from "@/services/db";
-import { useParams } from "react-router-dom";
 import AssignRoleForm from "../AssignRoleForm";
-import SearchAndSelectUser from "./SearchAndSelectUser";
+import { useNavigate, useParams } from "react-router-dom";
+import SelectTeamCollaborator from "./SelectTeamCollaborator";
 
-const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
-  const { projectId } = useParams();
+function AddTeamCollaboratorForm({ setShowAddTeamCollaboratorForm }) {
+  const navigate = useNavigate();
+  const { projectId, teamId } = useParams();
 
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedRole, setSelectedRole] = useState("member");
 
-  const [showSearchForm, setShowSearchFrom] = useState(true);
+  const [showSelectCollaboratorForm, setShowSelectCollaboratorForm] =
+    useState(true);
+
   const [showAssignRoleForm, setShowAssignRoleForm] = useState(false);
 
-  const sendInvite = async (e) => {
+  const addTeamCollaborator = async (e) => {
     e.preventDefault();
     try {
-      await addData(`projects/${projectId}/invite`, {
+      await addData(`projects/${projectId}/teams/${teamId}/add`, {
         username: selectedUser.username,
         role: selectedRole,
       });
-
       toast.success(
-        `${selectedUser.username} invited as ${selectedRole} successfully.`
+        `${selectedUser.username} added as ${selectedRole} successfully.`
       );
+
+      if (selectedRole === "leader") navigate(`/`, { replace: true });
     } catch (e) {
       toast.error(
         e.response.data.error || "Error inviting user, try again later."
@@ -35,47 +39,48 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
       setSelectedUser("");
       setSelectedRole("member");
 
-      setShowSearchFrom(true);
       setShowAssignRoleForm(false);
+      setShowSelectCollaboratorForm(true);
     }
   };
 
-  const cancelInvite = () => {
+  const cancelAddTeamCollaborator = () => {
     setSelectedUser("");
-    setShowSearchFrom(true);
     setSelectedRole("member");
+
     setShowAssignRoleForm(false);
-    setShowSendProjectInviteForm(false);
+    setShowSelectCollaboratorForm(true);
+    setShowAddTeamCollaboratorForm(false);
   };
 
   return (
     <div className="relative h-full p-10 rounded-md bg-slate-700">
       <form
-        onSubmit={sendInvite}
-        className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-4 bg-slate-700"
+        onSubmit={addTeamCollaborator}
+        className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-5 bg-slate-700"
       >
-        {showSearchForm && (
-          <SearchAndSelectUser
+        {showSelectCollaboratorForm && (
+          <SelectTeamCollaborator
             setSelectedUser={setSelectedUser}
-            setShowSearchForm={setShowSearchFrom}
             setShowAssignRoleForm={setShowAssignRoleForm}
-            setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+            setShowSelectCollaboratorForm={setShowSelectCollaboratorForm}
+            setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
           />
         )}
         {showAssignRoleForm && (
           <AssignRoleForm
-            entity="project"
+            entity="team"
             selectedUser={selectedUser}
             selectedRole={selectedRole}
             setSelectedRole={setSelectedRole}
-            cancelAddCollaborator={cancelInvite}
-            setShowSearchFrom={setShowSearchFrom}
             setShowAssignRoleForm={setShowAssignRoleForm}
+            cancelAddCollaborator={cancelAddTeamCollaborator}
+            setShowSelectCollaboratorForm={setShowSelectCollaboratorForm}
           />
         )}
       </form>
     </div>
   );
-};
+}
 
-export default SendProjectInviteForm;
+export default AddTeamCollaboratorForm;

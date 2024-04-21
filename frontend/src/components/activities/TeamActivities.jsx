@@ -56,15 +56,11 @@ export default function TeamActivities({
       className="relative cursor-pointer"
       onClick={() => setShowTeamActivitiesPopUp(true)}
     >
-      <span>Activities</span>
-      {teamActivities?.data?.filter((n) => !n.isRead).length > 0 && (
-        <div className="absolute bottom-3 right-[-10px] rounded-full px-2 py-1 text-xs font-semibold bg-blue-500 text-white flex items-center justify-center">
-          {teamActivities.data.filter((n) => !n.isRead).length}
-        </div>
-      )}
+      Activities
     </div>
   ) : (
     <ActivitiesPopUp
+      entity="Team"
       activities={teamActivities?.data}
       handleActivities={handleTeamActivities}
       setShowActivitiesPopUp={setShowTeamActivitiesPopUp}

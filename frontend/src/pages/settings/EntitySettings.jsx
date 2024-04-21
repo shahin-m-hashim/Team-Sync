@@ -1,20 +1,18 @@
 /* eslint-disable react/prop-types */
 
-import { capitalizeFirstLetterOfEachWord } from "@/helpers/stringHandler";
-
 import Loading from "@/components/Loading";
-import GroupedUsers from "@/components/GroupedUsers";
 import ImageHandler from "@/components/ImageHandler";
+import GroupedUsers from "@/components/GroupedUsers";
 import UserNavbar from "@/components/navbars/UserNavbar";
 import defaultIcon from "../../assets/images/defaultIcon.png";
-import CurrentCollaborators from "@/components/list/CurrentCollaborators";
+import CurrentCollaborators from "@/components/CurrentCollaborators";
+import { capitalizeFirstLetterOfEachWord } from "@/helpers/stringHandler";
 import UpdateEntityDetailsForm from "@/components/forms/UpdateEntityDetailsForm";
-import AddEntityCollaboratorForm from "@/components/forms/AddEntityCollaboratorForm";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
+import AddTeamCollaboratorForm from "@/components/forms/teams/AddTeamCollaboratorForm";
 
 const EntitySettings = ({
   entity,
-  parent,
   setIsEditing,
   entitySettings,
   entityIconPath,
@@ -24,13 +22,19 @@ const EntitySettings = ({
   kickCollaborator,
   showCurrentCollaborators,
   handleUpdateEntityDetails,
-  handleAddEntityCollaborator,
   setShowCurrentCollaborators,
   showUpdateEntityDetailsForm,
   showAddEntityCollaboratorForm,
   setShowUpdateEntityDetailsForm,
   setShowAddEntityCollaboratorForm,
 }) => {
+  const leader = entitySettings?.collaborators?.find(
+    (collaborator) => collaborator.role === "Leader"
+  );
+  const guide = entitySettings?.collaborators?.find(
+    (collaborator) => collaborator.role === "Guide"
+  );
+
   return (
     <div className="relative h-full">
       <UserNavbar />
@@ -119,19 +123,16 @@ const EntitySettings = ({
           {entitySettings ? (
             showAddEntityCollaboratorForm ? (
               <>
-                {entity === "project" ? (
+                {entity === "project" && (
                   <SendProjectInviteForm
                     setShowSendProjectInviteForm={
                       setShowAddEntityCollaboratorForm
                     }
                   />
-                ) : (
-                  <AddEntityCollaboratorForm
-                    entity={entity}
-                    parent={parent}
-                    parentMembers={entitySettings?.parentMembers || []}
-                    handleAddEntityCollaborator={handleAddEntityCollaborator}
-                    setShowAddEntityCollaboratorForm={
+                )}
+                {entity === "team" && (
+                  <AddTeamCollaboratorForm
+                    setShowAddTeamCollaboratorForm={
                       setShowAddEntityCollaboratorForm
                     }
                   />
@@ -159,7 +160,7 @@ const EntitySettings = ({
                       {capitalizeFirstLetterOfEachWord(entity)} Leader
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {entitySettings?.leader || `Your ${entity} leader`}
+                      {leader?.username || `Your ${entity} leader`}
                     </div>
                   </div>
                   <div className="flex-1">
@@ -167,7 +168,7 @@ const EntitySettings = ({
                       {capitalizeFirstLetterOfEachWord(entity)} Guide
                     </label>
                     <div className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500">
-                      {entitySettings?.guide || `Your ${entity} guide`}
+                      {guide?.username || `Your ${entity} guide`}
                     </div>
                   </div>
                 </div>

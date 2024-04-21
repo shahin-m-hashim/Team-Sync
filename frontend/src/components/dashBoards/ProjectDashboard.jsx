@@ -6,7 +6,6 @@ import Loading from "../Loading";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { addData } from "@/services/db";
-import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
 import { setLocalSecureItem } from "@/lib/utils";
@@ -17,9 +16,10 @@ import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import { useContext, useEffect, useReducer, useState } from "react";
+import ProjectDetailsCard from "../details cards/ProjectDetailsCard";
 import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
-export default function Teams() {
+export default function ProjectDashboard() {
   const { projectId } = useParams();
   const { setError } = useContext(UserContext);
 
@@ -29,10 +29,14 @@ export default function Teams() {
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderTeams, setListOnlyLeaderTeams] = useState(false);
 
-  const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
+  const [showProjectActivitiesPopUp, setShowProjectActivitiesPopUp] =
     useState(false);
 
-  const projectDetails = useFetch(`projects/${projectId}`);
+  const [
+    showInviteProjectCollaboratorForm,
+    setShowInviteProjectCollaboratorForm,
+  ] = useState(false);
+
   const teams = useFetch(`projects/${projectId}/teams`, reFetchTeams);
 
   if (teams?.data) {
@@ -114,21 +118,24 @@ export default function Teams() {
           description="Your team is where you can organize your sub teams, add members and work with them effortlessly."
         />
       )}
-      {showSendProjectInviteForm && (
+      {showInviteProjectCollaboratorForm && (
         <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
             <SendProjectInviteForm
-              projectId={projectId}
-              setShowSendProjectInviteForm={setShowSendProjectInviteForm}
+              setShowSendProjectInviteForm={
+                setShowInviteProjectCollaboratorForm
+              }
             />
           </div>
         </div>
       )}
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
-        <DetailCard
-          renderList="Team"
-          parentDetails={projectDetails}
-          setShowAddCollaboratorForm={setShowSendProjectInviteForm}
+        <ProjectDetailsCard
+          showProjectActivitiesPopUp={showProjectActivitiesPopUp}
+          setShowProjectActivitiesPopUp={setShowProjectActivitiesPopUp}
+          setShowInviteProjectCollaboratorForm={
+            setShowInviteProjectCollaboratorForm
+          }
         />
         {initialTeams ? (
           <StatusCard list={initialTeams} renderList="Team" />
@@ -158,7 +165,7 @@ export default function Teams() {
         <ListSubHeader renderList="Team" />
         {initialTeams ? (
           <ListBody
-            renderList={"Team"}
+            renderList="Team"
             list={initialTeams || []}
             listNameSearchTxt={teamNameSearchTxt}
           />

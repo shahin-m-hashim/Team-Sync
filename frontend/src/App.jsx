@@ -7,18 +7,19 @@ import HomePage from "./pages/HomePage";
 import ErrorPage from "./pages/ErrorPage";
 import DummyPage from "./pages/DummyPage";
 import LoginPage from "./pages/auth/LoginPage";
-import Teams from "./components/dashBody/Teams";
 import SignupPage from "./pages/auth/SignUpPage";
-import UserDashboard from "./pages/UserDashboard";
 import UserProvider from "./providers/UserProvider";
 import FileProvider from "./providers/FileProvider";
-import Projects from "./components/dashBody/Projects";
-import SubTeams from "./components/dashBody/SubTeams";
+import SideBar from "./components/sidebars/UserSideBar";
 import TeamSettings from "./pages/settings/TeamSettings";
+import UserNavbar from "./components/navbars/UserNavbar";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
 import SubTeamSettings from "./pages/settings/SubTeamSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
+import TeamDashboard from "./components/dashBoards/TeamDashboard";
+import UserDashboard from "./components/dashBoards/UserDashboard";
+import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -53,14 +54,18 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: (
-          <UserDashboard>
-            <Outlet />
-          </UserDashboard>
+          <>
+            <SideBar />
+            <div className="flex relative flex-col h-full pl-[16vw]">
+              <UserNavbar settings={"p-2 border-white border-2 rounded-md"} />
+              <Outlet />
+            </div>
+          </>
         ),
         children: [
           {
             index: true,
-            element: <Projects />,
+            element: <UserDashboard />,
           },
           {
             path: "projects/:projectId",
@@ -68,7 +73,7 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <Teams />,
+                element: <ProjectDashboard />,
               },
               {
                 path: "teams/:teamId",
@@ -76,11 +81,7 @@ const router = createBrowserRouter([
                 children: [
                   {
                     index: true,
-                    element: <SubTeams />,
-                  },
-                  {
-                    path: "subteams/:subTeamId",
-                    element: <Teams />,
+                    element: <TeamDashboard />,
                   },
                 ],
               },

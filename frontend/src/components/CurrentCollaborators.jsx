@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import defaultDp from "../../assets/images/defaultDp.png";
+import defaultDp from "../assets/images/defaultDp.png";
 
 const CurrentCollaborators = ({
   collaborators,
