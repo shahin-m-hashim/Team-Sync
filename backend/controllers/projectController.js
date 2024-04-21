@@ -1,23 +1,33 @@
 const {
-  getProject,
   createTeam,
   removeProject,
   setProjectIcon,
   getProjectTeams,
+  getProjectDetails,
   removeProjectIcon,
   setProjectDetails,
+  getProjectMembers,
   removeCollaborator,
-  getProjectSettings,
   getProjectActivities,
   sendProjectInvitation,
 } = require("../services/projectService");
 
 // GET Requests
-const fetchProject = async (req, res, next) => {
+const fetchProjectDetails = async (req, res, next) => {
   try {
-    const { projectId } = req.project;
-    const project = await getProject(projectId);
+    const { projectId } = req.params;
+    const project = await getProjectDetails(projectId);
     res.status(200).json(project);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchProjectMembers = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    const { members } = await getProjectMembers(projectId);
+    res.status(200).json(members);
   } catch (e) {
     next(e);
   }
@@ -25,7 +35,7 @@ const fetchProject = async (req, res, next) => {
 
 const fetchProjectActivities = async (req, res, next) => {
   try {
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const activities = await getProjectActivities(projectId);
     res.status(200).json(activities);
   } catch (e) {
@@ -36,20 +46,9 @@ const fetchProjectActivities = async (req, res, next) => {
 const fetchProjectTeams = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const teams = await getProjectTeams(userId, projectId);
     res.status(200).json(teams);
-  } catch (e) {
-    next(e);
-  }
-};
-
-const fetchProjectSettings = async (req, res, next) => {
-  try {
-    const { projectId } = req.project;
-
-    const projectSettings = await getProjectSettings(projectId);
-    res.status(200).json(projectSettings);
   } catch (e) {
     next(e);
   }
@@ -59,7 +58,7 @@ const fetchProjectSettings = async (req, res, next) => {
 const inviteProjectMember = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const { username, role } = req.body;
     await sendProjectInvitation(userId, projectId, username, role);
     res.status(200).json({
@@ -81,7 +80,7 @@ const addTeam = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { teamDetails } = req.body;
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const teamId = await createTeam(userId, projectId, teamDetails);
     console.log(
       `New team ${teamId} is created for this project ${projectId} by leader ${userId}`
@@ -105,10 +104,8 @@ const addTeam = async (req, res, next) => {
 // PATCH Requests
 const updateProjectDetails = async (req, res, next) => {
   try {
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const { updatedProjectDetails } = req.body;
-
-    console.log("Updated project details: ", updatedProjectDetails);
 
     await setProjectDetails(projectId, updatedProjectDetails);
     res.status(200).json({
@@ -129,7 +126,7 @@ const updateProjectDetails = async (req, res, next) => {
 
 const updateProjectIcon = async (req, res, next) => {
   try {
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     const { updatedProjectIcon } = req.body;
     await setProjectIcon(projectId, updatedProjectIcon);
     res.status(200).json({
@@ -150,7 +147,7 @@ const updateProjectIcon = async (req, res, next) => {
 // DELETE Requests
 const deleteProjectIcon = async (req, res, next) => {
   try {
-    const { projectId } = req.project;
+    const { projectId } = req.params;
     await removeProjectIcon(projectId);
     res.status(200).json({
       success: true,
@@ -190,14 +187,14 @@ const deleteProject = async (req, res, next) => {
 
 module.exports = {
   addTeam,
-  fetchProject,
   deleteProject,
   fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
+  fetchProjectMembers,
+  fetchProjectDetails,
   inviteProjectMember,
   updateProjectDetails,
-  fetchProjectSettings,
   fetchProjectActivities,
   kickProjectCollaborator,
 };

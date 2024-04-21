@@ -1,21 +1,21 @@
 const {
-  getTeam,
   setTeamIcon,
   createSubTeam,
+  getTeamDetails,
   removeTeamIcon,
   setTeamDetails,
+  getTeamMembers,
   getTeamSubTeams,
-  getTeamSettings,
   getTeamActivities,
   setTeamCollaborator,
   removeTeamCollaborator,
 } = require("../services/teamService");
 
 // GET Requests
-const fetchTeam = async (req, res, next) => {
+const fetchTeamDetails = async (req, res, next) => {
   try {
-    const { teamId } = req.team;
-    const project = await getTeam(teamId);
+    const { teamId } = req.params;
+    const project = await getTeamDetails(teamId);
     res.status(200).json(project);
   } catch (e) {
     next(e);
@@ -24,9 +24,19 @@ const fetchTeam = async (req, res, next) => {
 
 const fetchTeamActivities = async (req, res, next) => {
   try {
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     const activities = await getTeamActivities(teamId);
     res.status(200).json(activities);
+  } catch (e) {
+    next(e);
+  }
+};
+
+const fetchTeamMembers = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const { members } = await getTeamMembers(teamId);
+    res.status(200).json(members);
   } catch (e) {
     next(e);
   }
@@ -35,21 +45,10 @@ const fetchTeamActivities = async (req, res, next) => {
 const fetchTeamSubTeams = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { teamId } = req.team;
+    const { teamId } = req.params;
 
     const subTeams = await getTeamSubTeams(teamId, userId);
     res.status(200).json(subTeams);
-  } catch (e) {
-    next(e);
-  }
-};
-
-const fetchTeamSettings = async (req, res, next) => {
-  try {
-    const { teamId } = req.team;
-
-    const teamSettings = await getTeamSettings(teamId);
-    res.status(200).json(teamSettings);
   } catch (e) {
     next(e);
   }
@@ -59,7 +58,7 @@ const fetchTeamSettings = async (req, res, next) => {
 const addTeamCollaborator = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     const { username, role } = req.body;
     await setTeamCollaborator(userId, teamId, username, role);
     res.status(200).json({
@@ -80,7 +79,7 @@ const addTeamCollaborator = async (req, res, next) => {
 const addSubTeam = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     const { subTeamDetails } = req.body;
     const subTeamId = await createSubTeam(userId, teamId, subTeamDetails);
     console.log(
@@ -105,7 +104,7 @@ const addSubTeam = async (req, res, next) => {
 // PATCH REQUESTS
 const updateTeamDetails = async (req, res, next) => {
   try {
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     const { updatedTeamDetails } = req.body;
     await setTeamDetails(teamId, updatedTeamDetails);
     res.status(200).json({
@@ -126,7 +125,7 @@ const updateTeamDetails = async (req, res, next) => {
 
 const updateTeamIcon = async (req, res, next) => {
   try {
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     const { updatedTeamIcon } = req.body;
     await setTeamIcon(teamId, updatedTeamIcon);
     res
@@ -146,7 +145,7 @@ const updateTeamIcon = async (req, res, next) => {
 // DELETE Requests
 const deleteTeamIcon = async (req, res, next) => {
   try {
-    const { teamId } = req.team;
+    const { teamId } = req.params;
     await removeTeamIcon(teamId);
     res.status(200).json({
       success: true,
@@ -171,13 +170,13 @@ const kickTeamCollaborator = async (req, res, next) => {
 };
 
 module.exports = {
-  fetchTeam,
   addSubTeam,
   updateTeamIcon,
   deleteTeamIcon,
+  fetchTeamDetails,
+  fetchTeamMembers,
   fetchTeamSubTeams,
   updateTeamDetails,
-  fetchTeamSettings,
   fetchTeamActivities,
   addTeamCollaborator,
   kickTeamCollaborator,

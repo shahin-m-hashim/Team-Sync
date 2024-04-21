@@ -9,15 +9,64 @@ const activities = require("../models/activityModel");
 const notifications = require("../models/notificationModel");
 
 // GET
-const getTeam = async (teamId) => {
+const getTeamDetails = async (teamId) => {
+  let collaborators = [];
+
   const team = await teams
     .findById(teamId)
-    .select("icon name description leader guide members NOM")
-    .populate({ path: "leader guide members", select: "username profilePic" });
+    .select("icon name description leader guide members NOC")
+    .populate({
+      path: "leader guide members",
+      select: "username profilePic id",
+    });
 
-  if (!team) throw new Error("UnknownTeam");
+  if (!team) throw new Error("UnknownProject");
 
-  return team;
+  collaborators.push({
+    id: team.leader?.id,
+    role: "Leader",
+    username: team.leader?.username,
+    profilePic: team.leader?.profilePic,
+  });
+
+  team.guide &&
+    collaborators.push({
+      id: team.guide?.id,
+      role: "Guide",
+      username: team.guide?.username,
+      profilePic: team.guide?.profilePic,
+    });
+
+  team.members &&
+    team.members.forEach((member) => {
+      collaborators.push({
+        id: member.id,
+        role: "Member",
+        username: member?.username,
+        profilePic: member?.profilePic,
+      });
+    });
+
+  return {
+    icon: team.icon,
+    name: team.name,
+    description: team.description,
+    NOC: team.NOC,
+    collaborators,
+  };
+};
+
+const getTeamMembers = async (teamId) => {
+  const teamMembers = await teams
+    .findById(teamId)
+    .select("members -_id")
+    .populate({
+      path: "members",
+      select: "username profilePic tag fname",
+    });
+  if (!teamMembers) throw new Error("UnknownTeam");
+
+  return teamMembers;
 };
 
 const getTeamActivities = async (teamId) => {
@@ -42,9 +91,10 @@ const getTeamActivities = async (teamId) => {
 const getTeamSubTeams = async (teamId, userId) => {
   const team = await teams.findById(teamId).select("subTeams").populate({
     path: "subTeams",
-    select: "parent name createdAt icon progress status leader guide members",
+    select:
+      "parent grandParent name createdAt icon progress status leader guide members",
   });
-  if (!team) throw new Error("UnknownTeam");
+  if (!team) throw new Error("UnknownSubTeam");
 
   const formattedSubTeams = team.subTeams.map((subTeam) => {
     let role = "Member";
@@ -70,64 +120,12 @@ const getTeamSubTeams = async (teamId, userId) => {
   return formattedSubTeams;
 };
 
-const getTeamSettings = async (teamId) => {
-  const team = await teams
-    .findById(teamId)
-    .select("icon name description leader guide members parent")
-    .populate({
-      path: "leader guide members",
-      select: "username profilePic",
-    })
-    .populate({
-      path: "parent",
-      select: "members",
-      populate: {
-        path: "members",
-        select: "username fname profilePic tag",
-      },
-    });
-
-  if (!team) throw new Error("UnknownTeam");
-
-  const collaborators = [
-    {
-      role: "Leader",
-      id: team.leader?._id,
-      username: team.leader?.username,
-      profilePic: team.leader?.profilePic,
-    },
-    ...team.members.map((member) => ({
-      role: "Member",
-      id: member._id,
-      username: member.username,
-      profilePic: member.profilePic,
-    })),
-  ];
-
-  if (team.guide) {
-    collaborators.push({
-      role: "Guide",
-      id: team.guide?._id,
-      username: team.guide?.username,
-      profilePic: team.guide?.profilePic,
-    });
-  }
-
-  return {
-    collaborators,
-    icon: team.icon,
-    name: team.name,
-    NOC: collaborators.length,
-    guide: team.guide?.username,
-    description: team.description,
-    leader: team.leader?.username,
-    parentMembers: team.parent?.members,
-  };
-};
-
 // POST
 const setTeamCollaborator = async (userId, teamId, username, role) => {
   let session = null;
+  let newActivity = null;
+  let newNotification = null;
+  let newNotificationForLeader = null;
 
   try {
     session = await mongoose.startSession();
@@ -180,7 +178,7 @@ const setTeamCollaborator = async (userId, teamId, username, role) => {
       team.leader = collaborator._id;
 
       const notificationMessageForLeader = `You are no longer the leader of the team ${team.name} in project ${project.name}.`;
-      const newNotificationForLeader = await notifications.create(
+      newNotificationForLeader = await notifications.create(
         [
           {
             user: userId,
@@ -194,7 +192,7 @@ const setTeamCollaborator = async (userId, teamId, username, role) => {
       team.leader?.notifications?.push(newNotificationForLeader[0]._id);
 
       const notificationMessage = `You have been promoted as the leader of the team ${team.name} in project ${project.name} by the previous team leader ${previousLeader.username}.`;
-      const newNotification = await notifications.create(
+      newNotification = await notifications.create(
         [
           {
             user: collaborator._id,
@@ -209,9 +207,9 @@ const setTeamCollaborator = async (userId, teamId, username, role) => {
       collaborator.teams?.push(team._id);
       collaborator.notifications?.push(newNotification[0]._id);
 
-      const activityMsg = `${username} have been promoted as the current leader of this team ${team.name} by the previous leader ${previousLeader.username}.`;
+      const activityMsg = `${username} have been promoted as the current leader of this team by the previous leader ${previousLeader.username}.`;
 
-      const newActivity = await activities.create(
+      newActivity = await activities.create(
         [
           {
             type: "teamLeaderChanged",
@@ -263,13 +261,9 @@ const setTeamCollaborator = async (userId, teamId, username, role) => {
 
     await Promise.all([
       collaborator.save({ session }),
-      previousLeader.save(),
-      team.save({ session }),
+      previousLeader.save({ session }),
       team.save({ session }),
     ]);
-
-    await session.commitTransaction();
-    session.endSession();
 
     io.emit(
       "notifications",
@@ -277,7 +271,12 @@ const setTeamCollaborator = async (userId, teamId, username, role) => {
     );
 
     io.emit("activities", newActivity[0]._id);
+
+    await session.commitTransaction();
+    session.endSession();
   } catch (error) {
+    console.log(error);
+
     if (session) {
       await session.abortTransaction();
       session.endSession();
@@ -322,9 +321,10 @@ const createSubTeam = async (userId, teamId, subTeamDetails) => {
     const newActivity = await activities.create(
       [
         {
-          team: team.parent.id,
-          type: "subTeamAdded",
-          message: `A new sub team ${newSubTeam[0].name} is added to this team ${team.name} by leader ${team.leader.username}`,
+          entity: "team",
+          type: "subTeamAddedToTeam",
+          image: newSubTeam[0].icon,
+          message: `A new sub team ${newSubTeam[0].name} is added to this team by leader ${team.leader.username}`,
         },
       ],
       { session }
@@ -381,11 +381,7 @@ const removeTeamIcon = async (teamId) => {
   io.emit("teams", (team.id + team.updatedAt).toString());
 };
 
-const removeTeamCollaborator = async (
-  role,
-  projectId,
-  collaboratorUsername
-) => {
+const removeTeamCollaborator = async (teamId, collaboratorUsername, role) => {
   let session = null;
   try {
     session = await mongoose.startSession();
@@ -396,20 +392,18 @@ const removeTeamCollaborator = async (
       .session(session);
     if (!collaborator) throw new Error("UnknownUser");
 
-    const project = await projects
-      .findById(projectId)
+    const team = await teams
+      .findById(teamId)
       .populate({
         path: "leader guide members invitations",
-        select: "username to project",
+        select: "username project",
       })
       .session(session);
-    if (!project) throw new Error("UnknownProject");
-
-    console.log("Project\n", project);
+    if (!team) throw new Error("UnknownTeam");
 
     let notificationMessage = "";
-    if (role === "guide" && project.guide?.username === collaboratorUsername) {
-      project.guide = null;
+    if (role === "guide" && team.guide?.username === collaboratorUsername) {
+      team.guide = null;
       collaborator.projects = collaborator.projects.pull(projectId);
       project.invitations = project.invitations.filter(
         (invitation) =>
@@ -437,9 +431,10 @@ const removeTeamCollaborator = async (
       const newActivity = await activities.create(
         [
           {
-            project: projectId,
-            type: "collaboratorRemoved",
-            message: `${collaboratorUsername} who was a ${role} of this project was removed by its leader ${project.leader?.username}`,
+            entity: "team",
+            image: collaborator.profilePic,
+            type: "teamCollaboratorRemoved",
+            message: `${collaboratorUsername} who was a ${role} of this team was removed by its leader ${project.leader?.username}`,
           },
         ],
         { session }
@@ -484,15 +479,14 @@ const removeTeamCollaborator = async (
 };
 
 module.exports = {
-  getTeam,
   setTeamIcon,
   createSubTeam,
   createSubTeam,
+  getTeamDetails,
   setTeamDetails,
   removeTeamIcon,
-  setTeamDetails,
+  getTeamMembers,
   getTeamSubTeams,
-  getTeamSettings,
   getTeamActivities,
   setTeamCollaborator,
   removeTeamCollaborator,

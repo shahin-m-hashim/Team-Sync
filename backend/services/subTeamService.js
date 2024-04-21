@@ -1,3 +1,4 @@
+const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
@@ -6,15 +7,64 @@ const activities = require("../models/activityModel");
 const notifications = require("../models/notificationModel");
 
 // GET
-const getSubTeam = async (subTeamId) => {
+const getSubTeamDetails = async (subTeamId) => {
+  let collaborators = [];
+
   const subTeam = await subteams
     .findById(subTeamId)
-    .select("icon name description leader guide members NOM")
-    .populate({ path: "leader guide members", select: "username profilePic" });
+    .select("icon name description leader guide members NOC")
+    .populate({
+      path: "leader guide members",
+      select: "username profilePic id",
+    });
 
-  if (!subTeam) throw new Error("UnknownSubTeam");
+  if (!subTeam) throw new Error("UnknownProject");
 
-  return subTeam;
+  collaborators.push({
+    id: subTeam.leader?.id,
+    role: "Leader",
+    username: subTeam.leader?.username,
+    profilePic: subTeam.leader?.profilePic,
+  });
+
+  subTeam.guide &&
+    collaborators.push({
+      id: subTeam.guide?.id,
+      role: "Guide",
+      username: subTeam.guide?.username,
+      profilePic: subTeam.guide?.profilePic,
+    });
+
+  subTeam.members &&
+    subTeam.members.forEach((member) => {
+      collaborators.push({
+        id: member.id,
+        role: "Member",
+        username: member?.username,
+        profilePic: member?.profilePic,
+      });
+    });
+
+  return {
+    icon: subTeam.icon,
+    name: subTeam.name,
+    description: subTeam.description,
+    NOC: subTeam.NOC,
+    collaborators,
+  };
+};
+
+const getSubTeamMembers = async (subTeamId) => {
+  const subTeamMembers = await subteams
+    .findById(subTeamId)
+    .select("members -_id")
+    .populate({
+      path: "members",
+      select: "username profilePic tag fname",
+    });
+  if (!subTeamMembers) throw new Error("UnknownSubTeam");
+
+  return subTeamMembers;
 };
 
 const getSubTeamActivities = async (subTeamId) => {
@@ -70,62 +120,8 @@ const getSubTeamActivities = async (subTeamId) => {
 //   return formattedSubTeams;
 // };
 
-const getSubTeamSettings = async (subTeamId) => {
-  const subTeam = await subteams
-    .findById(subTeamId)
-    .select("icon name description leader guide members parent")
-    .populate({
-      path: "leader guide members",
-      select: "username profilePic",
-    })
-    .populate({
-      path: "parent",
-      select: "members",
-      populate: {
-        path: "members",
-        select: "username fname profilePic tag",
-      },
-    });
-
-  if (!subTeam) throw new Error("UnknownSubTeam");
-
-  const collaborators = [
-    {
-      role: "Leader",
-      id: subTeam.leader?._id,
-      username: subTeam.leader?.username,
-      profilePic: subTeam.leader?.profilePic,
-    },
-    ...subTeam.members.map((member) => ({
-      role: "Member",
-      id: member._id,
-      username: member.username,
-      profilePic: member.profilePic,
-    })),
-  ];
-
-  if (subTeam.guide) {
-    collaborators.push({
-      role: "Guide",
-      id: subTeam.guide?._id,
-      username: subTeam.guide?.username,
-      profilePic: subTeam.guide?.profilePic,
-    });
-  }
-
-  return {
-    collaborators,
-    icon: subTeam.icon,
-    name: subTeam.name,
-    NOC: collaborators.length,
-    guide: subTeam.guide?.username,
-    description: subTeam.description,
-    leader: subTeam.leader?.username,
-    parentMembers: subTeam.parent?.members,
-  };
-};
-
 // POST
+
 const setSubTeamCollaborator = async (userId, subTeamId, username, role) => {
   let session = null;
 
@@ -283,10 +279,10 @@ const setSubTeamCollaborator = async (userId, subTeamId, username, role) => {
 };
 
 // PATCH
-const setSubTeamDetails = async (subTeamId, newSubTeamDetails) => {
+const setSubTeamDetails = async (subTeamId, updatedSubTeamDetails) => {
   const subTeam = await subteams.findById(subTeamId);
   if (!subTeam) throw new Error("UnknownSubTeam");
-  const { name, description } = newSubTeamDetails;
+  const { name, description } = updatedSubTeamDetails;
   subTeam.name = name;
   subTeam.description = description;
   await subTeam.save();
@@ -294,10 +290,10 @@ const setSubTeamDetails = async (subTeamId, newSubTeamDetails) => {
   io.emit("subTeams", (subTeam.id + subTeam.updatedAt).toString());
 };
 
-const setSubTeamIcon = async (subTeamId, newSubTeamIcon) => {
+const setSubTeamIcon = async (subTeamId, updatedSubTeamIcon) => {
   const subTeam = await subteams.findById(subTeamId);
   if (!subTeam) throw new Error("UnknownSubTeam");
-  subTeam.icon = newSubTeamIcon;
+  subTeam.icon = updatedSubTeamIcon;
   await subTeam.save();
 
   io.emit("subTeams", (subTeam.id + subTeam.updatedAt).toString());
@@ -418,11 +414,11 @@ const removeSubTeamCollaborator = async (
 };
 
 module.exports = {
-  getSubTeam,
   setSubTeamIcon,
+  getSubTeamDetails,
   setSubTeamDetails,
   removeSubTeamIcon,
-  getSubTeamSettings,
+  getSubTeamMembers,
   getSubTeamActivities,
   setSubTeamCollaborator,
   removeSubTeamCollaborator,
