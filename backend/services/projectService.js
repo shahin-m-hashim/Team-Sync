@@ -11,15 +11,65 @@ const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
 
 // GET
-const getProject = async (projectId) => {
+const getProjectDetails = async (projectId) => {
+  let collaborators = [];
+
   const project = await projects
     .findById(projectId)
-    .select("icon name description leader guide members NOM")
-    .populate({ path: "leader guide members", select: "username profilePic" });
+    .select("icon name description leader guide members NOC")
+    .populate({
+      path: "leader guide members",
+      select: "username profilePic id",
+    });
 
   if (!project) throw new Error("UnknownProject");
 
-  return project;
+  collaborators.push({
+    id: project.leader?.id,
+    role: "Leader",
+    username: project.leader?.username,
+    profilePic: project.leader?.profilePic,
+  });
+
+  project.guide &&
+    collaborators.push({
+      id: project.guide?.id,
+      role: "Guide",
+      username: project.guide?.username,
+      profilePic: project.guide?.profilePic,
+    });
+
+  project.members &&
+    project.members.forEach((member) => {
+      collaborators.push({
+        id: member.id,
+        role: "Member",
+        username: member?.username,
+        profilePic: member?.profilePic,
+      });
+    });
+
+  return {
+    icon: project.icon,
+    name: project.name,
+    description: project.description,
+    NOC: project.NOC,
+    collaborators,
+  };
+};
+
+const getProjectMembers = async (projectId) => {
+  const projectMembers = await projects
+    .findById(projectId)
+    .select("members -_id")
+    .populate({
+      path: "members",
+      select: "username profilePic tag fname",
+    });
+
+  if (!projectMembers) throw new Error("UnknownProject");
+
+  return projectMembers;
 };
 
 const getProjectActivities = async (projectId) => {
@@ -72,53 +122,6 @@ const getProjectTeams = async (userId, projectId) => {
   });
 
   return formattedTeams;
-};
-
-const getProjectSettings = async (projectId) => {
-  const project = await projects
-    .findById(projectId)
-    .select("icon name description leader guide members")
-    .populate({
-      path: "leader guide members",
-      select: "username profilePic id",
-    })
-    .populate({
-      path: "teams",
-      select: "name createdAt icon progress status leader guide",
-    });
-
-  if (!project) throw new Error("UnknownProject");
-
-  const collaborators = [
-    {
-      role: "Leader",
-      username: project.leader?.username,
-      profilePic: project.leader?.profilePic,
-    },
-    ...project.members.map((member) => ({
-      role: "Member",
-      username: member.username,
-      profilePic: member.profilePic,
-    })),
-  ];
-
-  if (project.guide) {
-    collaborators.push({
-      role: "Guide",
-      username: project.guide.username,
-      profilePic: project.guide.profilePic,
-    });
-  }
-
-  return {
-    collaborators,
-    icon: project.icon,
-    name: project.name,
-    NOC: collaborators.length,
-    guide: project.guide?.username,
-    description: project.description,
-    leader: project.leader?.username,
-  };
 };
 
 // POST
@@ -239,9 +242,10 @@ const createTeam = async (userId, projectId, teamDetails) => {
     const newActivity = await activities.create(
       [
         {
-          project: projectId,
-          type: "teamAdded",
-          message: `A new team ${newTeam[0].name} is added to this project ${project.name} by leader ${project.leader.username}.`,
+          entity: "project",
+          image: newTeam[0].icon,
+          type: "teamAddedToProject",
+          message: `A new team ${newTeam[0].name} is added to this project by leader ${project.leader.username}.`,
         },
       ],
       { session }
@@ -313,7 +317,7 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
       .findById(projectId)
       .populate({
         path: "leader guide members invitations",
-        select: "username to project",
+        select: "username project",
       })
       .session(session);
     if (!project) throw new Error("UnknownProject");
@@ -348,8 +352,9 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
       const newActivity = await activities.create(
         [
           {
-            project: projectId,
-            type: "collaboratorRemoved",
+            entity: "project",
+            image: collaborator.profilePic,
+            type: "projectCollaboratorRemoved",
             message: `${collaboratorUsername} who was a ${role} of this project was removed by its leader ${project.leader?.username}`,
           },
         ],
@@ -471,15 +476,15 @@ const removeProject = async (userId, projectId) => {
 };
 
 module.exports = {
-  getProject,
   createTeam,
   removeProject,
   setProjectIcon,
   getProjectTeams,
+  getProjectDetails,
   removeProjectIcon,
   setProjectDetails,
+  getProjectMembers,
   removeCollaborator,
-  getProjectSettings,
   getProjectActivities,
   sendProjectInvitation,
 };

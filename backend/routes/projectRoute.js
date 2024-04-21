@@ -10,14 +10,14 @@ const { passProject } = require("../middlewares/passParams");
 
 const {
   addTeam,
-  fetchProject,
   deleteProject,
   fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
+  fetchProjectMembers,
+  fetchProjectDetails,
   inviteProjectMember,
   updateProjectDetails,
-  fetchProjectSettings,
   fetchProjectActivities,
   kickProjectCollaborator,
 } = require("../controllers/projectController");
@@ -25,7 +25,11 @@ const {
 projectRouter.use("/projects/:projectId", passProject, teamRoutes);
 
 // GET Requests
-projectRouter.get("/projects/:projectId", isProjectCollaborator, fetchProject);
+projectRouter.get(
+  "/projects/:projectId/details",
+  isProjectCollaborator,
+  fetchProjectDetails
+);
 
 projectRouter.get(
   "/projects/:projectId/activities",
@@ -34,15 +38,15 @@ projectRouter.get(
 );
 
 projectRouter.get(
-  "/projects/:projectId/teams",
+  "/projects/:projectId/members",
   isProjectCollaborator,
-  fetchProjectTeams
+  fetchProjectMembers
 );
 
 projectRouter.get(
-  "/projects/:projectId/settings",
-  isProjectLeader,
-  fetchProjectSettings
+  "/projects/:projectId/teams",
+  isProjectCollaborator,
+  fetchProjectTeams
 );
 
 // POST Requests
