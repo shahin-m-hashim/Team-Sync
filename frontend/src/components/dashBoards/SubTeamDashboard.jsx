@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import DetailCard from "../cards/DetailCard";
+import DetailCard from "../cards/DetailsCard";
 import StatusCard from "../cards/StatusCard";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";

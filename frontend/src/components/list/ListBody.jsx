@@ -15,9 +15,8 @@ function ListItem({
   name,
   icon,
   role,
-  parent,
   status,
-  userId,
+  parent,
   assignee,
   priority,
   progress,
@@ -26,6 +25,7 @@ function ListItem({
   grandParent,
   deadlineDate,
 }) {
+  const { userId } = useParams();
   const navigate = useNavigate();
 
   return (
@@ -147,7 +147,7 @@ function ListItem({
               ? `/user/${userId}/projects/${id}/settings`
               : renderList === "Team"
                 ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
-                : `/user/${userId}/projects/${parent}/teams/${grandParent}/subteams/${id}/settings`
+                : `/user/${userId}/projects/${grandParent}/teams/${parent}/subteams/${id}/settings`
           }
           className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
         >
@@ -175,16 +175,9 @@ function ListItem({
 }
 
 export default function ListBody({ list, renderList, listNameSearchTxt }) {
-  const { userId } = useParams();
-
   return list.length > 0 ? (
     list.map((item) => (
-      <ListItem
-        {...item}
-        key={item.id}
-        userId={userId}
-        renderList={renderList}
-      />
+      <ListItem {...item} key={item.id} renderList={renderList} />
     ))
   ) : (
     <EmptyListBody name={renderList} listNameSearchTxt={listNameSearchTxt} />

@@ -6,7 +6,6 @@ import Loading from "../Loading";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { addData } from "@/services/db";
-import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
 import ListBody from "@/components/list/ListBody";
@@ -15,10 +14,11 @@ import ListHeader from "@/components/list/ListHeader";
 import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
+import TeamDetailsCard from "../details cards/TeamDetailsCard";
 import { useContext, useEffect, useReducer, useState } from "react";
-import AddEntityCollaboratorForm from "../forms/AddEntityCollaboratorForm";
+import AddTeamCollaboratorForm from "../forms/teams/AddTeamCollaboratorForm";
 
-export default function SubTeams() {
+export default function TeamDashboard() {
   const { setError } = useContext(UserContext);
   const { projectId, teamId } = useParams();
 
@@ -28,13 +28,11 @@ export default function SubTeams() {
   const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
   const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
 
-  const [showAddSubTeamCollaboratorForm, setShowAddSubTeamCollaboratorForm] =
+  const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
     useState(false);
 
-  const teamDetails = useFetch(`projects/${projectId}/teams/${teamId}`);
-  const teamSettings = useFetch(
-    `projects/${projectId}/teams/${teamId}/settings`
-  );
+  const [showTeamActivitiesPopUp, setShowTeamActivitiesPopUp] = useState(false);
+
   const subTeams = useFetch(
     `projects/${projectId}/teams/${teamId}/subTeams`,
     reFetchSubTeams
@@ -43,19 +41,6 @@ export default function SubTeams() {
   const leaderSubTeams = subTeams?.data?.filter(
     (team) => team.role === "Leader"
   );
-
-  const handleAddSubTeamCollaborator = async (values) => {
-    try {
-      await addData(`projects/${projectId}/teams/${teamId}/add`, values);
-      setShowAddSubTeamCollaboratorForm(false);
-      setReFetchSubTeams((prev) => !prev);
-      toast.success("Sub Team collaborator added successfully");
-    } catch (e) {
-      toast.error(
-        e.response.data.error || "Failed to add sub team collaborator"
-      );
-    }
-  };
 
   const handleAddSubTeam = async (subTeamDetails) => {
     try {
@@ -81,7 +66,7 @@ export default function SubTeams() {
     });
   };
 
-  const [initialSubTeams, dispatch] = useReducer(listReducer, SubTeams?.data);
+  const [initialSubTeams, dispatch] = useReducer(listReducer, subTeams?.data);
   const setSubTeams = (action) => dispatch(action);
 
   useEffect(() => {
@@ -125,26 +110,20 @@ export default function SubTeams() {
           description="Your sub team is where you can add members, create and assign tasks to work with them effortlessly."
         />
       )}
-      {showAddSubTeamCollaboratorForm && (
+      {showAddTeamCollaboratorForm && (
         <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
-            <AddEntityCollaboratorForm
-              entity="team"
-              parent="project"
-              parentMembers={teamSettings?.data?.parentMembers}
-              handleAddEntityCollaborator={handleAddSubTeamCollaborator}
-              setShowAddEntityCollaboratorForm={
-                setShowAddSubTeamCollaboratorForm
-              }
+            <AddTeamCollaboratorForm
+              setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
             />
           </div>
         </div>
       )}
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
-        <DetailCard
-          renderList="Sub Team"
-          parentDetails={teamDetails}
-          setShowAddCollaboratorForm={setShowAddSubTeamCollaboratorForm}
+        <TeamDetailsCard
+          showTeamActivitiesPopUp={showTeamActivitiesPopUp}
+          setShowTeamActivitiesPopUp={setShowTeamActivitiesPopUp}
+          setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
         />
         {initialSubTeams ? (
           <StatusCard list={initialSubTeams} renderList="Team" />

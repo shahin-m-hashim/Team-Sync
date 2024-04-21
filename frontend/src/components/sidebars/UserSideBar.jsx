@@ -17,7 +17,7 @@ const MenuItem = ({ icon, text }) => (
   </div>
 );
 
-export default function UserSideBar() {
+export default function SideBar() {
   const { user, setUserStatus } = useContext(UserContext);
 
   if (user?.username.length > 13)

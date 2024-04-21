@@ -16,7 +16,7 @@ import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import { useContext, useEffect, useReducer, useState } from "react";
 
-export default function Projects() {
+export default function UserDashboard() {
   const { setError } = useContext(UserContext);
   const { reFetchProjects, setReFetchProjects } = useContext(UserContext);
 

@@ -26,7 +26,7 @@ const ProjectSettings = () => {
     useState(false);
 
   const projectSettings = useFetch(
-    `projects/${projectId}/settings`,
+    `projects/${projectId}/details`,
     reFetchProjectSettings
   );
 

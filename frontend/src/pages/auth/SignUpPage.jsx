@@ -48,6 +48,9 @@ export default function SignupPage() {
         password,
       });
       toast.success("Account Created Successfully");
+      setShowPassword(false);
+      setShowCPassword(false);
+      resetForm();
     } catch (e) {
       if (e.status === 500) {
         setServerError(true);
