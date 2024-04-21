@@ -5,28 +5,28 @@ import useFetch from "@/hooks/useFetch";
 import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { deleteData, updateData } from "@/services/db";
-import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
-import { teamValidationSchema } from "@/validations/entityValidations";
+import { useContext, useEffect, useState } from "react";
+import { subTeamValidationSchema } from "@/validations/entityValidations";
 
-const TeamSettings = () => {
+const SubTeamSettings = () => {
   const { setError } = useContext(UserContext);
   const { userId, projectId, teamId, subTeamId } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
   const [reFetchSubTeamSettings, setReFetchSubTeamSettings] = useState(false);
 
-  const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
+  const [showAddSubTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
     useState(false);
 
-  const [showCurrentTeamCollaborators, setShowCurrentTeamCollaborators] =
+  const [showCurrentSubTeamCollaborators, setShowCurrentSubTeamCollaborators] =
     useState(false);
 
-  const [showUpdateTeamDetailsForm, setShowUpdateTeamDetailsForm] =
+  const [showUpdateSubTeamDetailsForm, setShowUpdateSubTeamDetailsForm] =
     useState(false);
 
   const subTeamSettings = useFetch(
-    `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/settings`,
+    `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/details`,
     reFetchSubTeamSettings
   );
 
@@ -45,8 +45,11 @@ const TeamSettings = () => {
 
   const handleAddSubTeamCollaborator = async (values) => {
     try {
-      await updateData(`projects/${projectId}/teams/${teamId}/add`, values);
-      showUpdateTeamDetailsForm(false);
+      await updateData(
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/add`,
+        values
+      );
+      showUpdateSubTeamDetailsForm(false);
       setIsEditing(false);
 
       setReFetchSubTeamSettings((prev) => !prev);
@@ -67,16 +70,16 @@ const TeamSettings = () => {
     }
   };
 
-  const handleUpdateSubTeamDetails = async (updatedTeamDetails) => {
+  const handleUpdateSubTeamDetails = async (updatedSubTeamDetails) => {
     try {
       const { data } = await updateData(
-        `projects/${projectId}/teams/${teamId}/details`,
-        { updatedTeamDetails }
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/details`,
+        { updatedSubTeamDetails }
       );
       setIsEditing(false);
-      showUpdateTeamDetailsForm(false);
+      setShowUpdateSubTeamDetailsForm(false);
 
-      reFetchSubTeamSettings((prev) => !prev);
+      setReFetchSubTeamSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
       console.log(e);
@@ -86,21 +89,26 @@ const TeamSettings = () => {
     }
   };
 
-  const updateTeamIcon = async (downloadURL) => {
+  const updateSubTeamIcon = async (downloadURL) => {
     try {
-      await updateData(`projects/${projectId}/teams/${teamId}/icon`, {
-        updatedTeamIcon: downloadURL,
-      });
-      reFetchSubTeamSettings((prev) => !prev);
+      await updateData(
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/icon`,
+        {
+          updatedSubTeamIcon: downloadURL,
+        }
+      );
+      setReFetchSubTeamSettings((prev) => !prev);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to update team icon");
     }
   };
 
-  const deleteTeamIcon = async () => {
+  const deleteSubTeamIcon = async () => {
     try {
-      await deleteData(`projects/${projectId}/teams/${teamId}/icon`);
-      reFetchSubTeamSettings((prev) => !prev);
+      await deleteData(
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/icon`
+      );
+      setReFetchSubTeamSettings((prev) => !prev);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to delete team icon");
     }
@@ -122,19 +130,19 @@ const TeamSettings = () => {
         parent="team"
         entity="sub team"
         setIsEditing={setIsEditing}
-        updateEntityIcon={updateTeamIcon}
-        deleteEntityIcon={deleteTeamIcon}
+        updateEntityIcon={updateSubTeamIcon}
+        deleteEntityIcon={deleteSubTeamIcon}
         entitySettings={subTeamSettings?.data}
-        validationSchema={teamValidationSchema}
+        validationSchema={subTeamValidationSchema}
         kickCollaborator={kickSubTeamCollaborator}
         setReFetchEntitySettings={setReFetchSubTeamSettings}
         handleUpdateEntityDetails={handleUpdateSubTeamDetails}
-        showCurrentCollaborators={showCurrentTeamCollaborators}
-        showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}
+        showCurrentCollaborators={showCurrentSubTeamCollaborators}
+        showUpdateEntityDetailsForm={showUpdateSubTeamDetailsForm}
         handleAddEntityCollaborator={handleAddSubTeamCollaborator}
-        showAddEntityCollaboratorForm={showAddTeamCollaboratorForm}
-        setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
-        setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}
+        showAddEntityCollaboratorForm={showAddSubTeamCollaboratorForm}
+        setShowCurrentCollaborators={setShowCurrentSubTeamCollaborators}
+        setShowUpdateEntityDetailsForm={setShowUpdateSubTeamDetailsForm}
         setShowAddEntityCollaboratorForm={setShowAddTeamCollaboratorForm}
         entityIconPath={`users/${userId}/projects/${projectId}/teams/${teamId}/subteams/${subTeamId}/icon`}
       />
@@ -142,4 +150,4 @@ const TeamSettings = () => {
   );
 };
 
-export default TeamSettings;
+export default SubTeamSettings;
