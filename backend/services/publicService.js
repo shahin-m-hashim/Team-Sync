@@ -23,7 +23,6 @@ const findUser = async (searchQuery) => {
       { $limit: 5 },
       {
         $project: {
-          _id: 0,
           username: 1,
           fname: 1,
           profilePic: 1,

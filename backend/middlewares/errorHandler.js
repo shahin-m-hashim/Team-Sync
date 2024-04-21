@@ -37,16 +37,28 @@ const errorHandler = (error, req, res, next) => {
         error: "Team not found, Please create a team first.",
       });
 
-    case "UserAlreadyInProjectAsAGuide":
+    case "UserAlreadyInProjectAsGuide":
       return res.status(400).json({
         success: false,
         error: "User is already a guide in this project.",
       });
 
-    case "UserAlreadyInProjectAsAMember":
+    case "UserAlreadyInProjectAsGuide":
+      return res.status(400).json({
+        success: false,
+        error: "User is already a guide in this project.",
+      });
+
+    case "UserAlreadyInProjectAsMember":
       return res.status(400).json({
         success: false,
         error: "User is already a member in this project.",
+      });
+
+    case "UserAlreadyInTeamAsMember":
+      return res.status(400).json({
+        success: false,
+        error: "User is already a member in this team.",
       });
 
     case "UserAlreadyInvited":
@@ -93,12 +105,6 @@ const errorHandler = (error, req, res, next) => {
         success: false,
         error:
           "User is already a leader in a sub team within this team. He cant be added unless he demotes his leader role first from that sub team.",
-      });
-
-    case "UserAlreadyInTeam":
-      return res.status(400).json({
-        success: false,
-        error: "User is already in the team.",
       });
 
     case "UnknownSubTeam":

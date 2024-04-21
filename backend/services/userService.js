@@ -226,6 +226,9 @@ const setSecurityDetails = async (userId, newSecurityDetails) => {
 };
 
 const setInvitation = async (userId, invitationId, status) => {
+  let newActivity;
+  let newNotification;
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -249,6 +252,7 @@ const setInvitation = async (userId, invitationId, status) => {
 
     const project = await projects
       .findById(invitation.project.toString())
+      .select("name guide members activities")
       .session(session);
 
     const projectLeader = await users
@@ -257,8 +261,6 @@ const setInvitation = async (userId, invitationId, status) => {
 
     const invitedUser = await users.findById(invitedUserId).session(session);
 
-    let newNotification;
-
     if (userId !== invitedUserId && userId !== invitation.to.toString()) {
       throw new Error("UnknownInvitation");
     }
@@ -266,21 +268,19 @@ const setInvitation = async (userId, invitationId, status) => {
     if (status === "accept") {
       invitation.status = "accepted";
 
-      if (invitation.role === "member") {
-        project.members.push(invitedUser._id);
-      } else {
-        project.guide = userId;
-      }
+      if (invitation.role === "guide") project.guide = invitedUser._id;
+
+      if (invitation.role === "member") project.members.push(invitedUser._id);
 
       invitedUser.projects.push(project._id);
 
-      const newActivity = await activities.create(
+      newActivity = await activities.create(
         [
           {
-            project: project._id,
-            type: "collaboratorJoined",
-            message: `${invitedUser.username} has joined this project ${project.name} as a ${invitation.role}`,
+            entity: "project",
+            type: "projectCollaboratorJoined",
             image: invitedUser.profilePic,
+            message: `${invitedUser.username} has joined this project as a ${invitation.role}`,
           },
         ],
         { session }
@@ -329,11 +329,12 @@ const setInvitation = async (userId, invitationId, status) => {
       project.save({ session }),
     ]);
 
-    await session.commitTransaction();
-    session.endSession();
-
+    newActivity && io.emit("projectActivities", newActivity[0]._id);
     io.emit("notifications", newNotification[0]._id);
     io.emit("invitations", (invitation.id + invitation.updatedAt).toString());
+
+    await session.commitTransaction();
+    session.endSession();
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

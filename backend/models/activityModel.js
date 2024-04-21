@@ -14,21 +14,24 @@ const activitySchema = new mongoose.Schema(
       type: String,
       enum: [
         "",
-        "teamAdded", // project activity
-        "teamUpdated", // project activity
-        "teamDeleted", // project activity
-        "collaboratorJoined", // project activity
-        "collaboratorLeft", // project activity
-        "collaboratorRemoved", // project activity
-        "subTeamAdded", // team activity
-        "subTeamUpdated", // team activity
-        "subTeamDeleted", // team activity
-        "teamLeaderChanged", // team activity
-        "teamCollaboratorAdded", // team activity
-        "teamCollaboratorRemoved", // team activity
-        "subTeamLeaderChanged", // sub team activity
-        "subTeamCollaboratorAdded", // sub team activity
-        "subTeamCollaboratorRemoved", // sub team activity
+        "teamLeaderChanged",
+        "teamAddedToProject",
+        "subTeamAddedToTeam",
+        "taskAddedToSubTeam",
+        "teamUpdatedInProject",
+        "subTeamUpdatedInTeam",
+        "subTeamLeaderChanged",
+        "taskUpdatedInSubTeam",
+        "teamCollaboratorAdded",
+        "teamDeletedFromProject",
+        "subTeamDeletedFromTeam",
+        "taskDeletedFromSubTeam",
+        "projectCollaboratorLeft",
+        "teamCollaboratorRemoved",
+        "subTeamCollaboratorAdded",
+        "projectCollaboratorJoined",
+        "projectCollaboratorRemoved",
+        "subTeamCollaboratorRemoved",
       ],
       default: "",
       required: true,

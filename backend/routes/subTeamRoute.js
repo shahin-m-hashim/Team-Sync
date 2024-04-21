@@ -2,15 +2,15 @@ const subTeamRouter = require("express").Router();
 
 const {
   isSubTeamLeader,
-  isSubTeamCollaborator,
+  isProjectCollaborator,
 } = require("../middlewares/RBAC");
 
 const {
-  fetchSubTeam,
   updateSubTeamIcon,
   deleteSubTeamIcon,
+  fetchSubTeamDetails,
+  fetchSubTeamMembers,
   updateSubTeamDetails,
-  fetchSubTeamSettings,
   fetchSubTeamActivities,
   addSubTeamCollaborator,
   kickSubTeamCollaborator,
@@ -19,24 +19,28 @@ const {
 // subTeamRouter.use("/subTeams/:subTeamId", passSubTeam, taskRoutes);
 
 // GET Requests
-subTeamRouter.get("/subTeams/:subTeamId", isSubTeamCollaborator, fetchSubTeam);
+subTeamRouter.get(
+  "/subTeams/:subTeamId/details",
+  isProjectCollaborator,
+  fetchSubTeamDetails
+);
 
 // subTeamRouter.get(
 //   "/subTeams/:subTeamId/tasks",
-//   isSubTeamCollaborator,
+//   isProjectCollaborator,
 //   fetchSubTeamTasks
 // );
 
 subTeamRouter.get(
   "/subTeams/:subTeamId/activities",
-  isSubTeamCollaborator,
+  isProjectCollaborator,
   fetchSubTeamActivities
 );
 
 subTeamRouter.get(
-  "/subTeams/:subTeamId/settings",
-  isSubTeamLeader,
-  fetchSubTeamSettings
+  "/subTeams/:subTeamId/members",
+  isProjectCollaborator,
+  fetchSubTeamMembers
 );
 
 // POST Requests

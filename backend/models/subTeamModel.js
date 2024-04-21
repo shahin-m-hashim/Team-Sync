@@ -52,6 +52,10 @@ const subTeamSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    NOC: {
+      type: Number,
+      default: 1,
+    },
     unavailableMembers: [{ type: String }],
     activities: [
       {
@@ -92,6 +96,7 @@ subTeamSchema.pre("save", async function (next) {
   this.NOT = this.tasks?.length;
   this.NOM = this.members?.length;
   this.NOA = this.activities?.length;
+  this.NOC = this.NOC + this.guide ? 1 : 0 + this.NOM;
   next();
 });
 
