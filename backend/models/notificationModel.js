@@ -23,6 +23,7 @@ const notificationSchema = new mongoose.Schema(
         "projectNameUpdated",
         "teamGuidePromotion",
         "teamLeaderPromotion",
+        "projectGuideDemotion",
         "subTeamGuideDemotion",
         "addedAsSubTeamMember",
         "subTeamGuidePromotion",

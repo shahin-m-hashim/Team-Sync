@@ -1,11 +1,11 @@
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
-const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
 const subteams = require("../models/subTeamModel");
 const projects = require("../models/projectModel");
+const { io, connectedUsers } = require("../server");
 const activities = require("../models/activityModel");
 const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
@@ -394,10 +394,6 @@ const removeProjectCollaborator = async (
 
     if (role === "guide" && project.guide?.username === collaboratorUsername) {
       project.guide = null;
-      collaborator.projects = collaborator.projects.filter(
-        (project) => project.id.toString() !== projectId
-      );
-
       notificationMsg = `You are no longer a guide of the project ${project.name}.`;
       activityMsg = `${collaboratorUsername}, who was a guide of this project was removed by the leader ${project.leader?.username}`;
     }
@@ -411,10 +407,6 @@ const removeProjectCollaborator = async (
       project.members = project.members.filter(
         (member) => member.username !== collaboratorUsername
       );
-      collaborator.projects = collaborator.projects.filter(
-        (project) => project.toString() !== projectId
-      );
-
       notificationMsg = `You are no longer a member of the project ${project.name}.`;
       activityMsg = `${collaboratorUsername}, who was a member of this project was removed by the leader ${project.leader?.username}`;
     }
@@ -458,6 +450,10 @@ const removeProjectCollaborator = async (
     );
     project.activities.push(newActivity[0].id);
 
+    collaborator.projects = collaborator.projects.filter(
+      (project) => project.toString() !== projectId
+    );
+
     await Promise.all([
       project.save({ session }),
       collaborator.save({ session }),
@@ -469,6 +465,9 @@ const removeProjectCollaborator = async (
     io.emit("projectActivities", newActivity[0]._id);
     io.emit("notifications", newNotification[0]._id);
     io.emit("projects", (project.id + project.updatedAt).toString());
+
+    const socketIdOfCollaborator = connectedUsers[collaborator.id];
+    io.to(socketIdOfCollaborator).emit("kickedFromProject", projectId);
   } catch (error) {
     if (session) {
       await session.abortTransaction();

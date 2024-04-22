@@ -6,7 +6,8 @@ const {
   fetchUserDetails,
   updateProfilePic,
   deleteProfilePic,
-  handleInvitation,
+  acceptInvitation,
+  rejectInvitation,
   fetchAllUserTeams,
   handleNotifications,
   fetchAllUserSubTeams,
@@ -35,7 +36,8 @@ userRouter.get("/notifications", fetchAllUserNotifications);
 
 // PATCH Requests
 userRouter.patch("/profilePic", updateProfilePic);
-userRouter.patch("/invitation", handleInvitation);
+userRouter.patch("/invitation/accept", acceptInvitation);
+userRouter.patch("/invitation/reject", rejectInvitation);
 userRouter.patch("/notifications", handleNotifications);
 userRouter.patch("/primaryDetails", updatePrimaryDetails);
 userRouter.patch("/contactDetails", updateContactDetails);

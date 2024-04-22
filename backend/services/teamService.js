@@ -133,14 +133,14 @@ const createTeamMember = async (teamId, newMemberUsername) => {
       .populate({ path: "leader", select: "username" })
       .populate({
         path: "parent members",
-        select: "name username unAvailableMembers",
+        select: "name username unavailableMembers",
       })
       .session(session);
 
     if (!team) throw new Error("UnknownTeam");
 
     const newMember = await users
-      .findOne({ username: newGuideUsername })
+      .findOne({ username: newMemberUsername })
       .select("notifications teams")
       .session(session);
 
@@ -149,13 +149,13 @@ const createTeamMember = async (teamId, newMemberUsername) => {
     if (team.members?.some((member) => member.equals(newMember.id)))
       throw new Error("UserAlreadyInTeamAsMember");
 
-    if (team.parent.unAvailableMembers.includes(newMemberUsername))
+    if (team.parent.unavailableMembers.includes(newMemberUsername))
       throw new Error("UserAlreadyInAnotherTeam");
 
     team.members.push(newMember.id);
     newMember.teams.push(team._id);
 
-    const notificationMessageForNewMember = `You have been add as a member in the team ${team.name} in project ${team.parent.name} by the team leader ${team.leader.username}.`;
+    const notificationMessageForNewMember = `You have been added as a member in the team ${team.name} in project ${team.parent.name} by the team leader ${team.leader.username}.`;
 
     const notificationForNewMember = await notifications.create(
       [
@@ -183,7 +183,7 @@ const createTeamMember = async (teamId, newMemberUsername) => {
       },
     ]);
 
-    team.parent.unAvailableMembers.push(newMemberUsername);
+    team.parent.unavailableMembers.push(newMemberUsername);
 
     await Promise.all([team.save({ session }), newMember.save({ session })]);
 
@@ -307,7 +307,7 @@ const setTeamLeader = async (teamId, currentLeaderId, newLeaderUsername) => {
       .select("name icon parent")
       .populate({
         path: "parent",
-        select: "name unAvailableMembers",
+        select: "name unavailableMembers",
       })
       .session(session);
 
@@ -327,7 +327,7 @@ const setTeamLeader = async (teamId, currentLeaderId, newLeaderUsername) => {
 
     if (!newLeader) throw new Error("UnknownUser");
 
-    if (team.parent.unAvailableMembers.includes(newLeaderUsername))
+    if (team.parent.unavailableMembers.includes(newLeaderUsername))
       throw new Error("UserAlreadyInAnotherTeam");
 
     currentLeader.teams = currentLeader.teams.filter(
@@ -399,7 +399,7 @@ const setTeamGuide = async (teamId, newGuideUsername) => {
       .populate({ path: "leader", select: "username" })
       .populate({
         path: "parent",
-        select: "name unAvailableMembers",
+        select: "name unavailableMembers",
       })
       .session(session);
 
