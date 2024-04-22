@@ -5,6 +5,7 @@ const {
   removeSubTeamIcon,
   getSubTeamMembers,
   getSubTeamActivities,
+  setSubTeamActivities,
   setSubTeamCollaborator,
   removeSubTeamCollaborator,
 } = require("../services/subTeamService");
@@ -95,6 +96,21 @@ const updateSubTeamDetails = async (req, res, next) => {
   }
 };
 
+const handleSubTeamActivities = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { subTeamId } = req.params;
+
+    await setSubTeamActivities(userId, subTeamId);
+    res.status(200).json({
+      success: true,
+      message: "Sub team activities updated successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const updateSubTeamIcon = async (req, res, next) => {
   try {
     const { subTeamId } = req.params;
@@ -152,5 +168,6 @@ module.exports = {
   updateSubTeamDetails,
   fetchSubTeamActivities,
   addSubTeamCollaborator,
+  handleSubTeamActivities,
   kickSubTeamCollaborator,
 };

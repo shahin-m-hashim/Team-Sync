@@ -10,28 +10,39 @@ const activitySchema = new mongoose.Schema(
       default: "project",
       required: true,
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
+    },
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "teams",
+    },
+    subTeam: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "subTeams",
+    },
     type: {
       type: String,
       enum: [
         "",
+        "teamMemberAdded",
+        "teamGuideChanged",
         "teamLeaderChanged",
         "teamAddedToProject",
+        "subTeamMemberAdded",
         "subTeamAddedToTeam",
-        "taskAddedToSubTeam",
+        "subTeamGuideChanged",
+        "subTeamLeaderChanged",
         "teamUpdatedInProject",
         "subTeamUpdatedInTeam",
-        "subTeamLeaderChanged",
-        "taskUpdatedInSubTeam",
-        "teamCollaboratorAdded",
         "teamDeletedFromProject",
         "subTeamDeletedFromTeam",
-        "taskDeletedFromSubTeam",
-        "projectCollaboratorLeft",
         "teamCollaboratorRemoved",
-        "subTeamCollaboratorAdded",
+        "projectCollaboratorLeft",
         "projectCollaboratorJoined",
-        "projectCollaboratorRemoved",
         "subTeamCollaboratorRemoved",
+        "projectCollaboratorRemoved",
       ],
       default: "",
       required: true,
@@ -50,10 +61,19 @@ const activitySchema = new mongoose.Schema(
       default: "",
       required: true,
     },
-    isRead: {
-      type: Boolean,
-      default: false,
-    },
+    read_users: [
+      {
+        readBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "users",
+        },
+        isRead: {
+          type: Boolean,
+          default: false,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

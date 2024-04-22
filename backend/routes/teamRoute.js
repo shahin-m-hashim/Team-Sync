@@ -6,14 +6,17 @@ const { isTeamLeader, isProjectCollaborator } = require("../middlewares/RBAC");
 
 const {
   addSubTeam,
+  addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
+  updateTeamGuide,
   fetchTeamDetails,
   fetchTeamMembers,
+  updateTeamLeader,
   fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamActivities,
-  addTeamCollaborator,
+  handleTeamActivities,
   kickTeamCollaborator,
 } = require("../controllers/teamController");
 
@@ -45,13 +48,21 @@ teamRouter.get(
 );
 
 // POST Requests
-teamRouter.post("/teams/:teamId/add", isTeamLeader, addTeamCollaborator);
-
 teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
+teamRouter.post("/teams/:teamId/member", isTeamLeader, addTeamMember);
 
 // PATCH Requests
 teamRouter.patch("/teams/:teamId/icon", isTeamLeader, updateTeamIcon);
 teamRouter.patch("/teams/:teamId/details", isTeamLeader, updateTeamDetails);
+
+teamRouter.patch("/teams/:teamId/guide", isTeamLeader, updateTeamGuide);
+teamRouter.patch("/teams/:teamId/leader", isTeamLeader, updateTeamLeader);
+
+teamRouter.patch(
+  "/teams/:teamId/activities",
+  isProjectCollaborator,
+  handleTeamActivities
+);
 
 // DELETE Requests
 teamRouter.delete("/teams/:teamId/icon", isTeamLeader, deleteTeamIcon);

@@ -16,10 +16,11 @@ const {
   deleteProjectIcon,
   fetchProjectMembers,
   fetchProjectDetails,
-  inviteProjectMember,
   updateProjectDetails,
   fetchProjectActivities,
+  handleProjectActivities,
   kickProjectCollaborator,
+  inviteProjectCollaborator,
 } = require("../controllers/projectController");
 
 projectRouter.use("/projects/:projectId", passProject, teamRoutes);
@@ -53,7 +54,7 @@ projectRouter.get(
 projectRouter.post(
   "/projects/:projectId/invite",
   isProjectLeader,
-  inviteProjectMember
+  inviteProjectCollaborator
 );
 
 projectRouter.post("/projects/:projectId/team", isProjectLeader, addTeam);
@@ -69,6 +70,12 @@ projectRouter.patch(
   "/projects/:projectId/icon",
   isProjectLeader,
   updateProjectIcon
+);
+
+projectRouter.patch(
+  "/projects/:projectId/activities",
+  isProjectCollaborator,
+  handleProjectActivities
 );
 
 // DELETE Requests

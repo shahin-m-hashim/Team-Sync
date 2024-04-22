@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema(
   {
-    to: {
+    from: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
-    from: {
+    to: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
@@ -14,20 +14,21 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       enum: [
         "",
-        "projectUpdated",
         "projectDeleted",
         "kickedFromTeam",
+        "teamGuideDemotion",
         "kickedFromProject",
         "kickedFromSubTeam",
-        "teamLeaderDemotion",
+        "addedAsTeamMember",
+        "projectNameUpdated",
+        "teamGuidePromotion",
         "teamLeaderPromotion",
-        "subTeamLeaderDemotion",
+        "subTeamGuideDemotion",
+        "addedAsSubTeamMember",
+        "subTeamGuidePromotion",
         "subTeamLeaderPromotion",
-        "projectCollaboratorLeft",
-        "addedAsTeamCollaborator",
         "projectInvitationAccepted",
         "projectInvitationRejected",
-        "addedAsSubTeamCollaborator",
       ],
       default: "",
       required: true,

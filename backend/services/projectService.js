@@ -16,7 +16,7 @@ const getProjectDetails = async (projectId) => {
 
   const project = await projects
     .findById(projectId)
-    .select("icon name description leader guide members NOC")
+    .select("icon name description leader guide members NOM")
     .populate({
       path: "leader guide members",
       select: "username profilePic id",
@@ -50,11 +50,11 @@ const getProjectDetails = async (projectId) => {
     });
 
   return {
+    collaborators,
     icon: project.icon,
     name: project.name,
     description: project.description,
-    NOC: project.NOC,
-    collaborators,
+    NOC: project.NOM + (project.guide ? 1 : 0) + 1,
   };
 };
 
@@ -72,22 +72,29 @@ const getProjectMembers = async (projectId) => {
   return projectMembers;
 };
 
-const getProjectActivities = async (projectId) => {
+const getProjectActivities = async (userId, projectId) => {
   const project = await projects
     .findById(projectId)
     .select("activities")
     .populate({
       path: "activities",
-      select: "-type -__v -updatedAt",
+      select: "image message read_users createdAt",
     });
 
   if (!project) throw new Error("UnknownProject");
 
   const formattedProjectActivities = project.activities.map((activity) => {
+    const currentUserReadStatus = activity.read_users.find(
+      (readUser) => readUser.readBy.toString() === userId
+    );
+
     return {
-      ...activity.toObject(),
+      id: activity._id,
+      image: activity.image,
+      message: activity.message,
       time: moment(activity.createdAt).format("hh:mm A"),
       date: moment(activity.createdAt).format("DD/MM/YYYY"),
+      isRead: currentUserReadStatus ? currentUserReadStatus.isRead : false,
     };
   });
 
@@ -127,6 +134,7 @@ const getProjectTeams = async (userId, projectId) => {
 // POST
 const sendProjectInvitation = async (userId, projectId, username, role) => {
   let session = null;
+  let newInvitation = null;
 
   try {
     session = await mongoose.startSession();
@@ -134,7 +142,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
 
     const project = await projects
       .findById(projectId)
-      .select("leader guide members invitations name")
+      .select("name leader guide members invitations")
       .populate({
         path: "leader guide members invitations",
         select: "username to project status",
@@ -147,14 +155,13 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
       .findOne({ username })
       .select("username invitations")
       .session(session);
-    if (!invitedUser) throw new Error("UnknownInvitedUser");
+    if (!invitedUser) throw new Error("UnknownUser");
 
     if (project.guide?.username === username)
-      throw new Error("UserAlreadyInProjectAsAGuide");
+      throw new Error("UserAlreadyInProjectAsGuide");
 
-    if (project.members?.some((member) => member?.username === username)) {
-      throw new Error("UserAlreadyInProjectAsAMember");
-    }
+    if (project.members?.some((member) => member?.username === username))
+      throw new Error("UserAlreadyInProjectAsMember");
 
     const existingInvitation = project.invitations.find(
       (invitation) =>
@@ -174,7 +181,7 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
     );
 
     const invitationMessage = `You have been invited to join the project ${project?.name} as a ${role} by its leader ${project.leader.username}.`;
-    const newInvitation = await invitations.create(
+    newInvitation = await invitations.create(
       [
         {
           role,
@@ -195,10 +202,10 @@ const sendProjectInvitation = async (userId, projectId, username, role) => {
     invitedUser.invitations.push(newInvitation[0]._id);
     await invitedUser.save({ session });
 
-    io.emit("invitations", newInvitation[0]._id);
-
     await session.commitTransaction();
     session.endSession();
+
+    io.emit("invitations", newInvitation[0]._id);
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -243,9 +250,11 @@ const createTeam = async (userId, projectId, teamDetails) => {
       [
         {
           entity: "project",
+          project: projectId,
           image: newTeam[0].icon,
           type: "teamAddedToProject",
           message: `A new team ${newTeam[0].name} is added to this project by leader ${project.leader.username}.`,
+          read_users: [{ readBy: userId, isRead: true }],
         },
       ],
       { session }
@@ -259,6 +268,7 @@ const createTeam = async (userId, projectId, teamDetails) => {
     session.endSession();
 
     io.emit("teams", newTeam[0]._id);
+    io.emit("projectActivities", newActivity[0]._id);
     return newTeam[0]._id;
   } catch (error) {
     if (session) {
@@ -271,14 +281,68 @@ const createTeam = async (userId, projectId, teamDetails) => {
 
 // PATCH
 const setProjectDetails = async (projectId, updatedProjectDetails) => {
-  const project = await projects.findById(projectId);
+  const newNotifications = [];
+
+  const project = await projects
+    .findById(projectId)
+    .select("name description guide members leader")
+    .populate({
+      path: "guide members leader",
+    });
+
   if (!project) throw new Error("UnknownProject");
+
   const { name, description } = updatedProjectDetails;
+  const previousProjectName = project.name;
+
   project.name = name;
   project.description = description;
+
+  const collaborators = [];
+  if (project.guide) collaborators.push(project.guide);
+  if (project.members) collaborators.push(...project.members);
+
+  for (const collaborator of collaborators) {
+    if (collaborator.username !== project.leader.username) {
+      const newNotification = await notifications.create({
+        from: project.leader,
+        to: collaborator.id,
+        type: "projectNameUpdated",
+        message: `The project ${previousProjectName} is updated to ${project.name} by its leader ${project.leader.username}.`,
+      });
+      newNotifications.push(newNotification);
+      collaborator.notifications.push(newNotification._id);
+      await collaborator.save();
+    }
+  }
+
   await project.save();
 
+  io.emit("notifications", newNotifications[0]._id);
   io.emit("projects", (project.id + project.updatedAt).toString());
+};
+
+const setProjectActivities = async (userId, projectId) => {
+  const project = await projects.findById(projectId).select("leader");
+  if (!project) throw new Error("UnknownProject");
+
+  if (userId === project.leader.toString()) return;
+
+  await activities.updateMany(
+    {
+      entity: "project",
+      project: projectId,
+      "read_users.readBy": { $ne: userId },
+    },
+    {
+      $addToSet: {
+        read_users: {
+          readBy: userId,
+          isRead: true,
+        },
+      },
+    }
+  );
 };
 
 const setProjectIcon = async (projectId, updatedProjectIcon) => {
@@ -288,7 +352,6 @@ const setProjectIcon = async (projectId, updatedProjectIcon) => {
   await project.save();
 
   io.emit("projects", (project.id + project.updatedAt).toString());
-
   return project.icon;
 };
 
@@ -302,14 +365,21 @@ const removeProjectIcon = async (projectId) => {
   io.emit("projects", (project.id + project.updatedAt).toString());
 };
 
-const removeCollaborator = async (projectId, collaboratorUsername, role) => {
+const removeProjectCollaborator = async (
+  projectId,
+  collaboratorUsername,
+  role
+) => {
   let session = null;
+  let notificationMsg, activityMsg;
+
   try {
     session = await mongoose.startSession();
     session.startTransaction();
 
     const collaborator = await users
       .findOne({ username: collaboratorUsername })
+      .select("projects notifications profilePic")
       .session(session);
     if (!collaborator) throw new Error("UnknownUser");
 
@@ -317,68 +387,76 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
       .findById(projectId)
       .populate({
         path: "leader guide members invitations",
-        select: "username project",
+        select: "username to project",
       })
       .session(session);
     if (!project) throw new Error("UnknownProject");
 
-    let notificationMessage = "";
     if (role === "guide" && project.guide?.username === collaboratorUsername) {
       project.guide = null;
-      collaborator.projects = collaborator.projects.pull(projectId);
-      project.invitations = project.invitations.filter(
-        (invitation) =>
-          invitation.project.toString() !== projectId ||
-          invitation.to.toString() !== collaborator._id.toString()
+      collaborator.projects = collaborator.projects.filter(
+        (project) => project.id.toString() !== projectId
       );
 
-      notificationMessage = `You are no longer a guide of the project ${project.name}.`;
-    } else if (
+      notificationMsg = `You are no longer a guide of the project ${project.name}.`;
+      activityMsg = `${collaboratorUsername}, who was a guide of this project was removed by the leader ${project.leader?.username}`;
+    }
+
+    if (
       role === "member" &&
       project.members?.some(
         (member) => member.username === collaboratorUsername
       )
     ) {
-      project.members.pull(collaborator._id);
-      collaborator.projects = collaborator.projects.pull(projectId);
-      project.invitations = project.invitations.filter(
-        (invitation) =>
-          invitation.project.toString() !== projectId ||
-          invitation.to.toString() !== collaborator._id.toString()
+      project.members = project.members.filter(
+        (member) => member.username !== collaboratorUsername
+      );
+      collaborator.projects = collaborator.projects.filter(
+        (project) => project.toString() !== projectId
       );
 
-      notificationMessage = `You are no longer a member of the project ${project.name}.`;
-
-      const newActivity = await activities.create(
-        [
-          {
-            entity: "project",
-            image: collaborator.profilePic,
-            type: "projectCollaboratorRemoved",
-            message: `${collaboratorUsername} who was a ${role} of this project was removed by its leader ${project.leader?.username}`,
-          },
-        ],
-        { session }
-      );
-      project.activities.push(newActivity[0]._id);
-    } else {
-      throw new Error("UnknownCollaborator");
+      notificationMsg = `You are no longer a member of the project ${project.name}.`;
+      activityMsg = `${collaboratorUsername}, who was a member of this project was removed by the leader ${project.leader?.username}`;
     }
+
+    project.invitations = project.invitations.filter(
+      (invitation) => invitation.to.toString() !== collaborator.id.toString()
+    );
 
     const newNotification = await notifications.create(
       [
         {
-          from: project.leader,
           to: collaborator.id,
+          from: project.leader.id,
+          message: notificationMsg,
           type: "kickedFromProject",
-          message: notificationMessage,
-          isRead: false,
         },
       ],
       { session }
     );
 
-    collaborator.notifications.push(newNotification[0]._id);
+    collaborator.notifications.push(newNotification[0].id);
+
+    const newActivity = await activities.create(
+      [
+        {
+          entity: "project",
+          project: projectId,
+          image: collaborator.profilePic,
+          type: "projectCollaboratorRemoved",
+          message: activityMsg,
+          read_users: [
+            { readBy: project.leader.id, isRead: true },
+            {
+              readBy: collaborator.id,
+              isRead: true,
+            },
+          ],
+        },
+      ],
+      { session }
+    );
+    project.activities.push(newActivity[0].id);
 
     await Promise.all([
       project.save({ session }),
@@ -388,8 +466,9 @@ const removeCollaborator = async (projectId, collaboratorUsername, role) => {
     await session.commitTransaction();
     session.endSession();
 
-    io.emit("projects", (project.id + project.updatedAt).toString());
+    io.emit("projectActivities", newActivity[0]._id);
     io.emit("notifications", newNotification[0]._id);
+    io.emit("projects", (project.id + project.updatedAt).toString());
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -484,7 +563,8 @@ module.exports = {
   removeProjectIcon,
   setProjectDetails,
   getProjectMembers,
-  removeCollaborator,
+  setProjectActivities,
   getProjectActivities,
   sendProjectInvitation,
+  removeProjectCollaborator,
 };
