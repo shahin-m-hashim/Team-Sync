@@ -1,10 +1,10 @@
 const moment = require("moment");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const projects = require("../models/projectModel");
+const { io, connectedUsers } = require("../server");
 const activities = require("../models/activityModel");
 const invitations = require("../models/invitationModel");
 const notifications = require("../models/notificationModel");
@@ -227,8 +227,141 @@ const setSecurityDetails = async (userId, newSecurityDetails) => {
   await user.save();
 };
 
-const setInvitation = async (userId, invitationId, status) => {
-  let newActivity;
+const setInvitationAccepted = async (userId, invitationId) => {
+  let projectActivity,
+    previousGuideSocketId,
+    notificationForProjectLeader,
+    notificationForPreviousGuide;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const invitation = await invitations.findById(invitationId);
+    if (!invitation) throw new Error("UnknownInvitation");
+
+    if (invitation.status === "accepted" || invitation.status === "rejected")
+      throw new Error("InvitationAlreadyResponded");
+
+    if (invitation.status === "expired")
+      throw new Error("InvitationHasExpired");
+
+    const { invitedUserId } = jwt.verify(
+      invitation.authenticity,
+      process.env.JWT_INVITATION_KEY
+    );
+
+    const project = await projects
+      .findById(invitation.project)
+      .select("name activities guide members invitations");
+
+    const projectLeader = await users
+      .findById(invitation.from)
+      .select("notifications");
+
+    const invitedUser = await users
+      .findById(invitedUserId)
+      .select("username projects profilePic");
+
+    invitation.isRead = true;
+    invitation.status = "accepted";
+
+    if (invitation.role === "guide") {
+      if (project.guide) {
+        const previousGuide = await users
+          .findById(project.guide)
+          .select("notifications projects");
+
+        previousGuideSocketId = connectedUsers[previousGuide.id];
+
+        notificationForPreviousGuide = await notifications.create(
+          [
+            {
+              to: previousGuide.id,
+              from: invitedUser.id,
+              type: "projectGuideDemotion",
+              message: `${invitedUser.username} has replaced you as the guide for the project ${project.name}`,
+            },
+          ],
+          { session }
+        );
+
+        previousGuide.notifications.push(notificationForPreviousGuide[0]._id);
+        previousGuide.projects = previousGuide.projects.filter(
+          (projectId) => projectId.toString() !== project._id.toString()
+        );
+        await previousGuide.save({ session });
+      }
+      project.guide = invitedUser._id;
+    }
+
+    if (invitation.role === "member") project.members.push(invitedUser._id);
+
+    invitedUser.projects.push(project._id);
+
+    projectActivity = await activities.create(
+      [
+        {
+          entity: "project",
+          project: project._id,
+          image: invitedUser.profilePic,
+          type: "projectCollaboratorJoined",
+          message: `${invitedUser.username} has joined this project as a ${invitation.role}`,
+          read_users: [
+            {
+              readBy: projectLeader.id,
+              isRead: true,
+            },
+            { readBy: userId, isRead: true },
+          ],
+        },
+      ],
+      { session }
+    );
+
+    project.activities.push(projectActivity._id);
+
+    project.invitations = project.invitations.filter(
+      (invitationId) => invitationId.toString() !== invitation._id.toString()
+    );
+
+    notificationForProjectLeader = await notifications.create(
+      [
+        {
+          to: projectLeader.id,
+          from: invitedUser.id,
+          type: "projectInvitationAccepted",
+          message: `${invitedUser.username} has accepted your invite to join the project ${project.name} as a ${invitation.role}`,
+        },
+      ],
+      { session }
+    );
+
+    projectLeader.notifications.push(notificationForProjectLeader[0]._id);
+
+    await Promise.all([
+      invitation.save({ session }),
+      invitedUser.save({ session }),
+      projectLeader.save({ session }),
+      project.save({ session }),
+    ]);
+
+    io.emit("projectActivities", projectActivity[0]._id);
+    io.emit("notifications", notificationForProjectLeader[0]._id);
+
+    previousGuideSocketId &&
+      io.to(previousGuideSocketId).emit("kickedFromProject", project._id);
+
+    await session.commitTransaction();
+    session.endSession();
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+const setInvitationRejected = async (userId, invitationId) => {
   let newNotification;
 
   const session = await mongoose.startSession();
@@ -253,89 +386,43 @@ const setInvitation = async (userId, invitationId, status) => {
     if (invitation.status === "expired")
       throw new Error("InvitationHasExpired");
 
-    const project = await projects
-      .findById(invitation.project.toString())
-      .select("name guide members activities")
-      .session(session);
+    invitation.status = "rejected";
 
     const projectLeader = await users
       .findById(invitation.from.toString())
+      .select("notifications")
       .session(session);
 
-    const invitedUser = await users.findById(invitedUserId).session(session);
+    const invitedUser = await users
+      .findById(invitedUserId)
+      .select("username profilePic")
+      .session(session);
 
-    if (status === "accept") {
-      invitation.status = "accepted";
+    const project = await projects
+      .findById(invitation.project.toString())
+      .select("name")
+      .session(session);
 
-      if (invitation.role === "guide") project.guide = invitedUser._id;
+    newNotification = await notifications.create(
+      [
+        {
+          from: invitedUser.id,
+          to: projectLeader.id,
+          type: "projectInvitationRejected",
+          message: `${invitedUser.username} has rejected your invite to join the project ${project.name} as a ${invitation.role}.`,
+        },
+      ],
+      { session }
+    );
 
-      if (invitation.role === "member") project.members.push(invitedUser._id);
-
-      invitedUser.projects.push(project._id);
-
-      newActivity = await activities.create(
-        [
-          {
-            entity: "project",
-            project: project._id,
-            image: invitedUser.profilePic,
-            type: "projectCollaboratorJoined",
-            message: `${invitedUser.username} has joined this project as a ${invitation.role}`,
-            read_users: [
-              {
-                readBy: projectLeader.id,
-                isRead: true,
-              },
-              { readBy: userId, isRead: true },
-            ],
-          },
-        ],
-        { session }
-      );
-
-      project.activities.push(newActivity[0]._id);
-
-      newNotification = await notifications.create(
-        [
-          {
-            to: projectLeader.id,
-            from: invitedUser.id,
-            type: "projectInvitationAccepted",
-            message: `${invitedUser.username} has accepted your invite to join the project ${project.name} as a ${invitation.role}`,
-          },
-        ],
-        { session }
-      );
-
-      invitation.isRead = true;
-      projectLeader.notifications.push(newNotification[0]._id);
-    }
-
-    if (status === "reject") {
-      invitation.status = "rejected";
-      newNotification = await notifications.create(
-        [
-          {
-            from: invitedUser.id,
-            to: projectLeader.id,
-            type: "projectInvitationRejected",
-            message: `${invitedUser.username} has rejected your invite to join the project ${project.name} as a ${invitation.role}`,
-          },
-        ],
-        { session }
-      );
-      invitation.isRead = true;
-      projectLeader.notifications.push(newNotification[0]._id);
-    }
+    invitation.isRead = true;
+    projectLeader.notifications.push(newNotification[0]._id);
 
     await Promise.all([
       invitation.save({ session }),
-      invitedUser.save({ session }),
       projectLeader.save({ session }),
-      project.save({ session }),
     ]);
 
-    io.emit("projectActivities", newActivity[0]?._id);
     io.emit("notifications", newNotification[0]?._id);
 
     await session.commitTransaction();
@@ -373,7 +460,6 @@ const removeAccount = async (userId, password) => {
 module.exports = {
   createProject,
   removeAccount,
-  setInvitation,
   setProfilePic,
   getUserDetails,
   getAllUserTeams,
@@ -386,5 +472,7 @@ module.exports = {
   setSecurityDetails,
   setSecondaryDetails,
   getAllUserInvitations,
+  setInvitationAccepted,
+  setInvitationRejected,
   getAllUserNotifications,
 };
