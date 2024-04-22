@@ -22,6 +22,7 @@ import UserDashboard from "./components/dashBoards/UserDashboard";
 import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { getLocalSecureItem } from "./lib/utils";
 
 const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
 export const socket = io(baseURL, { withCredentials: true });
@@ -140,10 +141,16 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const { id = null, status = null } = getLocalSecureItem("user", "low") ?? {};
+
   useEffect(() => {
     socket.on("connect", () => console.log(`Connected: ${socket.id}`));
     socket.on("disconnect", () => console.log(`Disconnected`));
   }, []);
+
+  useEffect(() => {
+    if (status === "LOGGED_IN") socket.emit("loggedIn", id);
+  }, [id, status]);
 
   return (
     <FileProvider>

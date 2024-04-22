@@ -17,16 +17,19 @@ import ListSubHeader from "@/components/list/ListSubHeader";
 import TeamDetailsCard from "../details cards/TeamDetailsCard";
 import { useContext, useEffect, useReducer, useState } from "react";
 import AddTeamCollaboratorForm from "../forms/teams/AddTeamCollaboratorForm";
+import KickedPopUp from "../popups/KickedPopUp";
 
 export default function TeamDashboard() {
-  const { setError } = useContext(UserContext);
   const { projectId, teamId } = useParams();
+  const { setError } = useContext(UserContext);
 
+  const [kickedFrom, setKickedFrom] = useState("team");
   const [reFetchSubTeams, setReFetchSubTeams] = useState(false);
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
   const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
+  const [showKickedFromTeamPopUp, setShowKickedFromTeamPopUp] = useState(false);
 
   const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
     useState(false);
@@ -90,6 +93,20 @@ export default function TeamDashboard() {
     return () => socket.off("subTeams");
   }, []);
 
+  useEffect(() => {
+    socket.on("kickedFromProject", () => {
+      setKickedFrom("project");
+      setShowKickedFromTeamPopUp(true);
+    });
+  });
+
+  useEffect(() => {
+    socket.on("kickedFromTeam", () => {
+      setKickedFrom("team");
+      setShowKickedFromTeamPopUp(true);
+    });
+  });
+
   if (subTeams?.error === "unauthorized") {
     setError("unauthorized");
     return null;
@@ -102,6 +119,12 @@ export default function TeamDashboard() {
 
   return (
     <>
+      {showKickedFromTeamPopUp && (
+        <KickedPopUp
+          entity={kickedFrom}
+          setShowKickedFromEntityPopUp={setShowKickedFromTeamPopUp}
+        />
+      )}
       {showAddSubTeamForm && (
         <AddListEntityForm
           renderList="Sub Team"

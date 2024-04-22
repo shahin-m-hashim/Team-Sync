@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { addData } from "@/services/db";
+import { addData, updateData } from "@/services/db";
 import AssignRoleForm from "../AssignRoleForm";
 import { useNavigate, useParams } from "react-router-dom";
 import SelectTeamCollaborator from "./SelectTeamCollaborator";
@@ -22,10 +22,20 @@ function AddTeamCollaboratorForm({ setShowAddTeamCollaboratorForm }) {
   const addTeamCollaborator = async (e) => {
     e.preventDefault();
     try {
-      await addData(`projects/${projectId}/teams/${teamId}/add`, {
-        username: selectedUser.username,
-        role: selectedRole,
-      });
+      if (selectedRole === "leader") {
+        await updateData(`projects/${projectId}/teams/${teamId}/leader`, {
+          username: selectedUser.username,
+        });
+      } else if (selectedRole === "guide") {
+        await updateData(`projects/${projectId}/teams/${teamId}/guide`, {
+          username: selectedUser.username,
+        });
+      } else {
+        await addData(`projects/${projectId}/teams/${teamId}/member`, {
+          username: selectedUser.username,
+        });
+      }
+
       toast.success(
         `${selectedUser.username} added as ${selectedRole} successfully.`
       );
