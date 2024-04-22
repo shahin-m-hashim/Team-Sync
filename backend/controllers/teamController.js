@@ -1,13 +1,16 @@
 const {
   setTeamIcon,
+  setTeamGuide,
+  setTeamLeader,
   createSubTeam,
   getTeamDetails,
   removeTeamIcon,
   setTeamDetails,
   getTeamMembers,
   getTeamSubTeams,
+  createTeamMember,
   getTeamActivities,
-  setTeamCollaborator,
+  setTeamActivities,
   removeTeamCollaborator,
 } = require("../services/teamService");
 
@@ -55,15 +58,14 @@ const fetchTeamSubTeams = async (req, res, next) => {
 };
 
 // POST REQUESTS
-const addTeamCollaborator = async (req, res, next) => {
+const addTeamMember = async (req, res, next) => {
   try {
-    const { userId } = req.user;
     const { teamId } = req.params;
-    const { username, role } = req.body;
-    await setTeamCollaborator(userId, teamId, username, role);
+    const { username } = req.body;
+    await createTeamMember(teamId, username);
     res.status(200).json({
       success: true,
-      message: `User ${username} added successfully to team ${teamId} as a ${role}`,
+      message: `User ${username} added successfully to team ${teamId} as a member`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -123,6 +125,64 @@ const updateTeamDetails = async (req, res, next) => {
   }
 };
 
+const updateTeamLeader = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { teamId } = req.params;
+    const { username } = req.body;
+    await setTeamLeader(teamId, userId, username);
+    res.status(200).json({
+      success: true,
+      message: "Team leader updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("TeamAlreadyExists"));
+    }
+    next(e);
+  }
+};
+
+const updateTeamGuide = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const { username } = req.body;
+    await setTeamGuide(teamId, username);
+    res.status(200).json({
+      success: true,
+      message: "Team guide updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("TeamAlreadyExists"));
+    }
+    next(e);
+  }
+};
+
+const handleTeamActivities = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { teamId } = req.params;
+
+    await setTeamActivities(userId, teamId);
+    res.status(200).json({
+      success: true,
+      message: "Team activities updated successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const updateTeamIcon = async (req, res, next) => {
   try {
     const { teamId } = req.params;
@@ -171,13 +231,16 @@ const kickTeamCollaborator = async (req, res, next) => {
 
 module.exports = {
   addSubTeam,
+  addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
+  updateTeamGuide,
   fetchTeamDetails,
   fetchTeamMembers,
+  updateTeamLeader,
   fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamActivities,
-  addTeamCollaborator,
+  handleTeamActivities,
   kickTeamCollaborator,
 };
