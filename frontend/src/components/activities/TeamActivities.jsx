@@ -22,20 +22,19 @@ export default function TeamActivities({
     reFetchTeamActivities
   );
 
-  useEffect(() => {}, [teamActivities]);
-
   const handleTeamActivities = async () => {
     try {
-      await updateData("notifications");
+      await updateData(`projects/${projectId}/teams/${teamId}/activities`);
       setReFetchTeamActivities((prev) => !prev);
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(e.response.data.error || "Something went wrong");
     }
   };
+  useEffect(() => {}, [teamActivities]);
 
   useEffect(() => {
-    socket.on("teamActivities", (notification) =>
-      setReFetchTeamActivities(notification)
+    socket.on("teamActivities", (teamActivities) =>
+      setReFetchTeamActivities(teamActivities)
     );
 
     return () => socket.off("teamActivities");
@@ -56,11 +55,16 @@ export default function TeamActivities({
       className="relative cursor-pointer"
       onClick={() => setShowTeamActivitiesPopUp(true)}
     >
-      Activities
+      <span>Activities</span>
+      {teamActivities?.data?.filter((n) => !n.isRead).length > 0 && (
+        <div className="absolute bottom-3 right-[-10px] rounded-full px-2 py-1 text-xs font-semibold bg-blue-500 text-white flex items-center justify-center">
+          {teamActivities.data.filter((n) => !n.isRead).length}
+        </div>
+      )}
     </div>
   ) : (
     <ActivitiesPopUp
-      entity="Team"
+      entity="team"
       activities={teamActivities?.data}
       handleActivities={handleTeamActivities}
       setShowActivitiesPopUp={setShowTeamActivitiesPopUp}

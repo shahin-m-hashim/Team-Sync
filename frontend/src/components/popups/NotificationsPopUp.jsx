@@ -39,6 +39,7 @@ export default function NotificationsPopUp({
   handleNotifications,
   setShowNotificationsPopUp,
 }) {
+  notifications = notifications?.sort((a, b) => a.isRead - b.isRead);
   return (
     <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen bg-gray-800 bg-opacity-50">
       <div className="max-w-2xl min-w-72 p-5 bg-white rounded-lg h-[80%]">
@@ -47,16 +48,17 @@ export default function NotificationsPopUp({
           <div className="bg-[#0e2152] pl-2 pr-2 ml-2 rounded-md">
             <p className="p-1 text-xs text-white">{notifications?.length}</p>
           </div>
-          {notifications?.length > 0 && (
-            <button
-              onClick={() => handleNotifications()}
-              className="absolute right-14"
-            >
-              <p className="text-[12px] text-gray-500 links">
-                Mark all as read
-              </p>
-            </button>
-          )}
+          {notifications?.length > 0 &&
+            notifications?.some((notification) => !notification.isRead) && (
+              <button
+                onClick={() => handleNotifications()}
+                className="absolute right-14"
+              >
+                <p className="text-xs font-medium text-gray-500 links">
+                  Mark all as read
+                </p>
+              </button>
+            )}
           <button
             className="absolute right-0 bottom-2"
             onClick={() => setShowNotificationsPopUp(false)}

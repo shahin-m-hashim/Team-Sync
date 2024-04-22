@@ -123,7 +123,6 @@ export default function InvitationsCard() {
         id: invitation,
         status: status,
       });
-      toast.success("Invitation handled successfully");
       setReFetchInvitations((prev) => !prev);
       setReFetchProjects((prev) => !prev);
     } catch (e) {
