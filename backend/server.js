@@ -19,15 +19,23 @@ const io = new Server(httpServer, {
   },
 });
 
+const connectedUsers = {};
+
 io.on("connection", (socket) => {
   console.log(`A new client ${socket.id} is now connected to this server`);
 
-  socket.on("disconnect", () =>
-    console.log(`The client ${socket.id} has disconnected from the server`)
-  );
+  socket.on("loggedIn", (userId) => (connectedUsers[userId] = socket.id));
+
+  socket.on("disconnect", () => {
+    const userId = Object.keys(connectedUsers).find(
+      (key) => connectedUsers[key] === socket.id
+    );
+    if (userId) delete connectedUsers[userId];
+    console.log(`The client ${socket.id} has disconnected from the server`);
+  });
 });
 
-module.exports = { io };
+module.exports = { io, connectedUsers };
 
 // Custom routes
 const authRoutes = require("./routes/authRoute");

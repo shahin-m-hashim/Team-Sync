@@ -13,6 +13,7 @@ const {
   updateSubTeamDetails,
   fetchSubTeamActivities,
   addSubTeamCollaborator,
+  handleSubTeamActivities,
   kickSubTeamCollaborator,
 } = require("../controllers/subTeamController");
 
@@ -62,6 +63,12 @@ subTeamRouter.patch(
   "/subTeams/:subTeamId/details",
   isSubTeamLeader,
   updateSubTeamDetails
+);
+
+subTeamRouter.patch(
+  "/subTeams/:subTeamId/activities",
+  isProjectCollaborator,
+  handleSubTeamActivities
 );
 
 // DELETE Requests

@@ -7,9 +7,10 @@ const {
   removeProjectIcon,
   setProjectDetails,
   getProjectMembers,
-  removeCollaborator,
+  setProjectActivities,
   getProjectActivities,
   sendProjectInvitation,
+  removeProjectCollaborator,
 } = require("../services/projectService");
 
 // GET Requests
@@ -35,8 +36,9 @@ const fetchProjectMembers = async (req, res, next) => {
 
 const fetchProjectActivities = async (req, res, next) => {
   try {
+    const { userId } = req.user;
     const { projectId } = req.params;
-    const activities = await getProjectActivities(projectId);
+    const activities = await getProjectActivities(userId, projectId);
     res.status(200).json(activities);
   } catch (e) {
     next(e);
@@ -55,7 +57,7 @@ const fetchProjectTeams = async (req, res, next) => {
 };
 
 // POST Requests
-const inviteProjectMember = async (req, res, next) => {
+const inviteProjectCollaborator = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { projectId } = req.params;
@@ -124,6 +126,21 @@ const updateProjectDetails = async (req, res, next) => {
   }
 };
 
+const handleProjectActivities = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { projectId } = req.params;
+
+    await setProjectActivities(userId, projectId);
+    res.status(200).json({
+      success: true,
+      message: "Project activities updated successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const updateProjectIcon = async (req, res, next) => {
   try {
     const { projectId } = req.params;
@@ -161,7 +178,7 @@ const deleteProjectIcon = async (req, res, next) => {
 const kickProjectCollaborator = async (req, res, next) => {
   try {
     const { projectId, collaboratorUsername, role } = req.params;
-    await removeCollaborator(projectId, collaboratorUsername, role);
+    await removeProjectCollaborator(projectId, collaboratorUsername, role);
     res.status(200).json({
       success: true,
       message: "Collaborator kicked successfully",
@@ -193,8 +210,9 @@ module.exports = {
   deleteProjectIcon,
   fetchProjectMembers,
   fetchProjectDetails,
-  inviteProjectMember,
   updateProjectDetails,
   fetchProjectActivities,
+  handleProjectActivities,
   kickProjectCollaborator,
+  inviteProjectCollaborator,
 };

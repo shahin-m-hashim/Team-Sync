@@ -67,6 +67,7 @@ const getAllUserTeams = async (userId) => {
     return {
       role,
       createdAt,
+      id: team._id,
       name: team.name,
       icon: team.icon,
       status: team.status,
@@ -95,6 +96,7 @@ const getAllUserSubTeams = async (userId) => {
     return {
       role,
       createdAt,
+      id: subTeam._id,
       name: subTeam.name,
       icon: subTeam.icon,
       status: subTeam.status,
@@ -113,7 +115,7 @@ const getAllUserInvitations = async (userId) => {
       path: "invitations",
       populate: {
         path: "from project",
-        select: "username profilePic name -_id",
+        select: "username profilePic name",
       },
       select: "role status isRead message createdAt",
     });
@@ -236,7 +238,13 @@ const setInvitation = async (userId, invitationId, status) => {
     const invitation = await invitations
       .findById(invitationId)
       .session(session);
-    if (!invitation || invitation.to.toString() !== userId)
+
+    const { invitedUserId } = jwt.verify(
+      invitation.authenticity,
+      process.env.JWT_INVITATION_KEY
+    );
+
+    if (userId !== invitedUserId && userId !== invitation.to.toString())
       throw new Error("UnknownInvitation");
 
     if (invitation.status === "accepted" || invitation.status === "rejected")
@@ -244,11 +252,6 @@ const setInvitation = async (userId, invitationId, status) => {
 
     if (invitation.status === "expired")
       throw new Error("InvitationHasExpired");
-
-    const { invitedUserId } = jwt.verify(
-      invitation.authenticity,
-      process.env.JWT_INVITATION_KEY
-    );
 
     const project = await projects
       .findById(invitation.project.toString())
@@ -260,10 +263,6 @@ const setInvitation = async (userId, invitationId, status) => {
       .session(session);
 
     const invitedUser = await users.findById(invitedUserId).session(session);
-
-    if (userId !== invitedUserId && userId !== invitation.to.toString()) {
-      throw new Error("UnknownInvitation");
-    }
 
     if (status === "accept") {
       invitation.status = "accepted";
@@ -278,9 +277,17 @@ const setInvitation = async (userId, invitationId, status) => {
         [
           {
             entity: "project",
-            type: "projectCollaboratorJoined",
+            project: project._id,
             image: invitedUser.profilePic,
+            type: "projectCollaboratorJoined",
             message: `${invitedUser.username} has joined this project as a ${invitation.role}`,
+            read_users: [
+              {
+                readBy: projectLeader.id,
+                isRead: true,
+              },
+              { readBy: userId, isRead: true },
+            ],
           },
         ],
         { session }
@@ -313,7 +320,6 @@ const setInvitation = async (userId, invitationId, status) => {
             to: projectLeader.id,
             type: "projectInvitationRejected",
             message: `${invitedUser.username} has rejected your invite to join the project ${project.name} as a ${invitation.role}`,
-            image: invitedUser.profilePic,
           },
         ],
         { session }
@@ -329,9 +335,8 @@ const setInvitation = async (userId, invitationId, status) => {
       project.save({ session }),
     ]);
 
-    newActivity && io.emit("projectActivities", newActivity[0]._id);
-    io.emit("notifications", newNotification[0]._id);
-    io.emit("invitations", (invitation.id + invitation.updatedAt).toString());
+    io.emit("projectActivities", newActivity[0]?._id);
+    io.emit("notifications", newNotification[0]?._id);
 
     await session.commitTransaction();
     session.endSession();
