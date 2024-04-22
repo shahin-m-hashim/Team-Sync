@@ -13,31 +13,29 @@ export default function SubTeamActivities({
   showSubTeamActivitiesPopUp,
   setShowSubTeamActivitiesPopUp,
 }) {
-  const { setError } = useContext(UserContext);
   const { projectId, teamId, subTeamId } = useParams();
-
+  const { setError } = useContext(UserContext);
   const [reFetchSubTeamActivities, setReFetchSubTeamActivities] =
     useState(false);
 
   const subTeamActivities = useFetch(
-    `projects/${projectId}/teams/${teamId}/subTeam/${subTeamId}/activities`,
+    `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/activities`,
     reFetchSubTeamActivities
   );
 
-  useEffect(() => {}, [subTeamActivities]);
-
   const handleSubTeamActivities = async () => {
     try {
-      await updateData("notifications");
+      await updateData(`projects/${projectId}/teams/${teamId}/activities`);
       setReFetchSubTeamActivities((prev) => !prev);
     } catch (e) {
-      toast.error("Something went wrong");
+      toast.error(e.response.data.error || "Something went wrong");
     }
   };
+  useEffect(() => {}, [subTeamActivities]);
 
   useEffect(() => {
-    socket.on("subTeamActivities", (notification) =>
-      setReFetchSubTeamActivities(notification)
+    socket.on("subTeamActivities", (subTeamActivity) =>
+      setReFetchSubTeamActivities(subTeamActivity)
     );
 
     return () => socket.off("subTeamActivities");
@@ -58,11 +56,16 @@ export default function SubTeamActivities({
       className="relative cursor-pointer"
       onClick={() => setShowSubTeamActivitiesPopUp(true)}
     >
-      Activities
+      <span>Activities</span>
+      {subTeamActivities?.data?.filter((n) => !n.isRead).length > 0 && (
+        <div className="absolute bottom-3 right-[-10px] rounded-full px-2 py-1 text-xs font-semibold bg-blue-500 text-white flex items-center justify-center">
+          {subTeamActivities.data.filter((n) => !n.isRead).length}
+        </div>
+      )}
     </div>
   ) : (
     <ActivitiesPopUp
-      entity="Sub Team"
+      entity="sub team"
       activities={subTeamActivities?.data}
       handleActivities={handleSubTeamActivities}
       setShowActivitiesPopUp={setShowSubTeamActivitiesPopUp}

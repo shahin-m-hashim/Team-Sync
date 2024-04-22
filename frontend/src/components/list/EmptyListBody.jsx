@@ -10,10 +10,12 @@ export default function EmptyListBody({ name, listNameSearchTxt }) {
       <img src={bye} width="20%" alt={`no${name}`} />
       <div className="text-center">
         {listNameSearchTxt === "" ? (
-          <span className="text-[1.7vw]">You currently have no {name}s</span>
+          <span className="text-[1.7vw]">
+            You currently have no {name.toLowerCase()}s
+          </span>
         ) : (
           <span className="text-[1.7vw]">
-            Your Search does not match any {name}s
+            Your Search does not match any {name.toLowerCase()}
           </span>
         )}
         <br />
