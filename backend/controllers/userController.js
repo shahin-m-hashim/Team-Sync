@@ -1,11 +1,10 @@
 const {
-  setInvitation,
   createProject,
   removeAccount,
   setProfilePic,
   getUserDetails,
-  setNotifications,
   getAllUserTeams,
+  setNotifications,
   removeProfilePic,
   setPrimaryDetails,
   setContactDetails,
@@ -13,6 +12,8 @@ const {
   getAllUserProjects,
   getAllUserSubTeams,
   setSecondaryDetails,
+  setInvitationAccepted,
+  setInvitationRejected,
   getAllUserInvitations,
   getAllUserNotifications,
 } = require("../services/userService");
@@ -196,15 +197,30 @@ const updateSecurityDetails = async (req, res, next) => {
   }
 };
 
-const handleInvitation = async (req, res, next) => {
+const acceptInvitation = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { id, status } = req.body;
-    await setInvitation(userId, id, status);
+    const { invitationId } = req.body;
+    await setInvitationAccepted(userId, invitationId);
 
     res.status(200).json({
       success: true,
-      message: "Invitation handled successfully",
+      message: "Invitation accepted",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const rejectInvitation = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { invitationId } = req.body;
+    await setInvitationRejected(userId, invitationId);
+
+    res.status(200).json({
+      success: true,
+      message: "Invitation rejected",
     });
   } catch (e) {
     next(e);
@@ -259,7 +275,8 @@ module.exports = {
   addProject,
   deleteAccount,
   updateProfilePic,
-  handleInvitation,
+  acceptInvitation,
+  rejectInvitation,
   deleteProfilePic,
   fetchUserDetails,
   fetchAllUserTeams,
