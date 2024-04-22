@@ -198,7 +198,7 @@ const EntitySettings = ({
                   onClick={() => setShowAddEntityCollaboratorForm(true)}
                   className="w-full bg-blue-500 hover:bg-blue-600 px-3 py-1.5 font-semibold text-black rounded-md disabled:bg-blue-300"
                 >
-                  {entity !== "Project" ? "Add" : "Invite"} New Collaborators
+                  {entity !== "project" ? "Add" : "Invite"} New Collaborators
                 </button>
               </div>
             )

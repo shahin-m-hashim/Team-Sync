@@ -18,6 +18,7 @@ import ListSubHeader from "@/components/list/ListSubHeader";
 import { useContext, useEffect, useReducer, useState } from "react";
 import ProjectDetailsCard from "../details cards/ProjectDetailsCard";
 import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
+import KickedPopUp from "../popups/KickedPopUp";
 
 export default function ProjectDashboard() {
   const { projectId } = useParams();
@@ -28,6 +29,9 @@ export default function ProjectDashboard() {
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderTeams, setListOnlyLeaderTeams] = useState(false);
+
+  const [showKickedFromProjectPopUp, setShowKickedFromProjectPopUp] =
+    useState(false);
 
   const [showProjectActivitiesPopUp, setShowProjectActivitiesPopUp] =
     useState(false);
@@ -98,6 +102,10 @@ export default function ProjectDashboard() {
     return () => socket.off("teams");
   }, []);
 
+  useEffect(() => {
+    socket.on("kickedFromProject", () => setShowKickedFromProjectPopUp(true));
+  });
+
   if (teams?.error === "unauthorized") {
     setError("unauthorized");
     return null;
@@ -110,6 +118,12 @@ export default function ProjectDashboard() {
 
   return (
     <>
+      {showKickedFromProjectPopUp && (
+        <KickedPopUp
+          entity="project"
+          setShowKickedFromEntityPopUp={setShowKickedFromProjectPopUp}
+        />
+      )}
       {showAddTeamForm && (
         <AddListEntityForm
           renderList="Team"

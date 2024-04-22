@@ -119,10 +119,16 @@ export default function InvitationsCard() {
 
   const handleInvitation = async (invitation, status) => {
     try {
-      await updateData("invitation", {
-        id: invitation,
-        status: status,
-      });
+      if (status === "accept") {
+        await updateData("invitation/accept", {
+          invitationId: invitation,
+        });
+      } else {
+        await updateData("invitation/reject", {
+          invitationId: invitation,
+        });
+      }
+
       setReFetchInvitations((prev) => !prev);
       setReFetchProjects((prev) => !prev);
     } catch (e) {
