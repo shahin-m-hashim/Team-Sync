@@ -1,12 +1,14 @@
 const {
   setSubTeamIcon,
+  setSubTeamGuide,
+  setSubTeamLeader,
   getSubTeamDetails,
-  setSubTeamDetails,
   removeSubTeamIcon,
+  setSubTeamDetails,
   getSubTeamMembers,
+  createSubTeamMember,
   getSubTeamActivities,
   setSubTeamActivities,
-  setSubTeamCollaborator,
   removeSubTeamCollaborator,
 } = require("../services/subTeamService");
 
@@ -23,8 +25,9 @@ const fetchSubTeamDetails = async (req, res, next) => {
 
 const fetchSubTeamActivities = async (req, res, next) => {
   try {
+    const { userId } = req.user;
     const { subTeamId } = req.params;
-    const activities = await getSubTeamActivities(subTeamId);
+    const activities = await getSubTeamActivities(userId, subTeamId);
     res.status(200).json(activities);
   } catch (e) {
     next(e);
@@ -54,14 +57,14 @@ const fetchSubTeamMembers = async (req, res, next) => {
 // };
 
 // POST REQUESTS
-const addSubTeamCollaborator = async (req, res, next) => {
+const addSubTeamMember = async (req, res, next) => {
   try {
-    const { userId } = req.user;
-    const { username, role, subTeamId } = req.subTeam;
-    await setSubTeamCollaborator(userId, subTeamId, username, role);
+    const { subTeamId } = req.params;
+    const { username } = req.body;
+    await createSubTeamMember(subTeamId, username);
     res.status(200).json({
       success: true,
-      message: `User ${username} added successfully to sub team ${subTeamId} as a ${role}`,
+      message: `User ${username} added successfully to sub team ${subTeamId} as a member`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -96,6 +99,49 @@ const updateSubTeamDetails = async (req, res, next) => {
   }
 };
 
+const updateSubTeamLeader = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { username } = req.body;
+    const { subTeamId } = req.params;
+    await setSubTeamLeader(subTeamId, userId, username);
+    res.status(200).json({
+      success: true,
+      message: "Sub team leader updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("TeamAlreadyExists"));
+    }
+    next(e);
+  }
+};
+
+const updateSubTeamGuide = async (req, res, next) => {
+  try {
+    const { username } = req.body;
+    const { subTeamId } = req.params;
+    await setSubTeamGuide(subTeamId, username);
+    res.status(200).json({
+      success: true,
+      message: "Sub team guide updated successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("TeamAlreadyExists"));
+    }
+    next(e);
+  }
+};
+
 const handleSubTeamActivities = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -115,10 +161,8 @@ const updateSubTeamIcon = async (req, res, next) => {
   try {
     const { subTeamId } = req.params;
     const { updatedSubTeamIcon } = req.body;
-
-    console.log(updatedSubTeamIcon);
-
     await setSubTeamIcon(subTeamId, updatedSubTeamIcon);
+
     res
       .status(200)
       .json({ success: true, message: "Sub team icon updated successfully" });
@@ -161,13 +205,15 @@ const kickSubTeamCollaborator = async (req, res, next) => {
 };
 
 module.exports = {
+  addSubTeamMember,
   updateSubTeamIcon,
   deleteSubTeamIcon,
+  updateSubTeamGuide,
   fetchSubTeamDetails,
   fetchSubTeamMembers,
+  updateSubTeamLeader,
   updateSubTeamDetails,
   fetchSubTeamActivities,
-  addSubTeamCollaborator,
   handleSubTeamActivities,
   kickSubTeamCollaborator,
 };
