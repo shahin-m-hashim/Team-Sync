@@ -23,6 +23,7 @@ import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { getLocalSecureItem } from "./lib/utils";
+import SubTeamDashboard from "./components/dashBoards/SubTeamDashboard";
 
 const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
 export const socket = io(baseURL, { withCredentials: true });
@@ -83,6 +84,16 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     element: <TeamDashboard />,
+                  },
+                  {
+                    path: "subteams/:subTeamId",
+                    element: <Outlet />,
+                    children: [
+                      {
+                        index: true,
+                        element: <SubTeamDashboard />,
+                      },
+                    ],
                   },
                 ],
               },

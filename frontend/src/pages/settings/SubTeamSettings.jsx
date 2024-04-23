@@ -8,6 +8,7 @@ import { deleteData, updateData } from "@/services/db";
 import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
 import { subTeamValidationSchema } from "@/validations/entityValidations";
+import { socket } from "@/App";
 
 const SubTeamSettings = () => {
   const { setError } = useContext(UserContext);
@@ -62,7 +63,7 @@ const SubTeamSettings = () => {
   const kickSubTeamCollaborator = async (username, role) => {
     try {
       await deleteData(
-        `projects/${projectId}/collaborators/${username}/roles/${role.toLowerCase()}`
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
       toast.success("Collaborator kicked successfully");
     } catch (e) {
@@ -113,6 +114,14 @@ const SubTeamSettings = () => {
       toast.error(e.response.data.error || "Failed to delete team icon");
     }
   };
+
+  useEffect(() => {
+    socket.on("subTeamDetails", (subTeamDetails) =>
+      setReFetchSubTeamSettings(subTeamDetails)
+    );
+
+    return () => socket.off("subTeamDetails");
+  }, []);
 
   if (subTeamSettings?.error === "unauthorized") {
     setError("unauthorized");

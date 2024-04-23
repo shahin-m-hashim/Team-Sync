@@ -1,160 +1,75 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-import DetailCard from "../cards/DetailsCard";
+
+import { socket } from "@/App";
+import { toast } from "react-toastify";
+import useFetch from "@/hooks/useFetch";
+import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
+import { useParams } from "react-router-dom";
+import DetailCard from "../cards/DetailsCard";
+import KickedPopUp from "../popups/KickedPopUp";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import AddTaskForm from "../forms/tasks/AddTaskForm";
 import ListHeader from "@/components/list/ListHeader";
-import { useState, useEffect, useReducer } from "react";
+import LeaderDemotion from "../popups/LeaderDemotion";
+import { UserContext } from "@/providers/UserProvider";
+import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import editSubmitted from "../../assets/images/Edit submitted.png";
 import viewSubmitted from "../../assets/images/View submitted.png";
+import { useState, useEffect, useReducer, useContext } from "react";
 
-const initialTasks = [
-  {
-    name: "Header",
-    createdDate: "01/02/2024",
-    assignee: "Asma123",
-    priority: "Medium",
-    deadlineDate: "25/06/2024",
-    status: "Not Started",
-    submitIcon: editSubmitted,
-    role: "Leader",
-  },
-  {
-    name: "Notification",
-    createdDate: "20/04/2024",
-    assignee: "Ajmal256",
-    priority: "High",
-    deadlineDate: "05/08/2024",
-    status: "Stopped",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Header",
-    createdDate: "20/04/2024",
-    assignee: "Shahin256",
-    priority: "Low",
-    deadlineDate: "05/08/2024",
-    status: "Pending",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Sidebar",
-    createdDate: "10/02/2024",
-    assignee: "Hari626",
-    priority: "High",
-    deadlineDate: "05/04/2024",
-    status: "Done",
-  },
-  {
-    name: "Filtering",
-    createdDate: "10/02/2024",
-    assignee: "Ajmal256",
-    priority: "Medium",
-    deadlineDate: "05/07/2024",
-    status: "Pending",
-  },
+export default function SubTeamDashboard() {
+  const { setError } = useContext(UserContext);
+  const { projectId, teamId, subTeamId } = useParams();
 
-  {
-    name: "Header",
-    createdDate: "01/02/2024",
-    assignee: "Asma123",
-    priority: "Medium",
-    deadlineDate: "25/06/2024",
-    status: "Not Started",
-    submitIcon: editSubmitted,
-    role: "Leader",
-  },
-  {
-    name: "Notification",
-    createdDate: "20/04/2024",
-    assignee: "Ajmal256",
-    priority: "High",
-    deadlineDate: "05/08/2024",
-    status: "Stopped",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Header",
-    createdDate: "20/04/2024",
-    assignee: "Shahin256",
-    priority: "Low",
-    deadlineDate: "05/08/2024",
-    status: "Pending",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Sidebar",
-    createdDate: "10/02/2024",
-    assignee: "Hari626",
-    priority: "High",
-    deadlineDate: "05/04/2024",
-    status: "Done",
-  },
-  {
-    name: "Filtering",
-    createdDate: "10/02/2024",
-    assignee: "Ajmal256",
-    priority: "Medium",
-    deadlineDate: "05/07/2024",
-    status: "Pending",
-  },
-
-  {
-    name: "Header",
-    createdDate: "01/02/2024",
-    assignee: "Asma123",
-    priority: "Medium",
-    deadlineDate: "25/06/2024",
-    status: "Not Started",
-    submitIcon: editSubmitted,
-    role: "Leader",
-  },
-  {
-    name: "Notification",
-    createdDate: "20/04/2024",
-    assignee: "Ajmal256",
-    priority: "High",
-    deadlineDate: "05/08/2024",
-    status: "Stopped",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Header",
-    createdDate: "20/04/2024",
-    assignee: "Shahin256",
-    priority: "Low",
-    deadlineDate: "05/08/2024",
-    status: "Pending",
-    submitIcon: viewSubmitted,
-  },
-  {
-    name: "Sidebar",
-    createdDate: "10/02/2024",
-    assignee: "Hari626",
-    priority: "High",
-    deadlineDate: "05/04/2024",
-    status: "Done",
-  },
-  {
-    name: "Filtering",
-    createdDate: "10/02/2024",
-    assignee: "Ajmal256",
-    priority: "Medium",
-    deadlineDate: "05/07/2024",
-    status: "Pending",
-  },
-];
-
-const yourTasks = initialTasks.filter(
-  (project) => project.assignee === "Ajmal256"
-);
-
-export default function Tasks() {
+  const [kickedFrom, setKickedFrom] = useState("subTeam");
+  const [reFetchTasks, setReFetchTasks] = useState(false);
   const [taskNameSearchTxt, setTaskNameSearchTxt] = useState("");
-  const [taskFilterBtnTxt, setTaskFilterBtnTxt] = useState("Filter");
   const [listOnlyYourTasks, setListOnlyYourTasks] = useState(false);
+  const [taskFilterBtnTxt, setTaskFilterBtnTxt] = useState("Filter");
+
+  const [showKickedFromSubTeamPopUp, setShowKickedFromSubTeamPopUp] =
+    useState(false);
+
+  const [
+    showSubTeamLeaderDemotionConfirmation,
+    setShowSubTeamLeaderDemotionConfirmation,
+  ] = useState(false);
+
+  const [showAddTaskCollaboratorForm, setShowAddSubTeamCollaboratorForm] =
+    useState(false);
+
+  const [showSubTeamActivitiesPopUp, setShowSubTeamActivitiesPopUp] =
+    useState(false);
+
+  const tasks = useFetch(
+    `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/tasks`,
+    reFetchTasks
+  );
+
+  const yourTasks = initialTasks.filter(
+    (project) => project.assignee === "Ajmal256"
+  );
+
+  const handleAddTask = async (taskDetails) => {
+    try {
+      await addData(
+        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/task`,
+        {
+          taskDetails,
+        }
+      );
+      setShowAddTaskForm(false);
+      toast.success("Task assigned successfully");
+    } catch (e) {
+      toast.error(
+        e.response.data.error || "An unexpected error occurred, try again later"
+      );
+    }
+  };
 
   const resetTaskList = () => {
     setTaskNameSearchTxt("");
@@ -162,11 +77,11 @@ export default function Tasks() {
     setTaskFilterBtnTxt("Filter");
     setTasks({
       type: "RESET",
-      initialState: initialTasks,
+      initialState: tasks?.data,
     });
   };
 
-  const [tasks, dispatch] = useReducer(listReducer, [...initialTasks]);
+  const [initialTasks, dispatch] = useReducer(listReducer, tasks?.data);
   const setTasks = (action) => dispatch(action);
 
   useEffect(() => {
@@ -183,14 +98,71 @@ export default function Tasks() {
         payload: initialTasks,
       });
     }
-  }, [listOnlyYourTasks]);
+  }, [tasks?.data, listOnlyYourTasks]);
+
+  useEffect(() => {
+    socket.on("tasks", (task) => setReFetchTasks(task));
+    return () => socket.off("tasks");
+  }, []);
+
+  useEffect(() => {
+    socket.on("kickedFromProject", () => {
+      setKickedFrom("project");
+      setShowKickedFromSubTeamPopUp(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("kickedFromTeam", () => {
+      setKickedFrom("team");
+      setShowKickedFromSubTeamPopUp(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("kickedFromSubTeam", () => {
+      setKickedFrom("subTeam");
+      setShowKickedFromSubTeamPopUp(true);
+    });
+  }, []);
 
   const [showAddTaskForm, setShowAddTaskForm] = useState(false);
 
   return (
     <>
+      {showSubTeamLeaderDemotionConfirmation && (
+        <LeaderDemotion
+          entity="team"
+          hideAddEntityForm={setShowAddSubTeamCollaboratorForm}
+          username={showSubTeamLeaderDemotionConfirmation.username || ""}
+          setShowEntityLeaderDemotion={setShowSubTeamLeaderDemotionConfirmation}
+        />
+      )}
+      {showKickedFromSubTeamPopUp && (
+        <KickedPopUp
+          entity={kickedFrom}
+          setShowKickedFromEntityPopUp={setShowKickedFromSubTeamPopUp}
+        />
+      )}
       {showAddTaskForm && (
-        <AddTaskForm setShowAddTaskForm={setShowAddTaskForm} />
+        <AddListEntityForm
+          renderList="Sub Team"
+          handleAddEntity={handleAddTask}
+          setShowAddEntityForm={setShowAddTaskForm}
+          description="Your sub team is where you can add members, create and assign tasks to work with them effortlessly."
+        />
+      )}
+      {showAddTaskCollaboratorForm && (
+        <div className="absolute inset-0 z-[50] h-full size-full backdrop-blur-sm">
+          <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
+            <AddTaskCollaboratorForm
+              setShowAddTaskCollaboratorForm={setShowAddTaskCollaboratorForm}
+              setShowTaskLeaderDemotionConfirmation={
+                setShowTaskLeaderDemotionConfirmation
+              }
+            />
+          </div>
+        </div>
       )}
       <div className="grid grid-cols-[1fr,1fr] gap-0.5 min-h-[17rem] border-white border-2 border-t-0 text-white">
         <DetailCard
