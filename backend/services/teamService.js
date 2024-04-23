@@ -251,7 +251,7 @@ const createSubTeam = async (userId, teamId, subTeamDetails) => {
 
     const team = await teams
       .findById(teamId)
-      .select("parent leader guide subTeams")
+      .select("parent leader guide subTeams activities")
       .populate({
         path: "leader",
         select: "username",

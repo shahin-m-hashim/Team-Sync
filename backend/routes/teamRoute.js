@@ -52,11 +52,11 @@ teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
 teamRouter.post("/teams/:teamId/member", isTeamLeader, addTeamMember);
 
 // PATCH Requests
-teamRouter.patch("/teams/:teamId/icon", isTeamLeader, updateTeamIcon);
-teamRouter.patch("/teams/:teamId/details", isTeamLeader, updateTeamDetails);
-
 teamRouter.patch("/teams/:teamId/guide", isTeamLeader, updateTeamGuide);
 teamRouter.patch("/teams/:teamId/leader", isTeamLeader, updateTeamLeader);
+
+teamRouter.patch("/teams/:teamId/icon", isTeamLeader, updateTeamIcon);
+teamRouter.patch("/teams/:teamId/details", isTeamLeader, updateTeamDetails);
 
 teamRouter.patch(
   "/teams/:teamId/activities",
