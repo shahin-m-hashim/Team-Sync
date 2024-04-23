@@ -30,15 +30,15 @@ teamRouter.get(
 );
 
 teamRouter.get(
-  "/teams/:teamId/subTeams",
-  isProjectCollaborator,
-  fetchTeamSubTeams
-);
-
-teamRouter.get(
   "/teams/:teamId/activities",
   isProjectCollaborator,
   fetchTeamActivities
+);
+
+teamRouter.get(
+  "/teams/:teamId/subTeams",
+  isProjectCollaborator,
+  fetchTeamSubTeams
 );
 
 teamRouter.get(

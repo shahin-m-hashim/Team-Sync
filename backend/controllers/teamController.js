@@ -27,8 +27,9 @@ const fetchTeamDetails = async (req, res, next) => {
 
 const fetchTeamActivities = async (req, res, next) => {
   try {
+    const { userId } = req.user;
     const { teamId } = req.params;
-    const activities = await getTeamActivities(teamId);
+    const activities = await getTeamActivities(userId, teamId);
     res.status(200).json(activities);
   } catch (e) {
     next(e);
