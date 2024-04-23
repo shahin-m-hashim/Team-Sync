@@ -104,14 +104,14 @@ export default function TeamDashboard() {
       setKickedFrom("project");
       setShowKickedFromTeamPopUp(true);
     });
-  });
+  }, []);
 
   useEffect(() => {
     socket.on("kickedFromTeam", () => {
       setKickedFrom("team");
       setShowKickedFromTeamPopUp(true);
     });
-  });
+  }, []);
 
   if (subTeams?.error === "unauthorized") {
     setError("unauthorized");
