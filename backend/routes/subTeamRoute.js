@@ -6,13 +6,15 @@ const {
 } = require("../middlewares/RBAC");
 
 const {
+  addSubTeamMember,
   updateSubTeamIcon,
   deleteSubTeamIcon,
+  updateSubTeamGuide,
   fetchSubTeamDetails,
   fetchSubTeamMembers,
+  updateSubTeamLeader,
   updateSubTeamDetails,
   fetchSubTeamActivities,
-  addSubTeamCollaborator,
   handleSubTeamActivities,
   kickSubTeamCollaborator,
 } = require("../controllers/subTeamController");
@@ -46,14 +48,23 @@ subTeamRouter.get(
 
 // POST Requests
 subTeamRouter.post(
-  "/subTeams/:subTeamId/add",
+  "/subTeams/:subTeamId/member",
   isSubTeamLeader,
-  addSubTeamCollaborator
+  addSubTeamMember
 );
 
-// subTeamRouter.post("/subTeams/:subTeamId/subTeam", isSubTeamLeader, addTask);
-
 // PATCH Requests
+subTeamRouter.patch(
+  "/subTeams/:subTeamId/guide",
+  isSubTeamLeader,
+  updateSubTeamGuide
+);
+subTeamRouter.patch(
+  "/subTeams/:subTeamId/leader",
+  isSubTeamLeader,
+  updateSubTeamLeader
+);
+
 subTeamRouter.patch(
   "/subTeams/:subTeamId/icon",
   isSubTeamLeader,
