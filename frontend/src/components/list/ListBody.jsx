@@ -55,9 +55,16 @@ function ListItem({
       {renderList !== "Task" ? (
         <div className="flex items-center pl-1">
           {icon ? (
-            <img src={icon} width={25} className="object-cover object-center" />
+            <img
+              src={icon}
+              width={25}
+              className="object-cover object-center rounded-full"
+            />
           ) : (
-            <img src={noImg} className="ml-1 bg-white size-5" />
+            <img
+              src={noImg}
+              className="object-cover object-center bg-white rounded-full size-6"
+            />
           )}
         </div>
       ) : (

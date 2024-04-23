@@ -40,7 +40,6 @@ export default function ActivitiesPopUp({
   handleActivities,
   setShowActivitiesPopUp,
 }) {
-  activities = activities?.sort((a, b) => a.isRead - b.isRead);
   return (
     <>
       <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen bg-gray-800 bg-opacity-50">

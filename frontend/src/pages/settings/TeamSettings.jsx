@@ -8,6 +8,7 @@ import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
 import { teamValidationSchema } from "@/validations/entityValidations";
+import { socket } from "@/App";
 
 const TeamSettings = () => {
   const { setError } = useContext(UserContext);
@@ -93,6 +94,14 @@ const TeamSettings = () => {
       toast.error(e.response.data.error || "Failed to delete team icon");
     }
   };
+
+  useEffect(() => {
+    socket.on("teamDetails", (teamDetails) =>
+      setReFetchTeamSettings(teamDetails)
+    );
+
+    return () => socket.off("teamDetails");
+  }, []);
 
   if (teamSettings?.error === "unauthorized") {
     setError("unauthorized");

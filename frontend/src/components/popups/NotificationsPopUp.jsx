@@ -39,7 +39,6 @@ export default function NotificationsPopUp({
   handleNotifications,
   setShowNotificationsPopUp,
 }) {
-  notifications = notifications?.sort((a, b) => a.isRead - b.isRead);
   return (
     <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen bg-gray-800 bg-opacity-50">
       <div className="max-w-2xl min-w-72 p-5 bg-white rounded-lg h-[80%]">

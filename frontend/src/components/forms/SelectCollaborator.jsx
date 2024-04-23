@@ -10,6 +10,12 @@ function SelectCollaborator({
   handleSelectUser,
   setShowAddCollaboratorForm,
 }) {
+  const user = getLocalSecureItem("user", "low");
+
+  parentMembers = parentMembers?.filter(
+    (member) => member.username !== user.username
+  );
+
   const currentUser = getLocalSecureItem("user", "low");
 
   const [showSearchResults, setShowSearchResults] = useState(false);
