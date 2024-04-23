@@ -51,7 +51,7 @@ export default function SubTeamActivities({
     return null;
   }
 
-  return !showSubTeamActivitiesPopUp ? (
+  return !showSubTeamActivitiesPopUp && !subTeamActivities?.error ? (
     <div
       className="relative cursor-pointer"
       onClick={() => setShowSubTeamActivitiesPopUp(true)}

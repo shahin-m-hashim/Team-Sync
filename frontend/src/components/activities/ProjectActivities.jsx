@@ -51,7 +51,7 @@ export default function ProjectActivities({
     return null;
   }
 
-  return !showProjectActivitiesPopUp ? (
+  return !showProjectActivitiesPopUp && !projectActivities?.error ? (
     <div
       className="relative cursor-pointer"
       onClick={() => setShowProjectActivitiesPopUp(true)}

@@ -13,6 +13,8 @@ import InvitationsPopUp from "../popups/InvitationsPopUp";
 import noInvitations from "../../assets/images/no activity.png";
 
 const Invitations = ({ invitations, handleInvitation }) => {
+  console.log(invitations);
+
   return (
     <div className="flex flex-col gap-2">
       {invitations?.slice(0, 3).map((invitation) => {
@@ -25,7 +27,7 @@ const Invitations = ({ invitations, handleInvitation }) => {
             )}
           >
             <img
-              className="object-cover object-center w-12"
+              className="object-cover object-center w-12 rounded-full"
               src={invitation?.from?.profilePic || defaultDp}
             />
             <div className="flex flex-col gap-1">

@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { addData, updateData } from "@/services/db";
+import { useParams } from "react-router-dom";
 import AssignRoleForm from "../AssignRoleForm";
-import { useNavigate, useParams } from "react-router-dom";
+import { addData, updateData } from "@/services/db";
 import SelectTeamCollaborator from "./SelectTeamCollaborator";
 
-function AddTeamCollaboratorForm({ setShowAddTeamCollaboratorForm }) {
-  const navigate = useNavigate();
+function AddTeamCollaboratorForm({
+  setShowAddTeamCollaboratorForm,
+  setShowTeamLeaderDemotionConfirmation,
+}) {
   const { projectId, teamId } = useParams();
 
   const [selectedUser, setSelectedUser] = useState("");
@@ -22,25 +24,26 @@ function AddTeamCollaboratorForm({ setShowAddTeamCollaboratorForm }) {
   const addTeamCollaborator = async (e) => {
     e.preventDefault();
     try {
-      if (selectedRole === "leader") {
-        await updateData(`projects/${projectId}/teams/${teamId}/leader`, {
-          username: selectedUser.username,
-        });
-      } else if (selectedRole === "guide") {
+      if (selectedRole === "guide") {
         await updateData(`projects/${projectId}/teams/${teamId}/guide`, {
           username: selectedUser.username,
         });
-      } else {
+      } else if (selectedRole === "member") {
         await addData(`projects/${projectId}/teams/${teamId}/member`, {
+          username: selectedUser.username,
+        });
+      } else {
+        setShowTeamLeaderDemotionConfirmation({
+          show: true,
           username: selectedUser.username,
         });
       }
 
-      toast.success(
-        `${selectedUser.username} added as ${selectedRole} successfully.`
-      );
-
-      if (selectedRole === "leader") navigate(`/`, { replace: true });
+      if (selectedRole !== "leader") {
+        toast.success(
+          `${selectedUser.username} added as ${selectedRole} successfully.`
+        );
+      }
     } catch (e) {
       toast.error(
         e.response.data.error || "Error inviting user, try again later."
