@@ -39,15 +39,15 @@ projectRouter.get(
 );
 
 projectRouter.get(
-  "/projects/:projectId/members",
-  isProjectCollaborator,
-  fetchProjectMembers
-);
-
-projectRouter.get(
   "/projects/:projectId/teams",
   isProjectCollaborator,
   fetchProjectTeams
+);
+
+projectRouter.get(
+  "/projects/:projectId/members",
+  isProjectCollaborator,
+  fetchProjectMembers
 );
 
 // POST Requests

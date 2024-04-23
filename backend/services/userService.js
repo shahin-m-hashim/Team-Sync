@@ -128,7 +128,13 @@ const getAllUserInvitations = async (userId) => {
     date: moment(invitation.createdAt).format("DD/MM/YYYY"),
   }));
 
-  return formattedInvitations;
+  return formattedInvitations.sort((a, b) =>
+    a.isRead !== b.isRead
+      ? a.isRead
+        ? 1
+        : -1
+      : new Date(b.createdAt) - new Date(a.createdAt)
+  );
 };
 
 const getAllUserNotifications = async (userId) => {
@@ -151,7 +157,13 @@ const getAllUserNotifications = async (userId) => {
     };
   });
 
-  return formattedNotifications;
+  return formattedNotifications.sort((a, b) =>
+    a.isRead !== b.isRead
+      ? a.isRead
+        ? 1
+        : -1
+      : new Date(b.createdAt) - new Date(a.createdAt)
+  );
 };
 
 // POST
@@ -319,7 +331,7 @@ const setInvitationAccepted = async (userId, invitationId) => {
       { session }
     );
 
-    project.activities.push(projectActivity._id);
+    project.activities.push(projectActivity[0]._id);
 
     project.invitations = project.invitations.filter(
       (invitationId) => invitationId.toString() !== invitation._id.toString()
@@ -340,14 +352,15 @@ const setInvitationAccepted = async (userId, invitationId) => {
     projectLeader.notifications.push(notificationForProjectLeader[0]._id);
 
     await Promise.all([
+      project.save({ session }),
       invitation.save({ session }),
       invitedUser.save({ session }),
       projectLeader.save({ session }),
-      project.save({ session }),
     ]);
 
     io.emit("projectActivities", projectActivity[0]._id);
     io.emit("notifications", notificationForProjectLeader[0]._id);
+    io.emit("projectDetails", (project.id + invitation.id).toString());
 
     previousGuideSocketId &&
       io.to(previousGuideSocketId).emit("kickedFromProject", project._id);

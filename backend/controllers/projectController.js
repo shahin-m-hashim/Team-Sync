@@ -81,8 +81,8 @@ const inviteProjectCollaborator = async (req, res, next) => {
 const addTeam = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { teamDetails } = req.body;
     const { projectId } = req.params;
+    const { teamDetails } = req.body;
     const teamId = await createTeam(userId, projectId, teamDetails);
     console.log(
       `New team ${teamId} is created for this project ${projectId} by leader ${userId}`
