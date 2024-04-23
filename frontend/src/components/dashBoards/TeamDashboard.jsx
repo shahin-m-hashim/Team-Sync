@@ -18,6 +18,7 @@ import TeamDetailsCard from "../details cards/TeamDetailsCard";
 import { useContext, useEffect, useReducer, useState } from "react";
 import AddTeamCollaboratorForm from "../forms/teams/AddTeamCollaboratorForm";
 import KickedPopUp from "../popups/KickedPopUp";
+import LeaderDemotion from "../popups/LeaderDemotion";
 
 export default function TeamDashboard() {
   const { projectId, teamId } = useParams();
@@ -30,6 +31,11 @@ export default function TeamDashboard() {
   const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
   const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
   const [showKickedFromTeamPopUp, setShowKickedFromTeamPopUp] = useState(false);
+
+  const [
+    showTeamLeaderDemotionConfirmation,
+    setShowTeamLeaderDemotionConfirmation,
+  ] = useState(false);
 
   const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
     useState(false);
@@ -119,6 +125,14 @@ export default function TeamDashboard() {
 
   return (
     <>
+      {showTeamLeaderDemotionConfirmation && (
+        <LeaderDemotion
+          entity="team"
+          hideAddEntityForm={setShowAddTeamCollaboratorForm}
+          username={showTeamLeaderDemotionConfirmation.username || ""}
+          setShowEntityLeaderDemotion={setShowTeamLeaderDemotionConfirmation}
+        />
+      )}
       {showKickedFromTeamPopUp && (
         <KickedPopUp
           entity={kickedFrom}
@@ -134,10 +148,13 @@ export default function TeamDashboard() {
         />
       )}
       {showAddTeamCollaboratorForm && (
-        <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
+        <div className="absolute inset-0 z-[50] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
             <AddTeamCollaboratorForm
               setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
+              setShowTeamLeaderDemotionConfirmation={
+                setShowTeamLeaderDemotionConfirmation
+              }
             />
           </div>
         </div>

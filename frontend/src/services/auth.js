@@ -54,12 +54,12 @@ const resetPassword = async (credentials) => {
 
 const logout = async () => {
   const { id } = getLocalSecureItem("user", "low");
+  localStorage.clear();
   await axios.post(
     base_url + "/auth/logout",
     { userId: id },
     { withCredentials: true }
   );
-  localStorage.clear();
 };
 
 export { signup, login, reqPassResetOTP, verifyOTP, resetPassword, logout };

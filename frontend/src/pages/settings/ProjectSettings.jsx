@@ -8,6 +8,7 @@ import { UserContext } from "@/providers/UserProvider";
 import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
 import { projectValidationSchema } from "@/validations/entityValidations";
+import { socket } from "@/App";
 
 const ProjectSettings = () => {
   const { userId, projectId } = useParams();
@@ -83,6 +84,14 @@ const ProjectSettings = () => {
     await deleteData(`projects/${projectId}/icon`);
     setReFetchProjectSettings((prev) => !prev);
   };
+
+  useEffect(() => {
+    socket.on("projectCollaborators", (projectCollaborator) =>
+      setReFetchProjectSettings(projectCollaborator)
+    );
+
+    return () => socket.off("projectCollaborators");
+  }, []);
 
   if (projectSettings?.error === "unauthorized") {
     setError("unauthorized");

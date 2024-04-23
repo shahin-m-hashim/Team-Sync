@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import GroupedUsers from "../GroupedUsers";
 import invite from "../../assets/images/invite.png";
 import report from "../../assets/images/report.png";
+import defaultDp from "../../assets/images/defaultDp.png";
 import groupVoiceCall from "../../assets/images/Call.png";
 import TeamActivities from "../activities/TeamActivities";
 import groupChat from "../../assets/images/Chat Messages.png";
@@ -49,7 +50,7 @@ export default function DetailsCard({
             {guide?.username || <span>NA</span>}
           </span>
           <img
-            src={guide?.profilePic}
+            src={guide?.profilePic || defaultDp}
             className="object-cover object-center rounded-full"
           />
         </div>
