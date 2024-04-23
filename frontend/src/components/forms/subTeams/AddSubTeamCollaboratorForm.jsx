@@ -5,13 +5,13 @@ import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import AssignRoleForm from "../AssignRoleForm";
 import { addData, updateData } from "@/services/db";
-import SelectTeamCollaborator from "./SelectTeamCollaborator";
+import SelectSubTeamCollaborator from "./SelectSubTeamCollaborator";
 
-function AddTeamCollaboratorForm({
-  setShowAddTeamCollaboratorForm,
-  setShowTeamLeaderDemotionConfirmation,
+function AddSubTeamCollaboratorForm({
+  setShowAddSubTeamCollaboratorForm,
+  setShowSubTeamLeaderDemotionConfirmation,
 }) {
-  const { projectId, teamId } = useParams();
+  const { projectId, teamId, subTeamId } = useParams();
 
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedRole, setSelectedRole] = useState("member");
@@ -21,19 +21,25 @@ function AddTeamCollaboratorForm({
 
   const [showAssignRoleForm, setShowAssignRoleForm] = useState(false);
 
-  const addTeamCollaborator = async (e) => {
+  const addSubTeamCollaborator = async (e) => {
     e.preventDefault();
     try {
       if (selectedRole === "guide") {
-        await updateData(`projects/${projectId}/teams/${teamId}/guide`, {
-          username: selectedUser.username,
-        });
+        await updateData(
+          `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/guide`,
+          {
+            username: selectedUser.username,
+          }
+        );
       } else if (selectedRole === "member") {
-        await addData(`projects/${projectId}/teams/${teamId}/member`, {
-          username: selectedUser.username,
-        });
+        await addData(
+          `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/member`,
+          {
+            username: selectedUser.username,
+          }
+        );
       } else {
-        setShowTeamLeaderDemotionConfirmation({
+        setShowSubTeamLeaderDemotionConfirmation({
           show: true,
           username: selectedUser.username,
         });
@@ -57,37 +63,39 @@ function AddTeamCollaboratorForm({
     }
   };
 
-  const cancelAddTeamCollaborator = () => {
+  const cancelAddSubTeamCollaborator = () => {
     setSelectedUser("");
     setSelectedRole("member");
 
     setShowAssignRoleForm(false);
     setShowSelectCollaboratorForm(true);
-    setShowAddTeamCollaboratorForm(false);
+    setShowAddSubTeamCollaboratorForm(false);
   };
 
   return (
     <div className="relative h-full p-10 rounded-md bg-slate-700">
       <form
-        onSubmit={addTeamCollaborator}
+        onSubmit={addSubTeamCollaborator}
         className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-5 bg-slate-700"
       >
         {showSelectCollaboratorForm && (
-          <SelectTeamCollaborator
+          <SelectSubTeamCollaborator
             setSelectedUser={setSelectedUser}
             setShowAssignRoleForm={setShowAssignRoleForm}
             setShowSelectCollaboratorForm={setShowSelectCollaboratorForm}
-            setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
+            setShowAddSubTeamCollaboratorForm={
+              setShowAddSubTeamCollaboratorForm
+            }
           />
         )}
         {showAssignRoleForm && (
           <AssignRoleForm
-            entity="team"
+            entity="sub team"
             selectedUser={selectedUser}
             selectedRole={selectedRole}
             setSelectedRole={setSelectedRole}
             setShowAssignRoleForm={setShowAssignRoleForm}
-            cancelAddCollaborator={cancelAddTeamCollaborator}
+            cancelAddCollaborator={cancelAddSubTeamCollaborator}
             setShowSelectCollaboratorForm={setShowSelectCollaboratorForm}
           />
         )}
@@ -96,4 +104,4 @@ function AddTeamCollaboratorForm({
   );
 }
 
-export default AddTeamCollaboratorForm;
+export default AddSubTeamCollaboratorForm;
