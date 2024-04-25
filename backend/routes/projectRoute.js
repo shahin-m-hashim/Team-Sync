@@ -14,12 +14,12 @@ const {
   fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
-  fetchProjectMembers,
   fetchProjectDetails,
   updateProjectDetails,
   fetchProjectActivities,
   handleProjectActivities,
   kickProjectCollaborator,
+  fetchProjectCollaborators,
   inviteProjectCollaborator,
 } = require("../controllers/projectController");
 
@@ -45,9 +45,9 @@ projectRouter.get(
 );
 
 projectRouter.get(
-  "/projects/:projectId/members",
+  "/projects/:projectId/collaborators",
   isProjectCollaborator,
-  fetchProjectMembers
+  fetchProjectCollaborators
 );
 
 // POST Requests

@@ -18,14 +18,4 @@ const passTeam = (req, res, next) => {
   }
 };
 
-const passSubTeam = (req, res, next) => {
-  try {
-    const { subTeamId } = req.params;
-    req.subTeam = { subTeamId };
-    next();
-  } catch (e) {
-    next(e);
-  }
-};
-
-module.exports = { passProject, passTeam, passSubTeam };
+module.exports = { passProject, passTeam };

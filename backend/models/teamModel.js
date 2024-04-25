@@ -57,13 +57,13 @@ const teamSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    subTeams: [
+    tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "subteams",
+        ref: "tasks",
       },
     ],
-    NOS: {
+    NOT: {
       type: Number,
       default: 0,
     },
@@ -84,8 +84,8 @@ const teamSchema = new mongoose.Schema(
 teamSchema.index({ name: 1, parent: 1 }, { unique: true });
 
 teamSchema.pre("save", async function (next) {
+  this.NOT = this.tasks?.length;
   this.NOM = this.members?.length;
-  this.NOS = this.subTeams?.length;
   this.NOA = this.activities?.length;
   next();
 });

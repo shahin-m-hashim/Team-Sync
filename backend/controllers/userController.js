@@ -10,36 +10,12 @@ const {
   setContactDetails,
   setSecurityDetails,
   getAllUserProjects,
-  getAllUserSubTeams,
   setSecondaryDetails,
   setInvitationAccepted,
   setInvitationRejected,
   getAllUserInvitations,
   getAllUserNotifications,
 } = require("../services/userService");
-
-// POST REQUESTS
-const addProject = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { projectDetails } = req.body;
-    const projectId = await createProject(userId, projectDetails);
-    console.log(`New project ${projectId} is created for user ${userId}`);
-    res.status(201).json({
-      success: true,
-      message: "Project created successfully",
-    });
-  } catch (e) {
-    if (e.name === "ValidationError") {
-      const customError = new Error("ValidationError");
-      customError.errors = e.errors;
-      next(customError);
-    } else if (e.name === "MongoServerError" && e.code === 11000) {
-      next(new Error("ProjectAlreadyExists"));
-    }
-    next(e);
-  }
-};
 
 // FETCH REQUESTS
 const fetchUserDetails = async (req, res, next) => {
@@ -72,16 +48,6 @@ const fetchAllUserTeams = async (req, res, next) => {
   }
 };
 
-const fetchAllUserSubTeams = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const subTeams = await getAllUserSubTeams(userId);
-    res.status(200).json(subTeams);
-  } catch (e) {
-    next(e);
-  }
-};
-
 const fetchAllUserInvitations = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -98,6 +64,29 @@ const fetchAllUserNotifications = async (req, res, next) => {
     const notifications = await getAllUserNotifications(userId);
     res.status(200).json(notifications);
   } catch (e) {
+    next(e);
+  }
+};
+
+// POST REQUESTS
+const addProject = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { projectDetails } = req.body;
+    const projectId = await createProject(userId, projectDetails);
+    console.log(`New project ${projectId} is created for user ${userId}`);
+    res.status(201).json({
+      success: true,
+      message: "Project created successfully",
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else if (e.name === "MongoServerError" && e.code === 11000) {
+      next(new Error("ProjectAlreadyExists"));
+    }
     next(e);
   }
 };
@@ -281,7 +270,6 @@ module.exports = {
   fetchUserDetails,
   fetchAllUserTeams,
   handleNotifications,
-  fetchAllUserSubTeams,
   fetchAllUserProjects,
   updatePrimaryDetails,
   updateContactDetails,

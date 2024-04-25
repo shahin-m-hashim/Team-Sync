@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
-const subteams = require("../models/subTeamModel");
 const projects = require("../models/projectModel");
 const { io, connectedUsers } = require("../server");
 const activities = require("../models/activityModel");
@@ -58,18 +57,16 @@ const getProjectDetails = async (projectId) => {
   };
 };
 
-const getProjectMembers = async (projectId) => {
-  const projectMembers = await projects
+const getProjectCollaborators = async (projectId) => {
+  const project = await projects
     .findById(projectId)
-    .select("members -_id")
+    .select("members guide -_id")
     .populate({
-      path: "members",
+      path: "guide members",
       select: "username profilePic tag fname",
     });
-
-  if (!projectMembers) throw new Error("UnknownProject");
-
-  return projectMembers;
+  if (!project) throw new Error("UnknownProject");
+  return [...project._doc.members, project.guide];
 };
 
 const getProjectActivities = async (userId, projectId) => {
@@ -333,6 +330,7 @@ const setProjectDetails = async (projectId, updatedProjectDetails) => {
 
   io.emit("notifications", newNotifications[0]._id);
   io.emit("projects", (project.id + project.updatedAt).toString());
+  io.emit("projectDetails", (project.id + project.updatedAt).toString());
 };
 
 const setProjectActivities = async (userId, projectId) => {
@@ -365,6 +363,7 @@ const setProjectIcon = async (projectId, updatedProjectIcon) => {
   await project.save();
 
   io.emit("projects", (project.id + project.updatedAt).toString());
+  io.emit("projectDetails", (project.id + project.updatedAt).toString());
   return project.icon;
 };
 
@@ -376,6 +375,7 @@ const removeProjectIcon = async (projectId) => {
   await project.save();
 
   io.emit("projects", (project.id + project.updatedAt).toString());
+  io.emit("projectDetails", (project.id + project.updatedAt).toString());
 };
 
 const removeProjectCollaborator = async (
@@ -480,15 +480,16 @@ const removeProjectCollaborator = async (
       collaborator.save({ session }),
     ]);
 
+    await session.commitTransaction();
+    session.endSession();
+
     io.emit("projectActivities", newActivity[0]._id);
     io.emit("notifications", newNotification[0]._id);
     io.emit("projects", (project.id + project.updatedAt).toString());
+    io.emit("projectDetails", (project.id + project.updatedAt).toString());
 
     const socketIdOfCollaborator = connectedUsers[collaborator.id];
     io.to(socketIdOfCollaborator).emit("kickedFromProject", projectId);
-
-    await session.commitTransaction();
-    session.endSession();
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -582,9 +583,9 @@ module.exports = {
   getProjectDetails,
   removeProjectIcon,
   setProjectDetails,
-  getProjectMembers,
   setProjectActivities,
   getProjectActivities,
   sendProjectInvitation,
+  getProjectCollaborators,
   removeProjectCollaborator,
 };
