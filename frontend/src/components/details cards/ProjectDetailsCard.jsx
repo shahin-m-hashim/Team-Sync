@@ -4,10 +4,10 @@ import { socket } from "@/App";
 import Loading from "../Loading";
 import useFetch from "@/hooks/useFetch";
 import { useParams } from "react-router-dom";
+import DetailsCard from "../cards/DetailsCard";
 import { getLocalSecureItem } from "@/lib/utils";
 import { UserContext } from "@/providers/UserProvider";
 import { useContext, useEffect, useState } from "react";
-import DetailsCard from "../cards/DetailsCard";
 
 export default function ProjectDetailsCard({
   showProjectActivitiesPopUp,

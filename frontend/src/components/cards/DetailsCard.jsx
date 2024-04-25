@@ -12,7 +12,6 @@ import groupChat from "../../assets/images/Chat Messages.png";
 import settings from "../../assets/images/settings colored.png";
 import groupVideoCall from "../../assets/images/Video Call.png";
 import ProjectActivities from "../activities/ProjectActivities";
-import SubTeamActivities from "../activities/SubTeamActivities";
 
 export default function DetailsCard({
   entity,
@@ -95,12 +94,6 @@ export default function DetailsCard({
             <TeamActivities
               showTeamActivitiesPopUp={showActivitiesPopUp}
               setShowTeamActivitiesPopUp={setShowActivitiesPopUp}
-            />
-          )}
-          {entity === "sub team" && (
-            <SubTeamActivities
-              showSubTeamActivitiesPopUp={showActivitiesPopUp}
-              setShowSubTeamActivitiesPopUp={setShowActivitiesPopUp}
             />
           )}
         </div>

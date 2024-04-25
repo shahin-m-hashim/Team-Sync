@@ -14,14 +14,13 @@ import FileProvider from "./providers/FileProvider";
 import SideBar from "./components/sidebars/UserSideBar";
 import TeamSettings from "./pages/settings/TeamSettings";
 import UserNavbar from "./components/navbars/UserNavbar";
+import TaskSettings from "./pages/settings/TaskSettings";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProjectSettings from "./pages/settings/ProjectSettings";
-import SubTeamSettings from "./pages/settings/SubTeamSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import TeamDashboard from "./components/dashBoards/TeamDashboard";
 import UserDashboard from "./components/dashBoards/UserDashboard";
 import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
-import SubTeamDashboard from "./components/dashBoards/SubTeamDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -71,7 +70,6 @@ const router = createBrowserRouter([
           },
           {
             path: "projects/:projectId",
-            element: <Outlet />,
             children: [
               {
                 index: true,
@@ -79,21 +77,10 @@ const router = createBrowserRouter([
               },
               {
                 path: "teams/:teamId",
-                element: <Outlet />,
                 children: [
                   {
                     index: true,
                     element: <TeamDashboard />,
-                  },
-                  {
-                    path: "subteams/:subTeamId",
-                    element: <Outlet />,
-                    children: [
-                      {
-                        index: true,
-                        element: <SubTeamDashboard />,
-                      },
-                    ],
                   },
                 ],
               },
@@ -110,12 +97,8 @@ const router = createBrowserRouter([
         element: <TeamSettings />,
       },
       {
-        path: "projects/:projectId/teams/:teamId/subteams/:subTeamId/settings",
-        element: <SubTeamSettings />,
-      },
-      {
-        path: "projects/:projectId/teams/:teamId/subteams/:subTeamId/tasks/:taskId/settings",
-        element: <Outlet />,
+        path: "projects/:projectId/teams/:teamId/tasks/:taskId/settings",
+        element: <TaskSettings />,
       },
       {
         path: "settings",

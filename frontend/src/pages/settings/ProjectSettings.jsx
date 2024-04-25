@@ -53,11 +53,12 @@ const ProjectSettings = () => {
       await deleteData(
         `projects/${projectId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
-      setReFetchProjectSettings((prev) => !prev);
-      toast.success("Collaborator kicked successfully");
+      toast.success("Project collaborator removed successfully");
       setDisableProjectUpdateButton(false);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to kick collaborator");
+    } finally {
+      setDisableProjectUpdateButton(false);
     }
   };
 
@@ -69,7 +70,6 @@ const ProjectSettings = () => {
       });
       setIsEditing(false);
       setShowUpdateProjectDetailsForm(false);
-      setReFetchProjectSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
       toast.error(
@@ -84,12 +84,10 @@ const ProjectSettings = () => {
     await updateData(`projects/${projectId}/icon`, {
       updatedProjectIcon: downloadURL,
     });
-    setReFetchProjectSettings((prev) => !prev);
   };
 
   const deleteProjectIcon = async () => {
     await deleteData(`projects/${projectId}/icon`);
-    setReFetchProjectSettings((prev) => !prev);
   };
 
   useEffect(() => {
