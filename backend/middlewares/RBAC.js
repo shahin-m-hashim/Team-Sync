@@ -1,6 +1,6 @@
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
-const subteams = require("../models/subTeamModel");
+const tasks = require("../models/taskModel");
 const projects = require("../models/projectModel");
 
 const isRegisteredUser = async (req, res, next) => {
@@ -110,29 +110,11 @@ const isTaskAssignee = async (req, res, next) => {
   }
 };
 
-const isSubTeamLeader = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { subTeamId } = req.params;
-
-    const subTeam = await subteams.findById(subTeamId).select("leader");
-    if (!subTeam) throw new Error("UnknownSubTeam");
-
-    if (userId === subTeam.leader.toString()) {
-      req.subTeam = req.params;
-      next();
-    } else throw new Error("ForbiddenAction");
-  } catch (e) {
-    next(e);
-  }
-};
-
 module.exports = {
   isTeamGuide,
   isTeamLeader,
   isTaskAssignee,
   isProjectLeader,
-  isSubTeamLeader,
   isRegisteredUser,
   isProjectCollaborator,
 };

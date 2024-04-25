@@ -154,6 +154,12 @@ const errorHandler = (error, req, res, next) => {
         error: "Task not found, Please create a task first.",
       });
 
+    case "TaskAlreadyExists":
+      return res.status(400).json({
+        success: false,
+        error: "A task with the given name already exists.",
+      });
+
     case "UserAlreadyAssignedToAnotherTask":
       return res.status(400).json({
         success: false,
@@ -169,6 +175,12 @@ const errorHandler = (error, req, res, next) => {
         success: false,
         error: "Validations failed.",
         validationErrors,
+      });
+
+    case "DeadlineError":
+      return res.status(400).json({
+        success: false,
+        error: "Deadline should be in the future",
       });
 
     case "TokenCreationFailure":

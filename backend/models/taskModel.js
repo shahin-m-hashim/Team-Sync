@@ -25,12 +25,18 @@ const taskSchema = new mongoose.Schema(
       required: [true, "Assignee is required"],
     },
     attachment: {
-      type: String,
-      validate: {
-        validator: (value) => !value || isValidFirebaseUrl(value),
-        message: "Invalid Image URL",
+      file: {
+        type: String,
+        validate: {
+          validator: (value) => !value || isValidFirebaseUrl(value),
+          message: "Invalid Image URL",
+        },
+        default: "",
       },
-      default: "",
+      firebaseId: {
+        type: String,
+        default: "",
+      },
     },
     priority: {
       type: String,
@@ -61,13 +67,12 @@ const taskSchema = new mongoose.Schema(
 taskSchema.index({ name: 1, parent: 1, grandParent: 1 }, { unique: true });
 
 taskSchema.pre("save", async function (next) {
-  const now = new Date();
-  const deadline = new Date(this.deadline);
+  if (this.deadline < this.createdAt) throw new Error("DeadlineError");
 
   setTimeout(async () => {
     this.status = "Stopped";
     await this.save();
-  }, deadline - now);
+  }, this.deadline - this.createdAt);
 
   next();
 });

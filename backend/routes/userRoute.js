@@ -10,7 +10,6 @@ const {
   rejectInvitation,
   fetchAllUserTeams,
   handleNotifications,
-  fetchAllUserSubTeams,
   fetchAllUserProjects,
   updatePrimaryDetails,
   updateContactDetails,
@@ -30,7 +29,6 @@ userRouter.post("/project", isRegisteredUser, addProject);
 userRouter.get("/user", fetchUserDetails);
 userRouter.get("/teams", fetchAllUserTeams);
 userRouter.get("/projects", fetchAllUserProjects);
-userRouter.get("/subteams", fetchAllUserSubTeams);
 userRouter.get("/invitations", fetchAllUserInvitations);
 userRouter.get("/notifications", fetchAllUserNotifications);
 
