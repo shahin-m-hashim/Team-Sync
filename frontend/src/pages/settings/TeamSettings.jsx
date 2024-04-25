@@ -52,8 +52,7 @@ const TeamSettings = () => {
       await deleteData(
         `projects/${projectId}/teams/${teamId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
-      toast.success("Team collaborator kicked successfully");
-      setReFetchTeamSettings(false);
+      toast.success("Team collaborator removed successfully");
     } catch (e) {
       toast.error(e.response.data.error || "Failed to kick team collaborator");
     } finally {
@@ -70,7 +69,6 @@ const TeamSettings = () => {
       );
       setIsEditing(false);
       setShowUpdateTeamDetailsForm(false);
-      setReFetchTeamSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
       console.log(e);
@@ -88,7 +86,6 @@ const TeamSettings = () => {
         updatedTeamIcon: downloadURL,
       });
       setIsEditing(false);
-      setReFetchTeamSettings((prev) => !prev);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to update team icon");
     }
@@ -97,7 +94,6 @@ const TeamSettings = () => {
   const deleteTeamIcon = async () => {
     try {
       await deleteData(`projects/${projectId}/teams/${teamId}/icon`);
-      setReFetchTeamSettings((prev) => !prev);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to delete team icon");
     }

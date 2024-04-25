@@ -12,7 +12,6 @@ import { capitalizeFirstLetterOfEachWord } from "@/helpers/stringHandler";
 import UpdateEntityDetailsForm from "@/components/forms/UpdateEntityDetailsForm";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import AddTeamCollaboratorForm from "@/components/forms/teams/AddTeamCollaboratorForm";
-import AddSubTeamCollaboratorForm from "@/components/forms/subTeams/AddSubTeamCollaboratorForm";
 
 const EntitySettings = ({
   entity,
@@ -155,16 +154,6 @@ const EntitySettings = ({
                         setShowAddEntityCollaboratorForm
                       }
                       setShowTeamLeaderDemotionConfirmation={
-                        setShowEntityLeaderDemotionConfirmation
-                      }
-                    />
-                  )}
-                  {entity === "sub team" && (
-                    <AddSubTeamCollaboratorForm
-                      setShowAddSubTeamCollaboratorForm={
-                        setShowAddEntityCollaboratorForm
-                      }
-                      setShowSubTeamLeaderDemotionConfirmation={
                         setShowEntityLeaderDemotionConfirmation
                       }
                     />

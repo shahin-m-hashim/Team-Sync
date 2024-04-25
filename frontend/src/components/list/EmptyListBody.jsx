@@ -3,10 +3,7 @@ import bye from "../../assets/images/bye brain.png";
 
 export default function EmptyListBody({ name, listNameSearchTxt }) {
   return (
-    <div
-      id={`${name}Body`}
-      className="flex items-center justify-center gap-10 pt-5"
-    >
+    <div className="flex items-center justify-center gap-10 pt-5">
       <img src={bye} width="20%" alt={`no${name}`} />
       <div className="text-center">
         {listNameSearchTxt === "" ? (

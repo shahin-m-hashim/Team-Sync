@@ -13,14 +13,16 @@ import { useState, createContext } from "react";
 const storage = getStorage(app);
 export const FileContext = createContext();
 
-const FileProvider = ({ children }) => {
-  const [file, setFile] = useState({
-    uploadProgress: 0,
-    uploadedFileURL: "",
-    uploadStatus: "idle",
-  });
+const initialFile = {
+  uploadProgress: 0,
+  uploadedFileURL: "",
+  uploadStatus: "idle",
+};
 
-  const uploadFile = async (newFile, path, updateSecondaryDatabase) => {
+const FileProvider = ({ children }) => {
+  const [file, setFile] = useState(initialFile);
+
+  const uploadFile = async (type, newFile, path, updateSecondaryDatabase) => {
     if (!newFile) return;
     try {
       const fileRef = ref(storage, path);
@@ -32,8 +34,9 @@ const FileProvider = ({ children }) => {
       const uploadTask = uploadBytesResumable(fileRef, newFile);
 
       uploadTask.on("state_changed", (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
 
         setFile((prevFile) => ({
           ...prevFile,
@@ -43,7 +46,7 @@ const FileProvider = ({ children }) => {
 
       await uploadTask;
       const uploadedFileURL = await getDownloadURL(fileRef);
-      await updateSecondaryDatabase(uploadedFileURL);
+      type !== "direct" && (await updateSecondaryDatabase(uploadedFileURL));
 
       setFile({
         uploadedFileURL,
@@ -70,8 +73,10 @@ const FileProvider = ({ children }) => {
     <FileContext.Provider
       value={{
         file,
+        setFile,
         uploadFile,
         deleteFile,
+        initialFile,
       }}
     >
       {children}

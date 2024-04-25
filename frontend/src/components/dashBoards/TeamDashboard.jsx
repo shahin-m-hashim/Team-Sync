@@ -3,37 +3,34 @@
 
 import { socket } from "@/App";
 import Loading from "../Loading";
-import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
-import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
+import TaskForm from "../forms/tasks/TaskForm";
+import KickedPopUp from "../popups/KickedPopUp";
+import { getLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
+import LeaderDemotion from "../popups/LeaderDemotion";
 import { UserContext } from "@/providers/UserProvider";
-import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import TeamDetailsCard from "../details cards/TeamDetailsCard";
 import { useContext, useEffect, useReducer, useState } from "react";
 import AddTeamCollaboratorForm from "../forms/teams/AddTeamCollaboratorForm";
-import KickedPopUp from "../popups/KickedPopUp";
-import LeaderDemotion from "../popups/LeaderDemotion";
 
 export default function TeamDashboard() {
   const { projectId, teamId } = useParams();
   const { setError } = useContext(UserContext);
+  const { username } = getLocalSecureItem("user", "low");
 
   const [kickedFrom, setKickedFrom] = useState("team");
-  const [reFetchSubTeams, setReFetchSubTeams] = useState(false);
+  const [reFetchTasks, setReFetchTasks] = useState(false);
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
+  const [listOnlyYourTasks, setListOnlyYourTasks] = useState(false);
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
-  const [showAddSubTeamForm, setShowAddSubTeamForm] = useState(false);
-  const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
   const [showKickedFromTeamPopUp, setShowKickedFromTeamPopUp] = useState(false);
-
-  const [disableAddTeamSubTeamButton, setDisableAddTeamSubTeamButton] =
-    useState(false);
 
   const [
     showTeamLeaderDemotionConfirmation,
@@ -45,64 +42,45 @@ export default function TeamDashboard() {
 
   const [showTeamActivitiesPopUp, setShowTeamActivitiesPopUp] = useState(false);
 
-  const subTeams = useFetch(
-    `projects/${projectId}/teams/${teamId}/subTeams`,
-    reFetchSubTeams
+  const tasks = useFetch(
+    `projects/${projectId}/teams/${teamId}/tasks`,
+    reFetchTasks
   );
 
-  const leaderSubTeams = subTeams?.data?.filter(
-    (team) => team.role === "Leader"
-  );
-
-  const handleAddSubTeam = async (subTeamDetails) => {
-    try {
-      setDisableAddTeamSubTeamButton(true);
-      await addData(`projects/${projectId}/teams/${teamId}/subTeam`, {
-        subTeamDetails,
-      });
-      setShowAddSubTeamForm(false);
-      toast.success("Sub team added successfully");
-    } catch (e) {
-      toast.error(
-        e.response.data.error || "An unexpected error occurred, try again later"
-      );
-    } finally {
-      setDisableAddTeamSubTeamButton(false);
-    }
-  };
+  const yourTasks = tasks?.data?.filter((task) => task.assignee === username);
 
   const resetSubTeamList = () => {
     setTeamNameSearchTxt("");
-    setListOnlyLeaderSubTeams(false);
+    setListOnlyYourTasks(false);
     setTeamFilterBtnTxt("Filter");
-    setSubTeams({
+    setTasks({
       type: "RESET",
-      initialState: subTeams?.data,
+      initialState: tasks?.data,
     });
   };
 
-  const [initialSubTeams, dispatch] = useReducer(listReducer, subTeams?.data);
-  const setSubTeams = (action) => dispatch(action);
+  const [initialTasks, dispatch] = useReducer(listReducer, tasks?.data);
+  const setTasks = (action) => dispatch(action);
 
   useEffect(() => {
     setTeamNameSearchTxt("");
     setTeamFilterBtnTxt("Filter");
-    if (listOnlyLeaderSubTeams) {
-      setSubTeams({
+    if (listOnlyYourTasks) {
+      setTasks({
         type: "SWITCH",
-        payload: leaderSubTeams,
+        payload: yourTasks,
       });
     } else {
-      setSubTeams({
+      setTasks({
         type: "SWITCH",
-        payload: subTeams?.data,
+        payload: tasks?.data,
       });
     }
-  }, [subTeams?.data, listOnlyLeaderSubTeams]);
+  }, [tasks?.data, listOnlyYourTasks]);
 
   useEffect(() => {
-    socket.on("subTeams", (team) => setReFetchSubTeams(team));
-    return () => socket.off("subTeams");
+    socket.on("tasks", (task) => setReFetchTasks(task));
+    return () => socket.off("tasks");
   }, []);
 
   useEffect(() => {
@@ -112,19 +90,12 @@ export default function TeamDashboard() {
     });
   }, []);
 
-  useEffect(() => {
-    socket.on("kickedFromTeam", () => {
-      setKickedFrom("team");
-      setShowKickedFromTeamPopUp(true);
-    });
-  }, []);
-
-  if (subTeams?.error === "unauthorized") {
+  if (tasks?.error === "unauthorized") {
     setError("unauthorized");
     return null;
   }
 
-  if (subTeams?.error === "serverError") {
+  if (tasks?.error === "serverError") {
     setError("serverError");
     return null;
   }
@@ -145,15 +116,7 @@ export default function TeamDashboard() {
           setShowKickedFromEntityPopUp={setShowKickedFromTeamPopUp}
         />
       )}
-      {showAddSubTeamForm && (
-        <AddListEntityForm
-          renderList="Sub Team"
-          handleAddEntity={handleAddSubTeam}
-          setShowAddEntityForm={setShowAddSubTeamForm}
-          disableAddEntityButton={disableAddTeamSubTeamButton}
-          description="Your sub team is where you can add members, create and assign tasks to work with them effortlessly."
-        />
-      )}
+      {showTaskForm && <TaskForm setShowTaskForm={setShowTaskForm} />}
       {showAddTeamCollaboratorForm && (
         <div className="absolute inset-0 z-[50] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
@@ -172,8 +135,8 @@ export default function TeamDashboard() {
           setShowTeamActivitiesPopUp={setShowTeamActivitiesPopUp}
           setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
         />
-        {initialSubTeams ? (
-          <StatusCard list={initialSubTeams} renderList="Team" />
+        {initialTasks ? (
+          <StatusCard list={initialTasks} renderList="Team" />
         ) : (
           <div className="relative bg-[#141414]">
             <Loading />
@@ -182,27 +145,27 @@ export default function TeamDashboard() {
       </div>
       <div>
         <ListHeader
-          renderList="Sub Team"
-          setList={setSubTeams}
+          renderList="Task"
+          setList={setTasks}
           projectId={projectId}
-          leaderList={leaderSubTeams}
+          leaderList={yourTasks}
+          initialList={tasks?.data}
           resetList={resetSubTeamList}
-          initialList={subTeams?.data}
+          switchList={listOnlyYourTasks}
           filterBtnTxt={teamFilterBtnTxt}
-          switchList={listOnlyLeaderSubTeams}
+          setSwitchList={setListOnlyYourTasks}
           listNameSearchTxt={teamNameSearchTxt}
           setFilterBtnTxt={setTeamFilterBtnTxt}
-          setSwitchList={setListOnlyLeaderSubTeams}
+          setShowAddEntityForm={setShowTaskForm}
           setListNameSearchTxt={setTeamNameSearchTxt}
-          setShowAddEntityForm={setShowAddSubTeamForm}
         />
       </div>
       <div className="flex flex-col h-full border-white border-2 rounded-b-md border-t-0 overflow-auto bg-[#141414] text-white">
-        <ListSubHeader renderList="Sub Team" />
-        {initialSubTeams ? (
+        <ListSubHeader renderList="Task" />
+        {initialTasks ? (
           <ListBody
-            renderList={"Sub Team"}
-            list={initialSubTeams || []}
+            renderList="Task"
+            list={initialTasks || []}
             listNameSearchTxt={teamNameSearchTxt}
           />
         ) : (

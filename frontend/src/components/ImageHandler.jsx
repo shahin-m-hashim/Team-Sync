@@ -64,7 +64,7 @@ export default function ImageHandler({
 
     try {
       toast.info(`${type || "Image"} will be updated shortly...`);
-      await uploadFile(imgFile, firebasePath, updateImage);
+      await uploadFile("", imgFile, firebasePath, updateImage);
       toast.success(`${type || "Image"} updated successfully !!!`);
     } catch (error) {
       if (error.response?.status === 401) {

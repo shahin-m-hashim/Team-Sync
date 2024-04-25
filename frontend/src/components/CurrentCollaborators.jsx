@@ -61,7 +61,7 @@ const CurrentCollaborators = ({
                     kickCollaborator(collaborator?.username, collaborator.role)
                   }
                 >
-                  Kick
+                  Remove
                 </button>
               )}
             </div>

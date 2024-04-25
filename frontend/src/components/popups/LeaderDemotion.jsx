@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { updateData } from "@/services/db";
 import { useNavigate, useParams } from "react-router-dom";
 import { capitalizeFirstLetterOfEachWord } from "@/helpers/stringHandler";
+import { toast } from "react-toastify";
 
 /* eslint-disable react/prop-types */
 function LeaderDemotion({
@@ -12,29 +13,24 @@ function LeaderDemotion({
   setShowEntityLeaderDemotion,
 }) {
   const navigate = useNavigate();
-  const { projectId, teamId, subTeamId } = useParams();
+  const { projectId, teamId } = useParams();
 
   useEffect(() => {
     hideAddEntityForm(false);
   }, []);
 
   const handleConfirm = async () => {
-    setShowEntityLeaderDemotion(false);
-
-    if (entity === "team") {
-      await updateData(`projects/${projectId}/teams/${teamId}/leader`, {
-        username,
-      });
-    } else {
-      await updateData(
-        `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/leader`,
-        {
+    try {
+      setShowEntityLeaderDemotion(false);
+      if (entity === "team") {
+        await updateData(`projects/${projectId}/teams/${teamId}/leader`, {
           username,
-        }
-      );
+        });
+      }
+      navigate("/", { replace: true });
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to demote leader");
     }
-
-    navigate("/", { replace: true });
   };
 
   return (
