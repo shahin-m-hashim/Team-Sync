@@ -11,6 +11,7 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
   const { projectId } = useParams();
 
   const [selectedUser, setSelectedUser] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
   const [selectedRole, setSelectedRole] = useState("member");
 
   const [showSearchForm, setShowSearchFrom] = useState(true);
@@ -19,6 +20,7 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
   const sendInvite = async (e) => {
     e.preventDefault();
     try {
+      setDisableButton(true);
       await addData(`projects/${projectId}/invite`, {
         username: selectedUser.username,
         role: selectedRole,
@@ -36,6 +38,7 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
       setSelectedRole("member");
 
       setShowSearchFrom(true);
+      setDisableButton(false);
       setShowAssignRoleForm(false);
     }
   };
@@ -67,6 +70,7 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
             entity="project"
             selectedUser={selectedUser}
             selectedRole={selectedRole}
+            disableButton={disableButton}
             setSelectedRole={setSelectedRole}
             cancelAddCollaborator={cancelInvite}
             setShowSearchFrom={setShowSearchFrom}

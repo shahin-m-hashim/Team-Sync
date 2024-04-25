@@ -32,6 +32,9 @@ export default function TeamDashboard() {
   const [listOnlyLeaderSubTeams, setListOnlyLeaderSubTeams] = useState(false);
   const [showKickedFromTeamPopUp, setShowKickedFromTeamPopUp] = useState(false);
 
+  const [disableAddTeamSubTeamButton, setDisableAddTeamSubTeamButton] =
+    useState(false);
+
   const [
     showTeamLeaderDemotionConfirmation,
     setShowTeamLeaderDemotionConfirmation,
@@ -53,6 +56,7 @@ export default function TeamDashboard() {
 
   const handleAddSubTeam = async (subTeamDetails) => {
     try {
+      setDisableAddTeamSubTeamButton(true);
       await addData(`projects/${projectId}/teams/${teamId}/subTeam`, {
         subTeamDetails,
       });
@@ -62,6 +66,8 @@ export default function TeamDashboard() {
       toast.error(
         e.response.data.error || "An unexpected error occurred, try again later"
       );
+    } finally {
+      setDisableAddTeamSubTeamButton(false);
     }
   };
 
@@ -144,6 +150,7 @@ export default function TeamDashboard() {
           renderList="Sub Team"
           handleAddEntity={handleAddSubTeam}
           setShowAddEntityForm={setShowAddSubTeamForm}
+          disableAddEntityButton={disableAddTeamSubTeamButton}
           description="Your sub team is where you can add members, create and assign tasks to work with them effortlessly."
         />
       )}

@@ -26,6 +26,8 @@ const TeamSettings = () => {
   const [showUpdateTeamDetailsForm, setShowUpdateTeamDetailsForm] =
     useState(false);
 
+  const [disableTeamUpdateButton, setDisableTeamUpdateButton] = useState(false);
+
   const teamSettings = useFetch(
     `projects/${projectId}/teams/${teamId}/details`,
     reFetchTeamSettings
@@ -46,24 +48,28 @@ const TeamSettings = () => {
 
   const kickTeamCollaborator = async (username, role) => {
     try {
+      setDisableTeamUpdateButton(true);
       await deleteData(
         `projects/${projectId}/teams/${teamId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
       toast.success("Team collaborator kicked successfully");
+      setReFetchTeamSettings(false);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to kick team collaborator");
+    } finally {
+      setDisableTeamUpdateButton(false);
     }
   };
 
   const handleUpdateTeamDetails = async (updatedTeamDetails) => {
     try {
+      setDisableTeamUpdateButton(true);
       const { data } = await updateData(
         `projects/${projectId}/teams/${teamId}/details`,
         { updatedTeamDetails }
       );
       setIsEditing(false);
       setShowUpdateTeamDetailsForm(false);
-
       setReFetchTeamSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
@@ -71,6 +77,8 @@ const TeamSettings = () => {
       toast.error(
         e.response?.data?.error || "An Unknown error occurred. Try again later."
       );
+    } finally {
+      setDisableTeamUpdateButton(false);
     }
   };
 
@@ -125,6 +133,7 @@ const TeamSettings = () => {
         validationSchema={teamValidationSchema}
         kickCollaborator={kickTeamCollaborator}
         setReFetchEntitySettings={setReFetchTeamSettings}
+        disableEntityUpdateButton={disableTeamUpdateButton}
         handleUpdateEntityDetails={handleUpdateTeamDetails}
         showCurrentCollaborators={showCurrentTeamCollaborators}
         showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}

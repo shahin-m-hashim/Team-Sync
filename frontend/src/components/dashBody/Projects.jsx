@@ -6,39 +6,28 @@ import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
-import { setLocalSecureItem } from "@/lib/utils";
+import { useParams } from "react-router-dom";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
 import InvitationsCard from "../cards/InvitationsCard";
 import { UserContext } from "@/providers/UserProvider";
+import { ErrorContext } from "@/providers/ErrorProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import { useContext, useEffect, useReducer, useState } from "react";
 
-export default function UserDashboard() {
-  const { setError } = useContext(UserContext);
+export default function Projects() {
+  const { userId } = useParams();
+  const { setError } = useContext(ErrorContext);
   const { reFetchProjects, setReFetchProjects } = useContext(UserContext);
 
   const [showAddProjectForm, setShowAddProjectForm] = useState(false);
   const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
   const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderProjects, setListOnlyLeaderProjects] = useState(false);
-  const [disableAddProjectButton, setDisableAddProjectButton] = useState(false);
 
   const projects = useFetch("projects", reFetchProjects);
-
-  if (projects.data) {
-    setLocalSecureItem(
-      "projects",
-      projects?.data?.map((project) => ({
-        project: project.id,
-        role: project.role,
-      })),
-      "medium"
-    );
-  }
-
   const leaderProjects = projects?.data?.filter(
     (project) => project.role === "Leader"
   );
@@ -48,7 +37,6 @@ export default function UserDashboard() {
 
   const handleAddProject = async (projectDetails) => {
     try {
-      setDisableAddProjectButton(true);
       await addData("project", { projectDetails });
       setReFetchProjects((prev) => !prev);
       setShowAddProjectForm(false);
@@ -57,8 +45,6 @@ export default function UserDashboard() {
       toast.error(
         e.response.data.error || "An unexpected error occurred, try again later"
       );
-    } finally {
-      setDisableAddProjectButton(false);
     }
   };
 
@@ -111,7 +97,6 @@ export default function UserDashboard() {
           handleAddEntity={handleAddProject}
           setReFetchProjects={setReFetchProjects}
           setShowAddEntityForm={setShowAddProjectForm}
-          disableAddEntityButton={disableAddProjectButton}
           description="Your project is where you can create your teams, add members and work with them effortlessly."
         />
       )}
@@ -145,6 +130,7 @@ export default function UserDashboard() {
         <ListSubHeader renderList="Project" />
         {initialProjects ? (
           <ListBody
+            userId={userId}
             renderList="Project"
             list={initialProjects}
             listNameSearchTxt={projectNameSearchTxt}

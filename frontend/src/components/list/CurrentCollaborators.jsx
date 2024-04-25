@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
 
-import defaultDp from "../assets/images/defaultDp.png";
+import defaultDp from "../../assets/images/defaultDp.png";
 
 const CurrentCollaborators = ({
   collaborators,
   kickCollaborator,
-  disableEntityUpdateButton,
   setShowCurrentCollaborators,
 }) => {
   return (
@@ -55,11 +54,10 @@ const CurrentCollaborators = ({
                 <div className="text-center">N/A</div>
               ) : (
                 <button
-                  disabled={disableEntityUpdateButton}
-                  className="p-1 text-white bg-red-500"
                   onClick={() =>
                     kickCollaborator(collaborator?.username, collaborator.role)
                   }
+                  className="p-1 text-white bg-red-500"
                 >
                   Kick
                 </button>
