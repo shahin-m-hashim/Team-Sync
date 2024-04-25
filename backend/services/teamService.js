@@ -3,8 +3,8 @@ const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
+const tasks = require("../models/taskModel");
 const projects = require("../models/projectModel");
-const subteams = require("../models/subTeamModel");
 const activities = require("../models/activityModel");
 const notifications = require("../models/notificationModel");
 
@@ -102,38 +102,24 @@ const getTeamActivities = async (userId, teamId) => {
   );
 };
 
-const getTeamSubTeams = async (teamId, userId) => {
-  const team = await teams.findById(teamId).select("subTeams").populate({
-    path: "subTeams",
-    select:
-      "parent grandParent name createdAt icon progress status leader guide members",
+const getTeamTasks = async (teamId) => {
+  const team = await teams.findById(teamId).select("tasks").populate({
+    path: "tasks",
+    select: "-__v -updatedAt",
   });
-  if (!team) throw new Error("UnknownSubTeam");
+  if (!team) throw new Error("UnknownTask");
 
-  const formattedSubTeams = team.subTeams.map((subTeam) => {
-    let role = "Collaborator";
-
-    const createdAt = moment(subTeam.createdAt).format("DD/MM/YYYY");
-
-    if (subTeam.guide?.toString() === userId) role = "Guide";
-    if (subTeam.leader?.toString() === userId) role = "Leader";
-    if (team.members?.some((member) => member.toString() === userId))
-      role = "Member";
-
+  const formattedTasks = team.tasks.map((task) => {
+    const deadline = moment(task.deadline).format("DD/MM/YYYY");
+    const createdAt = moment(task.createdAt).format("DD/MM/YYYY");
     return {
-      role,
+      ...task._doc,
       createdAt,
-      id: subTeam._id,
-      name: subTeam.name,
-      icon: subTeam.icon,
-      parent: subTeam.parent,
-      status: subTeam.status,
-      progress: subTeam.progress,
-      grandParent: subTeam.grandParent,
+      deadline,
     };
   });
 
-  return formattedSubTeams;
+  return formattedTasks;
 };
 
 // POST
@@ -236,69 +222,83 @@ const createTeamMember = async (teamId, newMemberUsername) => {
   }
 };
 
-const createSubTeam = async (userId, teamId, subTeamDetails) => {
+const assignTask = async (userId, teamId, taskDetails) => {
   let session = null;
 
   try {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const user = await users
-      .findById(userId)
-      .select("subTeams")
-      .session(session);
-    if (!user) throw new Error("UnknownUser");
-
     const team = await teams
       .findById(teamId)
-      .select("parent leader guide subTeams activities")
-      .populate({
-        path: "leader",
-        select: "username",
-      })
+      .select("name parent tasks activities unavailableMembers")
+      .populate({ path: "parent", select: "name" })
       .session(session);
     if (!team) throw new Error("UnknownTeam");
 
-    const newSubTeam = await subteams.create(
+    const { assigneeUsername } = taskDetails;
+
+    const assignee = await users
+      .find({ username: assigneeUsername })
+      .select("tasks notifications")
+      .session(session);
+    if (!assignee) throw new Error("UnknownUser");
+
+    if (team.unavailableMembers.includes(assigneeUsername))
+      throw new Error("UserAlreadyAssignedToAnotherTask");
+
+    const newTask = await tasks.create(
       [
         {
-          ...subTeamDetails,
-          grandParent: team.parent,
+          ...taskDetails,
           parent: teamId,
-          leader: userId,
-          guide: team.guide,
+          grandParent: team.parent,
         },
       ],
       { session }
     );
 
-    user.subTeams.push(newSubTeam[0]._id);
-    team.subTeams.push(newSubTeam[0]._id);
+    team.tasks.push(newTask[0]._id);
+    assignee.tasks.push(newTask[0]._id);
 
     const newActivity = await activities.create(
       [
         {
-          entity: "team",
           team: teamId,
-          type: "subTeamAddedToTeam",
-          image: newSubTeam[0].icon,
-          message: `A new sub team ${newSubTeam[0].name} is added to this team by leader ${team.leader.username}`,
+          entity: "team",
+          type: "teamTaskAdded",
+          message: `A new task ${newTask[0].name} is added to this team by leader ${team.leader.username}`,
           read_users: [{ readBy: userId, isRead: true }],
         },
       ],
       { session }
     );
-
     team.activities.push(newActivity[0]._id);
 
-    await Promise.all([user.save({ session }), team.save({ session })]);
+    const newNotification = await notifications.create(
+      [
+        {
+          from: userId,
+          to: assignee[0]._id,
+          type: "assignedTask",
+          message: `You have been assigned a new task ${newTask[0].name} in team ${team.name} in project ${team.parent.name} by the team leader ${team.leader.username}.`,
+        },
+      ],
+      { session }
+    );
+
+    team.unavailableMembers.push(assigneeUsername);
+    assignee.notifications.push(newNotification[0]._id);
+
+    await Promise.all([assignee.save({ session }), team.save({ session })]);
 
     await session.commitTransaction();
     session.endSession();
 
-    io.emit("subTeams", newSubTeam[0]._id);
+    io.emit("tasks", newTask[0]._id);
     io.emit("teamActivities", newActivity[0]._id);
-    return newSubTeam[0]._id;
+    io.emit("notifications", newNotification[0]._id);
+    return newTask[0]._id;
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -752,15 +752,15 @@ const removeTeamCollaborator = async (teamId, collaboratorUsername, role) => {
 };
 
 module.exports = {
+  assignTask,
   setTeamIcon,
   setTeamGuide,
-  createSubTeam,
+  getTeamTasks,
   setTeamLeader,
   getTeamDetails,
   setTeamDetails,
   removeTeamIcon,
   getTeamMembers,
-  getTeamSubTeams,
   createTeamMember,
   getTeamActivities,
   setTeamActivities,

@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const { isEmail, isURL, isStrongPassword } = require("validator");
+
 const {
   isValidFirebaseUrl,
   isValidGitHubURL,
@@ -183,16 +184,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    subTeams: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "subteams",
-      },
-    ],
-    NOST: {
-      type: Number,
-      default: 0,
-    },
     tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -253,7 +244,6 @@ userSchema.pre("save", async function (next) {
   this.NOTe = this.teams?.length;
   this.NOTa = this.tasks?.length;
   this.NOP = this.projects?.length;
-  this.NOST = this.subTeams?.length;
   this.NOC = this.connections?.length;
   this.NOI = this.invitations?.length;
   this.NON = this.notifications?.length;
@@ -261,11 +251,6 @@ userSchema.pre("save", async function (next) {
   this.phone.countryCode = this.phone.countryCode || "+91";
   this.address.country = this.address.country || "IN";
   this.wasNew = this.isNew;
-  next();
-});
-
-userSchema.post("save", async function (userDoc, next) {
-  if (this.wasNew) console.log(`User ${userDoc.id} is saved successfully`);
   next();
 });
 

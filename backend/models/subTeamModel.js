@@ -95,10 +95,4 @@ subTeamSchema.pre("save", async function (next) {
   next();
 });
 
-subTeamSchema.post("save", async function (subTeamDoc, next) {
-  if (this.wasNew)
-    console.log(`Sub team ${subTeamDoc.id} is saved successfully`);
-  next();
-});
-
 module.exports = mongoose.model("subteams", subTeamSchema);
