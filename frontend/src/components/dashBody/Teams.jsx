@@ -6,23 +6,21 @@ import Loading from "../Loading";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { addData } from "@/services/db";
+import DetailCard from "../cards/DetailCard";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
-import KickedPopUp from "../popups/KickedPopUp";
-import { setLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
-import { UserContext } from "@/providers/UserProvider";
+import { ErrorContext } from "@/providers/ErrorProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
 import { useContext, useEffect, useReducer, useState } from "react";
-import ProjectDetailsCard from "../details cards/ProjectDetailsCard";
 import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
 
-export default function ProjectDashboard() {
-  const { projectId } = useParams();
-  const { setError } = useContext(UserContext);
+export default function Teams() {
+  const { userId, projectId } = useParams();
+  const { setError } = useContext(ErrorContext);
 
   const [reFetchTeams, setReFetchTeams] = useState(false);
   const [showAddTeamForm, setShowAddTeamForm] = useState(false);
@@ -30,33 +28,10 @@ export default function ProjectDashboard() {
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderTeams, setListOnlyLeaderTeams] = useState(false);
 
-  const [disableAddProjectTeamButton, setDisableAddProjectTeamButton] =
+  const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
     useState(false);
-
-  const [showKickedFromProjectPopUp, setShowKickedFromProjectPopUp] =
-    useState(false);
-
-  const [showProjectActivitiesPopUp, setShowProjectActivitiesPopUp] =
-    useState(false);
-
-  const [
-    showInviteProjectCollaboratorForm,
-    setShowInviteProjectCollaboratorForm,
-  ] = useState(false);
 
   const teams = useFetch(`projects/${projectId}/teams`, reFetchTeams);
-
-  if (teams?.data) {
-    setLocalSecureItem(
-      "teams",
-      teams?.data?.map((team) => ({
-        team: team.id,
-        role: team.role,
-      })),
-      "medium"
-    );
-  }
-
   const leaderTeams = teams?.data?.filter((team) => team.role === "Leader");
 
   const [initialTeams, dispatch] = useReducer(listReducer, teams?.data);
@@ -64,7 +39,6 @@ export default function ProjectDashboard() {
 
   const handleAddTeam = async (teamDetails) => {
     try {
-      setDisableAddProjectTeamButton(true);
       await addData(`projects/${projectId}/team`, { teamDetails });
       setShowAddTeamForm(false);
       toast.success("Team added successfully");
@@ -72,8 +46,6 @@ export default function ProjectDashboard() {
       toast.error(
         e.response.data.error || "An unexpected error occurred, try again later"
       );
-    } finally {
-      setDisableAddProjectTeamButton(false);
     }
   };
 
@@ -108,10 +80,6 @@ export default function ProjectDashboard() {
     return () => socket.off("teams");
   }, []);
 
-  useEffect(() => {
-    socket.on("kickedFromProject", () => setShowKickedFromProjectPopUp(true));
-  });
-
   if (teams?.error === "unauthorized") {
     setError("unauthorized");
     return null;
@@ -124,39 +92,29 @@ export default function ProjectDashboard() {
 
   return (
     <>
-      {showKickedFromProjectPopUp && (
-        <KickedPopUp
-          entity="project"
-          setShowKickedFromEntityPopUp={setShowKickedFromProjectPopUp}
-        />
-      )}
       {showAddTeamForm && (
         <AddListEntityForm
           renderList="Team"
           handleAddEntity={handleAddTeam}
           setShowAddEntityForm={setShowAddTeamForm}
-          disableAddEntityButton={disableAddProjectTeamButton}
-          description="Your team is where you can organize your sub teams, add members and work with them effortlessly."
+          description="Your Team is where you can organize your sub teams, add members and work with them effortlessly."
         />
       )}
-      {showInviteProjectCollaboratorForm && (
+      {showSendProjectInviteForm && (
         <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
             <SendProjectInviteForm
-              setShowSendProjectInviteForm={
-                setShowInviteProjectCollaboratorForm
-              }
+              projectId={projectId}
+              setShowSendProjectInviteForm={setShowSendProjectInviteForm}
             />
           </div>
         </div>
       )}
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
-        <ProjectDetailsCard
-          showProjectActivitiesPopUp={showProjectActivitiesPopUp}
-          setShowProjectActivitiesPopUp={setShowProjectActivitiesPopUp}
-          setShowInviteProjectCollaboratorForm={
-            setShowInviteProjectCollaboratorForm
-          }
+        <DetailCard
+          renderList="Team"
+          projectId={projectId}
+          setShowSendProjectInviteForm={setShowSendProjectInviteForm}
         />
         {initialTeams ? (
           <StatusCard list={initialTeams} renderList="Team" />
@@ -170,14 +128,14 @@ export default function ProjectDashboard() {
         <ListHeader
           renderList="Team"
           setList={setTeams}
-          leaderList={leaderTeams}
           initialList={teams?.data}
+          leaderList={leaderTeams}
           resetList={resetTeamList}
           filterBtnTxt={teamFilterBtnTxt}
           switchList={listOnlyLeaderTeams}
+          setSwitchList={setListOnlyLeaderTeams}
           listNameSearchTxt={teamNameSearchTxt}
           setFilterBtnTxt={setTeamFilterBtnTxt}
-          setSwitchList={setListOnlyLeaderTeams}
           setShowAddEntityForm={setShowAddTeamForm}
           setListNameSearchTxt={setTeamNameSearchTxt}
         />
@@ -186,7 +144,8 @@ export default function ProjectDashboard() {
         <ListSubHeader renderList="Team" />
         {initialTeams ? (
           <ListBody
-            renderList="Team"
+            userId={userId}
+            renderList={"Team"}
             list={initialTeams || []}
             listNameSearchTxt={teamNameSearchTxt}
           />

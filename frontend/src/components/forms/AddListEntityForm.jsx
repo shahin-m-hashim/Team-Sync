@@ -7,6 +7,7 @@ export default function AddListEntityForm({
   description,
   handleAddEntity,
   setShowAddEntityForm,
+  disableAddEntityButton,
 }) {
   const lengthErrorRef = useRef();
   const requiredErrorRef = useRef();
@@ -76,6 +77,7 @@ export default function AddListEntityForm({
           You can add in members later
         </div>
         <button
+          disabled={disableAddEntityButton}
           onClick={() => validateAndSubmit()}
           className="rounded-lg  font-bold w-full px-3 py-2 bg-[#3085e5] text-black"
         >

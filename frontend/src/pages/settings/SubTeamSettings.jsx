@@ -26,6 +26,9 @@ const SubTeamSettings = () => {
   const [showUpdateSubTeamDetailsForm, setShowUpdateSubTeamDetailsForm] =
     useState(false);
 
+  const [disableSubTeamUpdateButton, setDisableSubTeamUpdateButton] =
+    useState(false);
+
   const subTeamSettings = useFetch(
     `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/details`,
     reFetchSubTeamSettings
@@ -46,6 +49,7 @@ const SubTeamSettings = () => {
 
   const handleAddSubTeamCollaborator = async (values) => {
     try {
+      setDisableSubTeamUpdateButton(true);
       await updateData(
         `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/add`,
         values
@@ -55,6 +59,7 @@ const SubTeamSettings = () => {
 
       setReFetchSubTeamSettings((prev) => !prev);
       toast.success("Collaborator added successfully");
+      setDisableSubTeamUpdateButton(false);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to add collaborator");
     }
@@ -62,31 +67,35 @@ const SubTeamSettings = () => {
 
   const kickSubTeamCollaborator = async (username, role) => {
     try {
+      setDisableSubTeamUpdateButton(true);
       await deleteData(
         `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
       toast.success("Collaborator kicked successfully");
     } catch (e) {
       toast.error(e.response.data.error || "Failed to kick collaborator");
+    } finally {
+      setDisableSubTeamUpdateButton(false);
     }
   };
 
   const handleUpdateSubTeamDetails = async (updatedSubTeamDetails) => {
     try {
+      setDisableSubTeamUpdateButton(true);
       const { data } = await updateData(
         `projects/${projectId}/teams/${teamId}/subTeams/${subTeamId}/details`,
         { updatedSubTeamDetails }
       );
       setIsEditing(false);
       setShowUpdateSubTeamDetailsForm(false);
-
       setReFetchSubTeamSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
-      console.log(e);
       toast.error(
         e.response?.data?.error || "An Unknown error occurred. Try again later."
       );
+    } finally {
+      setDisableSubTeamUpdateButton(false);
     }
   };
 
@@ -145,6 +154,7 @@ const SubTeamSettings = () => {
         validationSchema={subTeamValidationSchema}
         kickCollaborator={kickSubTeamCollaborator}
         setReFetchEntitySettings={setReFetchSubTeamSettings}
+        disableEntityUpdateButton={disableSubTeamUpdateButton}
         handleUpdateEntityDetails={handleUpdateSubTeamDetails}
         showCurrentCollaborators={showCurrentSubTeamCollaborators}
         showUpdateEntityDetailsForm={showUpdateSubTeamDetailsForm}

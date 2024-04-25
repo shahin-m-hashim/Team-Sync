@@ -1,17 +1,17 @@
 /* eslint-disable react/prop-types */
 
+import { useState } from "react";
 import Loading from "@/components/Loading";
 import ImageHandler from "@/components/ImageHandler";
 import GroupedUsers from "@/components/GroupedUsers";
 import UserNavbar from "@/components/navbars/UserNavbar";
 import defaultIcon from "../../assets/images/defaultIcon.png";
+import LeaderDemotion from "@/components/popups/LeaderDemotion";
 import CurrentCollaborators from "@/components/CurrentCollaborators";
 import { capitalizeFirstLetterOfEachWord } from "@/helpers/stringHandler";
 import UpdateEntityDetailsForm from "@/components/forms/UpdateEntityDetailsForm";
 import SendProjectInviteForm from "@/components/forms/projects/SendProjectInviteForm";
 import AddTeamCollaboratorForm from "@/components/forms/teams/AddTeamCollaboratorForm";
-import { useState } from "react";
-import LeaderDemotion from "@/components/popups/LeaderDemotion";
 import AddSubTeamCollaboratorForm from "@/components/forms/subTeams/AddSubTeamCollaboratorForm";
 
 const EntitySettings = ({
@@ -24,6 +24,7 @@ const EntitySettings = ({
   validationSchema,
   kickCollaborator,
   showCurrentCollaborators,
+  disableEntityUpdateButton,
   handleUpdateEntityDetails,
   setShowCurrentCollaborators,
   showUpdateEntityDetailsForm,
@@ -87,12 +88,13 @@ const EntitySettings = ({
                   <UpdateEntityDetailsForm
                     entity={entity}
                     setIsEditing={setIsEditing}
+                    validationSchema={validationSchema}
+                    disableEntityUpdateButton={disableEntityUpdateButton}
+                    handleUpdateEntityDetails={handleUpdateEntityDetails}
                     initialData={{
                       name: entitySettings.name,
                       description: entitySettings.description,
                     }}
-                    validationSchema={validationSchema}
-                    handleUpdateEntityDetails={handleUpdateEntityDetails}
                     setShowUpdateEntityDetailsForm={
                       setShowUpdateEntityDetailsForm
                     }
@@ -174,6 +176,7 @@ const EntitySettings = ({
                     <CurrentCollaborators
                       kickCollaborator={kickCollaborator}
                       collaborators={entitySettings?.collaborators}
+                      disableEntityUpdateButton={disableEntityUpdateButton}
                       setShowCurrentCollaborators={setShowCurrentCollaborators}
                     />
                   )}

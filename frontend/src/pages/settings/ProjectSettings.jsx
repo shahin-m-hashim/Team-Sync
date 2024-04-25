@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 
+import { socket } from "@/App";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import { useParams } from "react-router-dom";
@@ -8,7 +9,6 @@ import { UserContext } from "@/providers/UserProvider";
 import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
 import { projectValidationSchema } from "@/validations/entityValidations";
-import { socket } from "@/App";
 
 const ProjectSettings = () => {
   const { userId, projectId } = useParams();
@@ -24,6 +24,9 @@ const ProjectSettings = () => {
     useState(false);
 
   const [showCurrentProjectCollaborators, setShowCurrentProjectCollaborators] =
+    useState(false);
+
+  const [disableProjectUpdateButton, setDisableProjectUpdateButton] =
     useState(false);
 
   const projectSettings = useFetch(
@@ -46,11 +49,13 @@ const ProjectSettings = () => {
 
   const kickProjectCollaborator = async (username, role) => {
     try {
+      setDisableProjectUpdateButton(true);
       await deleteData(
         `projects/${projectId}/collaborators/${username}/roles/${role.toLowerCase()}`
       );
       setReFetchProjectSettings((prev) => !prev);
       toast.success("Collaborator kicked successfully");
+      setDisableProjectUpdateButton(false);
     } catch (e) {
       toast.error(e.response.data.error || "Failed to kick collaborator");
     }
@@ -58,18 +63,20 @@ const ProjectSettings = () => {
 
   const handleUpdateProjectDetails = async (updatedProjectDetails) => {
     try {
+      setDisableProjectUpdateButton(true);
       const { data } = await updateData(`projects/${projectId}/details`, {
         updatedProjectDetails,
       });
       setIsEditing(false);
       setShowUpdateProjectDetailsForm(false);
-
       setReFetchProjectSettings((prev) => !prev);
       toast.success(data?.message || "Update successfull");
     } catch (e) {
       toast.error(
         e.response?.data.error || "An Unknown error occurred. Try again later."
       );
+    } finally {
+      setDisableProjectUpdateButton(false);
     }
   };
 
@@ -86,11 +93,11 @@ const ProjectSettings = () => {
   };
 
   useEffect(() => {
-    socket.on("projectCollaborators", (projectCollaborator) =>
-      setReFetchProjectSettings(projectCollaborator)
+    socket.on("projectDetails", (projectDetails) =>
+      setReFetchProjectSettings(projectDetails)
     );
 
-    return () => socket.off("projectCollaborators");
+    return () => socket.off("projectDetails");
   }, []);
 
   if (projectSettings?.error === "unauthorized") {
@@ -114,6 +121,7 @@ const ProjectSettings = () => {
         validationSchema={projectValidationSchema}
         kickCollaborator={kickProjectCollaborator}
         setReFetchEntitySettings={setReFetchProjectSettings}
+        disableEntityUpdateButton={disableProjectUpdateButton}
         handleUpdateEntityDetails={handleUpdateProjectDetails}
         showAddEntityCollaboratorForm={showSendProjectInviteForm}
         showCurrentCollaborators={showCurrentProjectCollaborators}

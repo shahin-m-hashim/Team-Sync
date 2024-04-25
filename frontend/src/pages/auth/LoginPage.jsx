@@ -12,6 +12,7 @@ import { loginValidationSchema as validationSchema } from "../../validations/aut
 export default function LoginPage() {
   const errorRef = useRef();
   const navigate = useNavigate();
+  const [disableButton, setDisableButton] = useState(false);
 
   const user = getLocalSecureItem("user", "low");
   const [serverError, setServerError] = useState(false);
@@ -36,6 +37,7 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     try {
+      setDisableButton(true);
       const userId = await login(values);
       navigate(`/user/${userId}/dashboard`, { replace: true });
     } catch (e) {
@@ -48,6 +50,8 @@ export default function LoginPage() {
         } else console.log(e);
         document.body.addEventListener("click", handleLoginError);
       }
+    } finally {
+      setDisableButton(false);
     }
   };
 
@@ -153,6 +157,7 @@ export default function LoginPage() {
               <div>
                 <button
                   type="submit"
+                  disabled={disableButton}
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   Log in
