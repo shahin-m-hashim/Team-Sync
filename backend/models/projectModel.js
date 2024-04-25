@@ -95,10 +95,4 @@ projectSchema.pre("save", async function (next) {
   next();
 });
 
-projectSchema.post("save", async function (projectDoc, next) {
-  if (this.wasNew)
-    console.log(`Project ${projectDoc.id} is saved successfully`);
-  next();
-});
-
 module.exports = mongoose.model("projects", projectSchema);

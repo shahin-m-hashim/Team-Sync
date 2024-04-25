@@ -58,10 +58,4 @@ invitationSchema.pre("save", async function (next) {
   next();
 });
 
-invitationSchema.post("save", async function (invitationDoc, next) {
-  if (this.wasNew)
-    console.log(`Invitation ${invitationDoc.id} is saved successfully`);
-  next();
-});
-
 module.exports = mongoose.model("invitations", invitationSchema);

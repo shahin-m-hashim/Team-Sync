@@ -14,7 +14,7 @@ const getUserDetails = async (userId) => {
   const user = await users
     .findById(userId)
     .select(
-      "address socialLinks phone role status profilePic username fname tag bio pronoun organization occupation secondaryEmail last_seen"
+      "email address socialLinks phone role status profilePic username fname tag bio pronoun organization occupation secondaryEmail last_seen"
     );
   if (!user) throw new Error("UnknownUser");
   return user;

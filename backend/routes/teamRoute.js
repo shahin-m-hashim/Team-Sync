@@ -1,26 +1,26 @@
+const taskRoutes = require("./taskRoute");
 const teamRouter = require("express").Router();
-const subTeamRoutes = require("./subTeamRoute");
 
 const { passTeam } = require("../middlewares/passParams");
 const { isTeamLeader, isProjectCollaborator } = require("../middlewares/RBAC");
 
 const {
-  addSubTeam,
+  addTask,
   addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
+  fetchTeamTasks,
   updateTeamGuide,
   fetchTeamDetails,
   fetchTeamMembers,
   updateTeamLeader,
-  fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamActivities,
   handleTeamActivities,
   kickTeamCollaborator,
 } = require("../controllers/teamController");
 
-teamRouter.use("/teams/:teamId", passTeam, subTeamRoutes);
+teamRouter.use("/teams/:teamId", passTeam, taskRoutes);
 
 // GET Requests
 teamRouter.get(
@@ -35,11 +35,7 @@ teamRouter.get(
   fetchTeamActivities
 );
 
-teamRouter.get(
-  "/teams/:teamId/subTeams",
-  isProjectCollaborator,
-  fetchTeamSubTeams
-);
+teamRouter.get("/teams/:teamId/tasks", isProjectCollaborator, fetchTeamTasks);
 
 teamRouter.get(
   "/teams/:teamId/members",
@@ -48,7 +44,7 @@ teamRouter.get(
 );
 
 // POST Requests
-teamRouter.post("/teams/:teamId/subTeam", isTeamLeader, addSubTeam);
+teamRouter.post("/teams/:teamId/task", isTeamLeader, addTask);
 teamRouter.post("/teams/:teamId/member", isTeamLeader, addTeamMember);
 
 // PATCH Requests
