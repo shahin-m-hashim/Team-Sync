@@ -20,10 +20,10 @@ function ListItem({
   assignee,
   priority,
   progress,
+  deadline,
   createdAt,
   renderList,
   grandParent,
-  deadlineDate,
 }) {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -33,9 +33,9 @@ function ListItem({
       id={id}
       className={cn(
         renderList !== "Task"
-          ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px]"
+          ? "grid-cols-[185px,120px,80px,300px,150px,140px,80px,80px] cursor-pointer"
           : "grid-cols-[160px,120px,155px,115px,120px,120px,120px,70px,70px,70px]",
-        "relative cursor-pointer grid items-center gap-3  border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
+        "relative grid items-center gap-3  border-gray-700 border-b-[1px] w-full py-3 px-7 text-sm"
       )}
     >
       <div
@@ -44,8 +44,6 @@ function ListItem({
             navigate(`projects/${id}?role=${role}`);
           } else if (renderList === "Team") {
             navigate(`teams/${id}?role=${role}`);
-          } else {
-            navigate(`subteams/${id}?role=${role}`);
           }
         }}
         className="absolute top-0 bottom-0 left-0 bg-transparent right-60"
@@ -122,7 +120,7 @@ function ListItem({
       {renderList !== "Task" ? (
         <span className="pl-2">{role}</span>
       ) : (
-        <span>{deadlineDate}</span>
+        <span>{deadline}</span>
       )}
 
       {renderList === "Task" && (
@@ -154,7 +152,7 @@ function ListItem({
               ? `/user/${userId}/projects/${id}/settings`
               : renderList === "Team"
                 ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
-                : `/user/${userId}/projects/${grandParent}/teams/${parent}/subteams/${id}/settings`
+                : `/user/${userId}/projects/${grandParent}/teams/${parent}/tasks/${id}/settings`
           }
           className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
         >

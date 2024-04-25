@@ -9,11 +9,11 @@ function KickedPopUp({ entity, setShowKickedFromEntityPopUp }) {
     <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-filter backdrop-blur-md">
       <div className="max-w-sm p-4 text-center bg-white rounded-lg shadow-lg">
         <h2 className="mb-4 text-xl font-bold">
-          Kicked From {capitalizeFirstLetterOfEachWord(entity)} !!!
+          Removed From {capitalizeFirstLetterOfEachWord(entity)} !!!
         </h2>
         <p className="mb-4 text-gray-700">
-          You have been kicked from the {entity} by the {entity} leader. You are
-          no longer a collaborator and can no more access the {entity}&nbsp;
+          You have been removed from the {entity} by the {entity} leader. You
+          are no longer a collaborator and can no more access the {entity}&nbsp;
           resources.
         </p>
         <button

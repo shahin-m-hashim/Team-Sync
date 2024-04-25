@@ -16,7 +16,7 @@ function SelectTeamCollaborator({
   const { projectId } = useParams();
   const { setError } = useContext(UserContext);
 
-  const projectMembers = useFetch(`projects/${projectId}/members`);
+  const projectCollaborators = useFetch(`projects/${projectId}/collaborators`);
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
@@ -24,21 +24,21 @@ function SelectTeamCollaborator({
     setShowSelectCollaboratorForm(false);
   };
 
-  if (projectMembers?.error === "unauthorized") {
+  if (projectCollaborators?.error === "unauthorized") {
     setError("unauthorized");
     return null;
   }
 
-  if (projectMembers?.error === "serverError") {
+  if (projectCollaborators?.error === "serverError") {
     setError("serverError");
     return null;
   }
 
-  return projectMembers?.data ? (
+  return projectCollaborators?.data ? (
     <SelectCollaborator
       parent="project"
       handleSelectUser={handleSelectUser}
-      parentMembers={projectMembers?.data}
+      parentMembers={projectCollaborators?.data}
       setShowAddCollaboratorForm={setShowAddTeamCollaboratorForm}
     />
   ) : (
