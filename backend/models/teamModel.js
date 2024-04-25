@@ -90,9 +90,4 @@ teamSchema.pre("save", async function (next) {
   next();
 });
 
-teamSchema.post("save", async function (teamDoc, next) {
-  if (this.wasNew) console.log(`Team ${teamDoc.id} is saved successfully`);
-  next();
-});
-
 module.exports = mongoose.model("teams", teamSchema);

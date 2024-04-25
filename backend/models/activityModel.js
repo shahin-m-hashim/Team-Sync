@@ -26,22 +26,18 @@ const activitySchema = new mongoose.Schema(
       type: String,
       enum: [
         "",
+        "teamTaskAdded",
         "teamMemberAdded",
+        "teamTaskUpdated",
+        "teamTaskDeleted",
         "teamGuideChanged",
         "teamLeaderChanged",
         "teamAddedToProject",
-        "subTeamMemberAdded",
-        "subTeamAddedToTeam",
-        "subTeamGuideChanged",
-        "subTeamLeaderChanged",
         "teamUpdatedInProject",
-        "subTeamUpdatedInTeam",
         "teamDeletedFromProject",
-        "subTeamDeletedFromTeam",
         "teamCollaboratorRemoved",
         "projectCollaboratorLeft",
         "projectCollaboratorJoined",
-        "subTeamCollaboratorRemoved",
         "projectCollaboratorRemoved",
       ],
       default: "",
@@ -77,11 +73,5 @@ const activitySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-activitySchema.post("save", async function (activityDoc, next) {
-  if (this.wasNew)
-    console.log(`Activity ${activityDoc.id} is saved successfully`);
-  next();
-});
 
 module.exports = mongoose.model("activities", activitySchema);

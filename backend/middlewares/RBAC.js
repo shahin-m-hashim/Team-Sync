@@ -32,6 +32,29 @@ const isProjectLeader = async (req, res, next) => {
   }
 };
 
+const isProjectCollaborator = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { projectId } = req.project;
+
+    const project = await projects
+      .findById(projectId)
+      .select("leader guide members");
+
+    if (!project) throw new Error("UnknownProject");
+
+    if (
+      userId === project.leader?.toString() ||
+      userId === project.guide?.toString() ||
+      project.members.includes(userId)
+    ) {
+      next();
+    } else throw new Error("ForbiddenAction");
+  } catch (e) {
+    next(e);
+  }
+};
+
 const isTeamLeader = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -46,6 +69,40 @@ const isTeamLeader = async (req, res, next) => {
       projectId === team.parent.toString()
     ) {
       req.team = req.params;
+      next();
+    } else throw new Error("ForbiddenAction");
+  } catch (e) {
+    next(e);
+  }
+};
+
+const isTeamGuide = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { teamId } = req.params;
+
+    const team = await teams.findById(teamId).select("guide");
+    if (!team) throw new Error("UnknownTeam");
+
+    if (userId === team.guide.toString()) {
+      req.team = req.params;
+      next();
+    } else throw new Error("ForbiddenAction");
+  } catch (e) {
+    next(e);
+  }
+};
+
+const isTaskAssignee = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { taskId } = req.params;
+
+    const task = await tasks.findById(taskId).select("assignee");
+    if (!task) throw new Error("UnknownTask");
+
+    if (userId === task.assignee.toString()) {
+      req.task = req.params;
       next();
     } else throw new Error("ForbiddenAction");
   } catch (e) {
@@ -70,31 +127,10 @@ const isSubTeamLeader = async (req, res, next) => {
   }
 };
 
-const isProjectCollaborator = async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { projectId } = req.project;
-
-    const project = await projects
-      .findById(projectId)
-      .select("leader guide members");
-
-    if (!project) throw new Error("UnknownProject");
-
-    if (
-      userId === project.leader?.toString() ||
-      userId === project.guide?.toString() ||
-      project.members.includes(userId)
-    ) {
-      next();
-    } else throw new Error("ForbiddenAction");
-  } catch (e) {
-    next(e);
-  }
-};
-
 module.exports = {
+  isTeamGuide,
   isTeamLeader,
+  isTaskAssignee,
   isProjectLeader,
   isSubTeamLeader,
   isRegisteredUser,

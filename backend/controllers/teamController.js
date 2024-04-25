@@ -1,13 +1,13 @@
 const {
+  assignTask,
   setTeamIcon,
   setTeamGuide,
+  getTeamTasks,
   setTeamLeader,
-  createSubTeam,
   getTeamDetails,
   removeTeamIcon,
   setTeamDetails,
   getTeamMembers,
-  getTeamSubTeams,
   createTeamMember,
   getTeamActivities,
   setTeamActivities,
@@ -46,13 +46,11 @@ const fetchTeamMembers = async (req, res, next) => {
   }
 };
 
-const fetchTeamSubTeams = async (req, res, next) => {
+const fetchTeamTasks = async (req, res, next) => {
   try {
-    const { userId } = req.user;
     const { teamId } = req.params;
-
-    const subTeams = await getTeamSubTeams(teamId, userId);
-    res.status(200).json(subTeams);
+    const tasks = await getTeamTasks(teamId);
+    res.status(200).json(tasks);
   } catch (e) {
     next(e);
   }
@@ -79,18 +77,15 @@ const addTeamMember = async (req, res, next) => {
   }
 };
 
-const addSubTeam = async (req, res, next) => {
+const addTask = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { teamId } = req.params;
-    const { subTeamDetails } = req.body;
-    const subTeamId = await createSubTeam(userId, teamId, subTeamDetails);
-    console.log(
-      `New sub team ${subTeamId} is created for team ${teamId} by leader ${userId}`
-    );
+    const { taskDetails } = req.body;
+    const taskId = await assignTask(userId, teamId, taskDetails);
     res.status(201).json({
       success: true,
-      message: "Sub team created successfully",
+      message: `New task ${taskId} created and assigned successfully`,
     });
   } catch (e) {
     if (e.name === "ValidationError") {
@@ -231,15 +226,15 @@ const kickTeamCollaborator = async (req, res, next) => {
 };
 
 module.exports = {
-  addSubTeam,
+  addTask,
   addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
+  fetchTeamTasks,
   updateTeamGuide,
   fetchTeamDetails,
   fetchTeamMembers,
   updateTeamLeader,
-  fetchTeamSubTeams,
   updateTeamDetails,
   fetchTeamActivities,
   handleTeamActivities,

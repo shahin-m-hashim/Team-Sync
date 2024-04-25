@@ -398,7 +398,9 @@ const removeProjectCollaborator = async (
 
     const project = await projects
       .findById(projectId)
-      .select("leader guide members invitations activities unavailableMembers")
+      .select(
+        "name leader guide members invitations activities unavailableMembers"
+      )
       .populate({
         path: "leader guide members invitations",
         select: "username to project",

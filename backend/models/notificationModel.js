@@ -14,6 +14,9 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       enum: [
         "",
+        "taskUpdated",
+        "taskSubmitted",
+        "taskAssigned",
         "projectDeleted",
         "kickedFromTeam",
         "teamGuideDemotion",
@@ -47,11 +50,5 @@ const notificationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-notificationSchema.post("save", async function (notificationDoc, next) {
-  if (this.wasNew)
-    console.log(`Notification ${notificationDoc.id} is saved successfully`);
-  next();
-});
 
 module.exports = mongoose.model("notifications", notificationSchema);
