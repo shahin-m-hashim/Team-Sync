@@ -18,6 +18,7 @@ export default function SignupPage() {
   const [serverError, setServerError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
+  const [disableButton, setDisableButton] = useState(false);
 
   useEffect(() => {
     if (user?.status === "LOGGED_IN")
@@ -42,6 +43,7 @@ export default function SignupPage() {
     const { username, email, password } = values;
 
     try {
+      setDisableButton(true);
       await signup({
         username,
         email,
@@ -61,6 +63,8 @@ export default function SignupPage() {
         } else console.log(e);
         document.body.addEventListener("click", handleSignUpError);
       }
+    } finally {
+      setDisableButton(false);
     }
   };
 
@@ -214,9 +218,9 @@ export default function SignupPage() {
                 className="mb-3 text-sm text-center text-red-600 dark:text-red-400"
               ></p>
               <button
-                className="w-full px-4 py-2 text-sm font-bold text-white transition duration-300 bg-indigo-500 rounded-md hover:bg-indigo-600"
                 type="submit"
-                disabled={!isValid || isSubmitting}
+                disabled={!isValid || disableButton || isSubmitting}
+                className="w-full px-4 py-2 text-sm font-bold text-white transition duration-300 bg-indigo-500 rounded-md hover:bg-indigo-600"
               >
                 Register
               </button>
