@@ -40,6 +40,9 @@ const fetchTeamMembers = async (req, res, next) => {
   try {
     const { teamId } = req.params;
     const { members } = await getTeamMembers(teamId);
+
+    console.log(members);
+
     res.status(200).json(members);
   } catch (e) {
     next(e);
@@ -79,10 +82,10 @@ const addTeamMember = async (req, res, next) => {
 
 const addTask = async (req, res, next) => {
   try {
+    const { task } = req.body;
     const { userId } = req.user;
     const { teamId } = req.params;
-    const { taskDetails } = req.body;
-    const taskId = await assignTask(userId, teamId, taskDetails);
+    const taskId = await assignTask(userId, teamId, task);
     res.status(201).json({
       success: true,
       message: `New task ${taskId} created and assigned successfully`,
@@ -93,7 +96,7 @@ const addTask = async (req, res, next) => {
       customError.errors = e.errors;
       next(customError);
     } else if (e.name === "MongoServerError" && e.code === 11000) {
-      next(new Error("SubTeamAlreadyExists"));
+      next(new Error("TaskAlreadyExists"));
     }
     next(e);
   }

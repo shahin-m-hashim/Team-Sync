@@ -103,19 +103,37 @@ const getTeamActivities = async (userId, teamId) => {
 };
 
 const getTeamTasks = async (teamId) => {
-  const team = await teams.findById(teamId).select("tasks").populate({
-    path: "tasks",
-    select: "-__v -updatedAt",
-  });
+  const team = await teams
+    .findById(teamId)
+    .select("tasks leader")
+    .populate({
+      path: "tasks",
+      select: "-__v -updatedAt",
+      populate: {
+        path: "assignee",
+        select: "-_id username",
+      },
+    })
+    .populate({
+      path: "leader",
+      select: "-_id username",
+    });
+
   if (!team) throw new Error("UnknownTask");
+
+  console.log(team);
 
   const formattedTasks = team.tasks.map((task) => {
     const deadline = moment(task.deadline).format("DD/MM/YYYY");
     const createdAt = moment(task.createdAt).format("DD/MM/YYYY");
     return {
       ...task._doc,
-      createdAt,
+      id: task._id,
       deadline,
+      createdAt,
+      teamLeader: team.leader.username,
+      assignee: task.assignee.username,
+      attachment: task.attachment.file,
     };
   });
 
@@ -222,7 +240,7 @@ const createTeamMember = async (teamId, newMemberUsername) => {
   }
 };
 
-const assignTask = async (userId, teamId, taskDetails) => {
+const assignTask = async (userId, teamId, task) => {
   let session = null;
 
   try {
@@ -231,27 +249,26 @@ const assignTask = async (userId, teamId, taskDetails) => {
 
     const team = await teams
       .findById(teamId)
-      .select("name parent tasks activities unavailableMembers")
-      .populate({ path: "parent", select: "name" })
+      .select("leader name parent tasks activities unavailableMembers")
+      .populate({ path: "parent leader", select: "name username" })
       .session(session);
     if (!team) throw new Error("UnknownTeam");
 
-    const { assigneeUsername } = taskDetails;
-
     const assignee = await users
-      .find({ username: assigneeUsername })
+      .findOne({ username: task.assignee })
       .select("tasks notifications")
       .session(session);
     if (!assignee) throw new Error("UnknownUser");
 
-    if (team.unavailableMembers.includes(assigneeUsername))
+    if (team.unavailableMembers.includes(task.assignee))
       throw new Error("UserAlreadyAssignedToAnotherTask");
 
     const newTask = await tasks.create(
       [
         {
-          ...taskDetails,
+          ...task,
           parent: teamId,
+          assignee: assignee._id,
           grandParent: team.parent,
         },
       ],
@@ -279,15 +296,15 @@ const assignTask = async (userId, teamId, taskDetails) => {
       [
         {
           from: userId,
-          to: assignee[0]._id,
-          type: "assignedTask",
+          to: assignee._id,
+          type: "taskAssigned",
           message: `You have been assigned a new task ${newTask[0].name} in team ${team.name} in project ${team.parent.name} by the team leader ${team.leader.username}.`,
         },
       ],
       { session }
     );
 
-    team.unavailableMembers.push(assigneeUsername);
+    team.unavailableMembers.push(task.assignee);
     assignee.notifications.push(newNotification[0]._id);
 
     await Promise.all([assignee.save({ session }), team.save({ session })]);
@@ -382,6 +399,7 @@ const setTeamLeader = async (teamId, currentLeaderId, newLeaderUsername) => {
     const team = await teams
       .findById(teamId)
       .select("name icon parent activities leader members guide")
+      .populate({ path: "leader guide members", select: "username" })
       .session(session);
 
     if (!team) throw new Error("UnknownTeam");
@@ -399,7 +417,7 @@ const setTeamLeader = async (teamId, currentLeaderId, newLeaderUsername) => {
     if (team.members?.some((member) => member.equals(newLeader.id)))
       throw new Error("UserAlreadyInTeamAsMember");
 
-    let project = await projects
+    const project = await projects
       .findById(team.parent)
       .select("name unavailableMembers")
       .session(session);
@@ -437,35 +455,39 @@ const setTeamLeader = async (teamId, currentLeaderId, newLeaderUsername) => {
       { session }
     );
 
-    const newTeamActivity = await activities.create([
-      {
-        team: teamId,
-        entity: "team",
-        image: newLeader.profilePic,
-        type: "teamLeaderChanged",
-        message: `${newLeaderUsername} has been promoted as the new leader of this team by the previous team leader ${currentLeader.username}.`,
-        read_users: [
-          { readBy: newLeader.id, isRead: true },
-          { readBy: currentLeader.id, isRead: true },
-        ],
-      },
-    ]);
+    const newTeamActivity = await activities.create(
+      [
+        {
+          team: teamId,
+          entity: "team",
+          image: newLeader.profilePic,
+          type: "teamLeaderChanged",
+          message: `${newLeaderUsername} has been promoted as the new leader of this team by the previous team leader ${currentLeader.username}.`,
+          read_users: [
+            { readBy: newLeader.id, isRead: true },
+            { readBy: currentLeader.id, isRead: true },
+          ],
+        },
+      ],
+      { session }
+    );
 
     team.activities.push(newTeamActivity[0]._id);
     newLeader.notifications.push(notificationForNewLeader[0]._id);
 
     await Promise.all([
       team.save({ session }),
-      currentLeader.save({ session }),
+      project.save({ session }),
       newLeader.save({ session }),
+      currentLeader.save({ session }),
     ]);
+
+    await session.commitTransaction();
+    session.endSession();
 
     io.emit("teamActivities", newTeamActivity[0]._id);
     io.emit("notifications", notificationForNewLeader[0]._id);
     io.emit("teamDetails", (teamId + team.updatedAt).toString());
-
-    await session.commitTransaction();
-    session.endSession();
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -588,12 +610,12 @@ const setTeamGuide = async (teamId, newGuideUsername) => {
       currentGuide?.save({ session }),
     ]);
 
+    await session.commitTransaction();
+    session.endSession();
+
     io.emit("teamActivities", newTeamActivity._id);
     io.emit("notifications", notificationForNewGuide._id);
     io.emit("teamDetails", (teamId + team.updatedAt).toString());
-
-    await session.commitTransaction();
-    session.endSession();
   } catch (error) {
     if (session) {
       await session.abortTransaction();
@@ -628,6 +650,7 @@ const setTeamIcon = async (teamId, updatedTeamIcon) => {
   await team.save();
 
   io.emit("teams", (team.id + team.updatedAt).toString());
+  io.emit("teamDetails", (teamId + team.updatedAt).toString());
 
   return team.icon;
 };
@@ -640,6 +663,7 @@ const removeTeamIcon = async (teamId) => {
   await team.save();
 
   io.emit("teams", (team.id + team.updatedAt).toString());
+  io.emit("teamDetails", (teamId + team.updatedAt).toString());
 };
 
 const removeTeamCollaborator = async (teamId, collaboratorUsername, role) => {

@@ -78,35 +78,6 @@ const getAllUserTeams = async (userId) => {
   return formattedTeams;
 };
 
-const getAllUserSubTeams = async (userId) => {
-  const user = await users.findById(userId).select("subTeams").populate({
-    path: "subTeams",
-    select: "name createdAt icon progress status leader guide members",
-  });
-  if (!user) throw new Error("UnknownUser");
-
-  const formattedSubTeams = user.subTeams.map((subTeam) => {
-    let role = "Member";
-
-    const createdAt = moment(subTeam.createdAt).format("DD/MM/YYYY");
-
-    if (subTeam.leader?.toString() === userId) role = "Guide";
-    if (subTeam.leader?.toString() === userId) role = "Leader";
-
-    return {
-      role,
-      createdAt,
-      id: subTeam._id,
-      name: subTeam.name,
-      icon: subTeam.icon,
-      status: subTeam.status,
-      progress: subTeam.progress,
-    };
-  });
-
-  return formattedSubTeams;
-};
-
 const getAllUserInvitations = async (userId) => {
   const user = await users
     .findById(userId)
@@ -481,7 +452,6 @@ module.exports = {
   setPrimaryDetails,
   setContactDetails,
   getAllUserProjects,
-  getAllUserSubTeams,
   setSecurityDetails,
   setSecondaryDetails,
   getAllUserInvitations,
