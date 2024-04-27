@@ -105,7 +105,7 @@ const getTeamActivities = async (userId, teamId) => {
 const getTeamTasks = async (teamId) => {
   const team = await teams
     .findById(teamId)
-    .select("tasks leader")
+    .select("name tasks leader parent")
     .populate({
       path: "tasks",
       select: "-__v -updatedAt",
@@ -115,25 +115,31 @@ const getTeamTasks = async (teamId) => {
       },
     })
     .populate({
-      path: "leader",
-      select: "-_id username",
+      path: "parent",
+      select: "name",
     });
 
   if (!team) throw new Error("UnknownTask");
-
-  console.log(team);
 
   const formattedTasks = team.tasks.map((task) => {
     const deadline = moment(task.deadline).format("DD/MM/YYYY");
     const createdAt = moment(task.createdAt).format("DD/MM/YYYY");
     return {
-      ...task._doc,
-      id: task._id,
       deadline,
       createdAt,
-      teamLeader: team.leader.username,
+      id: task._id,
+      name: task.name,
+      team: team.name,
+      parent: team.id,
+      status: task.status,
+      priority: task.priority,
+      teamLeader: team.leader,
+      project: team.parent.name,
+      grandParent: team.parent.id,
       assignee: task.assignee.username,
-      attachment: task.attachment.file,
+      submittedTask: task.submittedTask,
+      attachmentURL: task.attachment.url,
+      attachmentPath: task.attachment.path,
     };
   });
 

@@ -25,7 +25,7 @@ const taskSchema = new mongoose.Schema(
       required: [true, "Assignee is required"],
     },
     attachment: {
-      file: {
+      url: {
         type: String,
         validate: {
           validator: (value) => !value || isValidFirebaseUrl(value),
@@ -33,7 +33,7 @@ const taskSchema = new mongoose.Schema(
         },
         default: "",
       },
-      firebaseId: {
+      path: {
         type: String,
         default: "",
       },
@@ -70,7 +70,7 @@ taskSchema.pre("save", async function (next) {
   if (this.deadline < this.createdAt) throw new Error("DeadlineError");
 
   setTimeout(async () => {
-    this.status = "Stopped";
+    if (this.status !== "Done") this.status = "Stopped";
     await this.save();
   }, this.deadline - this.createdAt);
 
