@@ -83,7 +83,7 @@ export default function InvitationsPopUp({
 }) {
   return (
     <>
-      <div className="fixed top-0 left-0 z-50 flex items-center justify-center w-screen h-screen bg-gray-800 bg-opacity-50">
+      <div className="fixed top-0 left-0 z-[100] flex items-center justify-center w-screen h-screen bg-gray-800 bg-opacity-50">
         <div className="max-w-2xl min-w-72 p-5 bg-white rounded-lg h-[80%]">
           <div className="relative flex items-center mb-4">
             <h1 className="text-xl font-bold text-blue-600">Invitations</h1>

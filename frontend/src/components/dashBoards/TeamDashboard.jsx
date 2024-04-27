@@ -118,7 +118,7 @@ export default function TeamDashboard() {
       )}
       {showTaskForm && <TaskForm setShowTaskForm={setShowTaskForm} />}
       {showAddTeamCollaboratorForm && (
-        <div className="absolute inset-0 z-[50] h-full size-full backdrop-blur-sm">
+        <div className="absolute inset-0 z-[200] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
             <AddTeamCollaboratorForm
               setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
@@ -147,7 +147,6 @@ export default function TeamDashboard() {
         <ListHeader
           renderList="Task"
           setList={setTasks}
-          projectId={projectId}
           leaderList={yourTasks}
           initialList={tasks?.data}
           resetList={resetSubTeamList}

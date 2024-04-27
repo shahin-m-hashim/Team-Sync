@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 export default function AssignTaskButton({
   task,
   setTask,
+  setFile,
+  initialFile,
   initialTask,
   attachmentRef,
   setShowTaskForm,
@@ -17,7 +19,7 @@ export default function AssignTaskButton({
 
   const validate = () => {
     const deadline = new Date(task.deadline);
-    if (!task.attachment.file) {
+    if (!task.attachment.url) {
       attachmentRef.current.innerText = "Attachment is required";
       return;
     } else if (
@@ -47,6 +49,7 @@ export default function AssignTaskButton({
       setDisableAssignTaskButton(true);
       await addData(`projects/${projectId}/teams/${teamId}/task`, { task });
       setTask(initialTask);
+      setFile(initialFile);
       setShowTaskForm(false);
       toast.success("Task assigned successfully");
     } catch (e) {

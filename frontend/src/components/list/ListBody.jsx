@@ -1,32 +1,58 @@
 /* eslint-disable react/prop-types */
 
-import { cn } from "@/lib/utils";
+import { useContext } from "react";
+import { toast } from "react-toastify";
 import EmptyListBody from "./EmptyListBody";
 import noImg from "../../assets/images/noImg.svg";
+import SubmitTask from "../forms/tasks/SubmitTask";
 import attach from "../../assets/images/Attach.png";
+import { cn, getLocalSecureItem } from "@/lib/utils";
+import { FileContext } from "@/providers/FileProvider";
 import settings from "../../assets/images/Settings.png";
 import deleteIcon from "../../assets/images/Delete.png";
-import submitIcon from "../../assets/images/submitTask.png";
+import download from "../../assets/images/Download.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { capitalizeFirstLetter } from "@/helpers/stringHandler";
+import viewSubmitted from "../../assets/images/viewSubmitted.png";
 
 function ListItem({
   id,
   name,
   icon,
   role,
+  team,
   status,
   parent,
+  project,
   assignee,
   priority,
   progress,
   deadline,
   createdAt,
   renderList,
+  teamLeader,
   grandParent,
+  attachmentURL,
+  submittedTask,
 }) {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { downloadFile } = useContext(FileContext);
+  const { username } = getLocalSecureItem("user", "low");
+
+  const handleDownload = (url, name) => {
+    try {
+      if (!url) {
+        name === "attachment"
+          ? toast.error("No attachment found")
+          : toast.error("Task not submitted yet");
+        return;
+      }
+      downloadFile(url, name);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <div
@@ -46,7 +72,10 @@ function ListItem({
             navigate(`teams/${id}?role=${role}`);
           }
         }}
-        className="absolute top-0 bottom-0 left-0 bg-transparent right-60"
+        className={cn(
+          renderList === "Task" && "hidden",
+          "absolute top-0 bottom-0 left-0 bg-transparent right-60"
+        )}
       />
       <span>{name}</span>
       <span>{createdAt}</span>
@@ -81,9 +110,24 @@ function ListItem({
           </div>
         </div>
       ) : (
-        <button className="pl-7">
-          <img src={attach} width={20} />
-        </button>
+        <>
+          {teamLeader === userId ? (
+            <button
+              onClick={() => handleDownload(attachmentURL, "attachment")}
+              className="pl-7"
+            >
+              <img src={attach} width={20} />
+            </button>
+          ) : (
+            <button className="pl-6">
+              <img
+                src={download}
+                onClick={() => handleDownload(attachmentURL, "attachment")}
+                width={30}
+              />
+            </button>
+          )}
+        </>
       )}
       {renderList !== "Task" ? (
         <div className="pl-8">
@@ -140,9 +184,22 @@ function ListItem({
               <span>{status}</span>
             </div>
           </div>
-          <button className="pl-3">
-            <img src={submitIcon} width={30} />
-          </button>
+          {assignee === username ? (
+            <SubmitTask
+              team={team}
+              taskId={id}
+              taskName={name}
+              project={project}
+              submittedTask={submittedTask}
+            />
+          ) : (
+            <button
+              className="pl-3"
+              onClick={() => handleDownload(submittedTask, "task")}
+            >
+              <img src={viewSubmitted} width={30} />
+            </button>
+          )}
         </>
       )}
       {role === "Leader" ? (
@@ -185,6 +242,9 @@ export default function ListBody({ list, renderList, listNameSearchTxt }) {
       <ListItem {...item} key={item.id} renderList={renderList} />
     ))
   ) : (
-    <EmptyListBody name={renderList} listNameSearchTxt={listNameSearchTxt} />
+    <EmptyListBody
+      renderList={renderList}
+      listNameSearchTxt={listNameSearchTxt}
+    />
   );
 }

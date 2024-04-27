@@ -16,14 +16,14 @@ export default function ListSubHeader({ renderList }) {
         <span>Name</span>
         <span className={cn(renderList !== "Task" && "pl-2")}>Created</span>
         {renderList !== "Task" ? (
-          <span>Icon</span>
+          <span>Logo</span>
         ) : (
           <span className="pl-2">Assignee</span>
         )}
         {renderList !== "Task" ? (
           <span>Progress</span>
         ) : (
-          <span>Attachments</span>
+          <span>Attachment</span>
         )}
         {renderList !== "Task" ? (
           <span className="pl-12">Status</span>
@@ -38,7 +38,7 @@ export default function ListSubHeader({ renderList }) {
         {renderList === "Task" && (
           <>
             <span className="pl-5">Status</span>
-            <span className="pl-1">Submit</span>
+            <span className="pl-3">Task</span>
           </>
         )}
         <span className={cn(renderList !== "Task" ? "pl-4" : "pl-2")}>

@@ -30,19 +30,19 @@ export default function ListHeader({
     if (renderList === "Team") {
       const projects = getLocalSecureItem("projects", "medium");
       projects?.forEach((project) => {
-        if (project.project === projectId && project.role !== "Leader")
+        if (project.id === projectId && project.role !== "Leader")
           setShowAddEntityBtn(false);
       });
-    } else if (renderList === "Sub Team") {
+    } else {
       const teams = getLocalSecureItem("teams", "medium");
       teams?.forEach((team) => {
-        if (team.team === teamId && team.role !== "Leader")
+        if (team.id === teamId && team.role !== "Leader")
           setShowAddEntityBtn(false);
       });
     }
 
     return () => setShowAddEntityBtn(true);
-  }, [projectId, renderList]);
+  }, [renderList, projectId, teamId]);
 
   return (
     <div className="grid bg-[#141414] grid-cols-[200px,1fr,180px] items-center text-white py-2 text-sm border-2 border-white rounded-t-md border-y-0 px-7">
