@@ -57,16 +57,18 @@ const getProjectDetails = async (projectId) => {
   };
 };
 
-const getProjectCollaborators = async (projectId) => {
-  const project = await projects
+const getProjectMembers = async (projectId) => {
+  const projectMembers = await projects
     .findById(projectId)
-    .select("members guide -_id")
+    .select("members -_id")
     .populate({
-      path: "guide members",
+      path: "members",
       select: "username profilePic tag fname",
     });
-  if (!project) throw new Error("UnknownProject");
-  return [...project._doc.members, project.guide];
+
+  if (!projectMembers) throw new Error("UnknownProject");
+
+  return projectMembers;
 };
 
 const getProjectActivities = async (userId, projectId) => {
@@ -583,9 +585,9 @@ module.exports = {
   getProjectDetails,
   removeProjectIcon,
   setProjectDetails,
+  getProjectMembers,
   setProjectActivities,
   getProjectActivities,
   sendProjectInvitation,
-  getProjectCollaborators,
   removeProjectCollaborator,
 };

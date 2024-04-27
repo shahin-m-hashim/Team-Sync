@@ -6,10 +6,10 @@ const {
   getProjectDetails,
   removeProjectIcon,
   setProjectDetails,
+  getProjectMembers,
   setProjectActivities,
   getProjectActivities,
   sendProjectInvitation,
-  getProjectCollaborators,
   removeProjectCollaborator,
 } = require("../services/projectService");
 
@@ -24,11 +24,11 @@ const fetchProjectDetails = async (req, res, next) => {
   }
 };
 
-const fetchProjectCollaborators = async (req, res, next) => {
+const fetchProjectMembers = async (req, res, next) => {
   try {
     const { projectId } = req.params;
-    const collaborators = await getProjectCollaborators(projectId);
-    res.status(200).json(collaborators);
+    const { members } = await getProjectMembers(projectId);
+    res.status(200).json(members);
   } catch (e) {
     next(e);
   }
@@ -208,7 +208,7 @@ module.exports = {
   fetchProjectTeams,
   updateProjectIcon,
   deleteProjectIcon,
-  fetchProjectCollaborators,
+  fetchProjectMembers,
   fetchProjectDetails,
   updateProjectDetails,
   fetchProjectActivities,

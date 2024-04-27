@@ -236,15 +236,22 @@ const setInvitationAccepted = async (userId, invitationId) => {
 
     const project = await projects
       .findById(invitation.project)
-      .select("name activities guide members invitations");
+      .select("name teams activities guide members invitations")
+      .populate({
+        path: "teams",
+        select: "guide",
+      })
+      .session(session);
 
     const projectLeader = await users
       .findById(invitation.from)
-      .select("notifications");
+      .select("notifications")
+      .session(session);
 
     const invitedUser = await users
       .findById(invitedUserId)
-      .select("username projects profilePic");
+      .select("username projects profilePic")
+      .session(session);
 
     invitation.isRead = true;
     invitation.status = "accepted";
@@ -276,6 +283,11 @@ const setInvitationAccepted = async (userId, invitationId) => {
         await previousGuide.save({ session });
       }
       project.guide = invitedUser._id;
+
+      project.teams.forEach(async (team) => {
+        if (!team.guide) team.guide = invitedUser._id;
+        await team.save({ session });
+      });
     }
 
     if (invitation.role === "member") project.members.push(invitedUser._id);
