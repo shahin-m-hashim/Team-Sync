@@ -13,8 +13,6 @@ import InvitationsPopUp from "../popups/InvitationsPopUp";
 import noInvitations from "../../assets/images/no activity.png";
 
 const Invitations = ({ invitations, handleInvitation }) => {
-  console.log(invitations);
-
   return (
     <div className="flex flex-col gap-2">
       {invitations?.slice(0, 3).map((invitation) => {

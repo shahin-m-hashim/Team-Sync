@@ -6,7 +6,7 @@ function KickedPopUp({ entity, setShowKickedFromEntityPopUp }) {
   const navigate = useNavigate();
 
   return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-filter backdrop-blur-md">
+    <div className="absolute inset-0 z-[100] flex items-center justify-center backdrop-filter backdrop-blur-md">
       <div className="max-w-sm p-4 text-center bg-white rounded-lg shadow-lg">
         <h2 className="mb-4 text-xl font-bold">
           Removed From {capitalizeFirstLetterOfEachWord(entity)} !!!

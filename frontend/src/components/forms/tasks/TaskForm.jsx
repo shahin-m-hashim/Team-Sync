@@ -4,7 +4,6 @@
 import { cn } from "@/lib/utils";
 import { v4 as uuidv4 } from "uuid";
 import { useRef, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useContext, useEffect } from "react";
 import SearchAssignee from "./SearchAssignee";
 import SelectPriority from "./SelectPriority";
@@ -16,46 +15,27 @@ import { FileContext } from "@/providers/FileProvider";
 
 const initialTask = {
   name: "",
-  priority: "",
-  deadline: null,
   assignee: "",
+  priority: "",
+  deadline: "",
   status: "Not Started",
   attachment: {
-    file: null,
-    firebaseId: "",
+    url: "",
+    path: "",
   },
 };
 
 export default function TaskForm({ setShowTaskForm }) {
-  const [firebaseId, setFirebaseId] = useState("");
+  const [attachmentId, setAttachmentId] = useState("");
 
   const attachmentRef = useRef();
   const taskInputsErrorRef = useRef();
   const [task, setTask] = useState(initialTask);
-  const { userId, projectId, teamId } = useParams();
   const [showMembers, setShowMembers] = useState(false);
   const [disableButtons, setDisableButtons] = useState(false);
 
   const { file, setFile, initialFile, uploadFile, deleteFile } =
     useContext(FileContext);
-
-  useEffect(() => {
-    setFirebaseId(uuidv4().replace(/-/g, ""));
-  }, []);
-
-  useEffect(() => {
-    if (file.uploadStatus === "completed") {
-      setTask((prevTask) => ({
-        ...prevTask,
-        attachment: {
-          file: file.uploadedFileURL,
-          firebaseId,
-        },
-      }));
-      setFile(initialFile);
-      attachmentRef.current.innerText = "";
-    }
-  }, [file]);
 
   const handleAttachment = async (e) => {
     try {
@@ -71,7 +51,7 @@ export default function TaskForm({ setShowTaskForm }) {
       await uploadFile(
         "direct",
         attachment,
-        `users/${userId}/projects/${projectId}/teams/${teamId}/tasks/attachments/${firebaseId}`
+        `tasks/attachments/${attachmentId}`
       );
     } catch (e) {
       console.log(e);
@@ -82,10 +62,9 @@ export default function TaskForm({ setShowTaskForm }) {
 
   const handleClose = async () => {
     try {
-      task.attachment.file &&
-        (await deleteFile(
-          `users/${userId}/projects/${projectId}/teams/${teamId}/tasks/attachments/${firebaseId}`
-        ));
+      file.uploadedFileURL &&
+        (await deleteFile(`tasks/attachments/${attachmentId}`));
+      setFile(initialFile);
     } catch (e) {
       console.log(e);
     }
@@ -93,6 +72,34 @@ export default function TaskForm({ setShowTaskForm }) {
     setTask(initialTask);
     setShowTaskForm(false);
   };
+
+  const handleReUpload = async () => {
+    try {
+      setTask({ ...task, attachment: initialTask.attachment });
+      setFile(initialFile);
+      await deleteFile(`tasks/attachments/${attachmentId}`);
+      setDisableButtons(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    setAttachmentId(uuidv4().replace(/-/g, ""));
+  }, []);
+
+  useEffect(() => {
+    if (file.uploadStatus === "completed") {
+      setTask((prevTask) => ({
+        ...prevTask,
+        attachment: {
+          url: file.uploadedFileURL,
+          path: file.path,
+        },
+      }));
+      attachmentRef.current.innerText = "";
+    }
+  }, [file]);
 
   return (
     <div className="absolute inset-0 z-50 size-full backdrop-blur-sm">
@@ -118,7 +125,12 @@ export default function TaskForm({ setShowTaskForm }) {
           <div className="flex flex-col p-3">
             <span>Task Attachment</span>
             <div className="flex justify-center">
-              <label className="rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2 cursor-pointer">
+              <label
+                className={cn(
+                  disableButtons ? "cursor-default" : "cursor-pointer",
+                  "rounded-[50%] size-[80px] bg-[rgba(6,6,6,30%)] flex items-center flex-col justify-center gap-2"
+                )}
+              >
                 <input
                   accept="*"
                   type="file"
@@ -128,10 +140,10 @@ export default function TaskForm({ setShowTaskForm }) {
                   onClick={() => (attachmentRef.current.innerText = "")}
                 />
                 <img
-                  src={task.attachment?.file ? successIcon : attachIcon}
-                  className={task.attachment?.file ? "pl-1 w-[70%]" : "w-[30%]"}
+                  src={task.attachment?.url ? successIcon : attachIcon}
+                  className={task.attachment?.url ? "pl-1 w-[70%]" : "w-[30%]"}
                 />
-                {!task.attachment.file && (
+                {!task.attachment.url && (
                   <span className="text-xs">ATTACH</span>
                 )}
               </label>
@@ -147,14 +159,11 @@ export default function TaskForm({ setShowTaskForm }) {
                 </span>
               </div>
             )}
-            {task.attachment?.file && (
+            {task.attachment?.url && (
               <span className="mt-1 text-xs">
                 Wrong attachment file&nbsp;?&nbsp;
                 <button
-                  onClick={() => {
-                    setTask({ ...task, attachment: initialTask.attachment });
-                    setDisableButtons(false);
-                  }}
+                  onClick={() => handleReUpload()}
                   className="font-semibold text-red-500"
                 >
                   REUPLOAD
@@ -246,6 +255,8 @@ export default function TaskForm({ setShowTaskForm }) {
         <AssignTaskButton
           task={task}
           setTask={setTask}
+          setFile={setFile}
+          initialFile={initialFile}
           initialTask={initialTask}
           attachmentRef={attachmentRef}
           setShowTaskForm={setShowTaskForm}

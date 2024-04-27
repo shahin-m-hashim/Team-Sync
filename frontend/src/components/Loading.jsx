@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="absolute inset-0 z-50 backdrop-blur-[1px]">
+    <div className="absolute inset-0 backdrop-blur-[1px]">
       <div className="flex flex-col items-center justify-center size-full">
         <svg
           aria-hidden="true"

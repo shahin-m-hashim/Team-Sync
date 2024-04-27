@@ -11,7 +11,7 @@ import { useContext, useEffect, useState } from "react";
 import { projectValidationSchema } from "@/validations/entityValidations";
 
 const ProjectSettings = () => {
-  const { userId, projectId } = useParams();
+  const { projectId } = useParams();
   const { setError } = useContext(UserContext);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -118,13 +118,13 @@ const ProjectSettings = () => {
         entitySettings={projectSettings?.data}
         validationSchema={projectValidationSchema}
         kickCollaborator={kickProjectCollaborator}
+        entityIconPath={`projects/${projectId}/icon`}
         setReFetchEntitySettings={setReFetchProjectSettings}
         disableEntityUpdateButton={disableProjectUpdateButton}
         handleUpdateEntityDetails={handleUpdateProjectDetails}
         showAddEntityCollaboratorForm={showSendProjectInviteForm}
         showCurrentCollaborators={showCurrentProjectCollaborators}
         showUpdateEntityDetailsForm={showUpdateProjectDetailsForm}
-        entityIconPath={`users/${userId}/projects/${projectId}/icon`}
         setShowAddEntityCollaboratorForm={setShowSendProjectInviteForm}
         setShowCurrentCollaborators={setShowCurrentProjectCollaborators}
         setShowUpdateEntityDetailsForm={setShowUpdateProjectDetailsForm}

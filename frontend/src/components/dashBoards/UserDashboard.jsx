@@ -32,7 +32,7 @@ export default function UserDashboard() {
     setLocalSecureItem(
       "projects",
       projects?.data?.map((project) => ({
-        project: project.id,
+        id: project.id,
         role: project.role,
       })),
       "medium"

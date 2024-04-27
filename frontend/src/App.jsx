@@ -20,6 +20,7 @@ import ProjectSettings from "./pages/settings/ProjectSettings";
 import UserSettingsPage from "./pages/settings/UserSettingsPage";
 import TeamDashboard from "./components/dashBoards/TeamDashboard";
 import UserDashboard from "./components/dashBoards/UserDashboard";
+import TaskUploadsProvider from "./providers/TaskUploadsProvider";
 import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
@@ -148,7 +149,9 @@ function App() {
 
   return (
     <FileProvider>
-      <RouterProvider router={router} />
+      <TaskUploadsProvider>
+        <RouterProvider router={router} />
+      </TaskUploadsProvider>
     </FileProvider>
   );
 }

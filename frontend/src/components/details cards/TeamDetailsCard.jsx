@@ -26,7 +26,7 @@ export default function TeamDetailsCard({
     const teams = getLocalSecureItem("teams", "medium");
 
     teams?.forEach((team) => {
-      if (team.team === teamId && team.role !== "Leader")
+      if (team.id === teamId && team.role !== "Leader")
         setDisableProjectSettingsLink(true);
     });
   }, [teamId]);
