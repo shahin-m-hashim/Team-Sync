@@ -55,7 +55,7 @@ const SendProjectInviteForm = ({ setShowSendProjectInviteForm }) => {
     <div className="relative h-full p-10 rounded-md bg-slate-700">
       <form
         onSubmit={sendInvite}
-        className="absolute top-0 left-0 right-0 z-10 h-full px-8 py-4 bg-slate-700"
+        className="absolute top-0 left-0 right-0 h-full px-8 py-4 bg-slate-700"
       >
         {showSearchForm && (
           <SearchAndSelectUser

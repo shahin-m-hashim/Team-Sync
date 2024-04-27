@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { cn } from "@/lib/utils";
+import TaskUploads from "../TaskUploads";
 import { useContext, useState } from "react";
 import Notifications from "../Notifications";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +13,7 @@ export default function UserNavbar({ settings }) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const [showDropDown, setShowDropDown] = useState(false);
+  const [showTaskUploadsPopUp, setShowTaskUploadsPopUp] = useState(false);
   const [showNotificationsPopUp, setShowNotificationsPopUp] = useState(false);
 
   return (
@@ -29,6 +31,10 @@ export default function UserNavbar({ settings }) {
           TeamSync
         </button>
         <div className="inline-flex items-center gap-6">
+          <TaskUploads
+            showTaskUploadsPopUp={showTaskUploadsPopUp}
+            setShowTaskUploadsPopUp={setShowTaskUploadsPopUp}
+          />
           <Notifications
             showNotificationsPopUp={showNotificationsPopUp}
             setShowNotificationsPopUp={setShowNotificationsPopUp}

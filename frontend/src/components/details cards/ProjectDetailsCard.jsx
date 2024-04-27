@@ -26,7 +26,7 @@ export default function ProjectDetailsCard({
     const projects = getLocalSecureItem("projects", "medium");
 
     projects?.forEach((project) => {
-      if (project.project === projectId && project.role !== "Leader")
+      if (project.id === projectId && project.role !== "Leader")
         setDisableProjectSettingsLink(true);
     });
   }, [projectId]);

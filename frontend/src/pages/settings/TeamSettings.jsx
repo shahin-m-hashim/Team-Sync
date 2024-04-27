@@ -11,8 +11,8 @@ import { teamValidationSchema } from "@/validations/entityValidations";
 import { socket } from "@/App";
 
 const TeamSettings = () => {
+  const { projectId, teamId } = useParams();
   const { setError } = useContext(UserContext);
-  const { userId, projectId, teamId } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
   const [reFetchTeamSettings, setReFetchTeamSettings] = useState(false);
@@ -128,6 +128,7 @@ const TeamSettings = () => {
         entitySettings={teamSettings?.data}
         validationSchema={teamValidationSchema}
         kickCollaborator={kickTeamCollaborator}
+        entityIconPath={`teams/${teamId}/icon`}
         setReFetchEntitySettings={setReFetchTeamSettings}
         disableEntityUpdateButton={disableTeamUpdateButton}
         handleUpdateEntityDetails={handleUpdateTeamDetails}
@@ -137,7 +138,6 @@ const TeamSettings = () => {
         setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
         setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}
         setShowAddEntityCollaboratorForm={setShowAddTeamCollaboratorForm}
-        entityIconPath={`users/${userId}/projects/${projectId}/teams/${teamId}/icon`}
       />
     )
   );

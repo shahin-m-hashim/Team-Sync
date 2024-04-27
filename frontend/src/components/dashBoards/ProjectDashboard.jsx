@@ -50,7 +50,7 @@ export default function ProjectDashboard() {
     setLocalSecureItem(
       "teams",
       teams?.data?.map((team) => ({
-        team: team.id,
+        id: team.id,
         role: team.role,
       })),
       "medium"
@@ -140,7 +140,7 @@ export default function ProjectDashboard() {
         />
       )}
       {showInviteProjectCollaboratorForm && (
-        <div className="absolute inset-0 z-[100] h-full size-full backdrop-blur-sm">
+        <div className="absolute inset-0 z-[200] h-full size-full backdrop-blur-sm">
           <div className="relative h-[70%] text-white max-w-xl transform -translate-x-1/2 top-20 left-1/2">
             <SendProjectInviteForm
               setShowSendProjectInviteForm={

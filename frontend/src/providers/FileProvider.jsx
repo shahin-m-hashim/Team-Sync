@@ -14,6 +14,7 @@ const storage = getStorage(app);
 export const FileContext = createContext();
 
 const initialFile = {
+  path: "",
   uploadProgress: 0,
   uploadedFileURL: "",
   uploadStatus: "idle",
@@ -28,6 +29,7 @@ const FileProvider = ({ children }) => {
       const fileRef = ref(storage, path);
       setFile((prevFile) => ({
         ...prevFile,
+        path,
         uploadStatus: "uploading",
       }));
 
@@ -46,9 +48,11 @@ const FileProvider = ({ children }) => {
 
       await uploadTask;
       const uploadedFileURL = await getDownloadURL(fileRef);
-      type !== "direct" && (await updateSecondaryDatabase(uploadedFileURL));
+      type !== "direct" &&
+        (await updateSecondaryDatabase(uploadedFileURL, path));
 
       setFile({
+        path,
         uploadedFileURL,
         uploadProgress: 100,
         uploadStatus: "completed",
@@ -61,6 +65,28 @@ const FileProvider = ({ children }) => {
       throw error;
     }
     return;
+  };
+
+  const downloadFile = async (fileURL, fileName) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "blob";
+
+    xhr.onload = () => {
+      const blob = xhr.response;
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = blob.type.includes("text") ? `${fileName}.txt` : fileName;
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    };
+
+    xhr.open("GET", fileURL);
+    xhr.send();
   };
 
   const deleteFile = async (path) => {
@@ -77,6 +103,7 @@ const FileProvider = ({ children }) => {
         uploadFile,
         deleteFile,
         initialFile,
+        downloadFile,
       }}
     >
       {children}
