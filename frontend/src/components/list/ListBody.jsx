@@ -40,6 +40,8 @@ function ListItem({
   const { downloadFile } = useContext(FileContext);
   const { username } = getLocalSecureItem("user", "low");
 
+  if (teamLeader === userId) role = "Leader";
+
   const handleDownload = (url, name) => {
     try {
       if (!url) {
@@ -195,7 +197,7 @@ function ListItem({
           ) : (
             <button
               className="pl-3"
-              onClick={() => handleDownload(submittedTask, "task")}
+              onClick={() => handleDownload(submittedTask, "taskSubmission")}
             >
               <img src={viewSubmitted} width={30} />
             </button>
