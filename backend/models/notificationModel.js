@@ -16,6 +16,8 @@ const notificationSchema = new mongoose.Schema(
         "",
         "taskUpdated",
         "taskSubmitted",
+        "taskApproved",
+        "taskRejected",
         "taskAssigned",
         "projectDeleted",
         "kickedFromTeam",

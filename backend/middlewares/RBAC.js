@@ -58,8 +58,9 @@ const isProjectCollaborator = async (req, res, next) => {
 const isTeamLeader = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { teamId } = req.params;
+    let { teamId } = req.params;
     const { projectId } = req.project;
+    if (!teamId) teamId = req.team.teamId;
 
     const team = await teams.findById(teamId).select("leader parent");
     if (!team) throw new Error("UnknownTeam");
