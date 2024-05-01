@@ -8,7 +8,9 @@ const SelectPriority = ({ task, setTask, taskInputsErrorRef }) => {
   return (
     <div
       onClick={() => {
-        taskInputsErrorRef.current.innerText = "";
+        if (taskInputsErrorRef) {
+          taskInputsErrorRef.current.innerText = "";
+        }
         setShowOptions(!showOptions);
       }}
       className="bg-[#5030E5] relative mt-3 px-3 py-2 rounded-lg w-full hover:cursor-pointer text-start text-[#BDBDBD]"

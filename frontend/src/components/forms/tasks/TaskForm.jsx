@@ -264,10 +264,10 @@ export default function TaskForm({ setShowTaskForm }) {
         />
         <button
           onClick={() => {
-            taskInputsErrorRef.current.innerText = "";
             setTask(initialTask);
+            setDisableButtons(false);
+            taskInputsErrorRef.current.innerText = "";
           }}
-          disabled={disableButtons}
           className="rounded-lg font-bold w-full px-3 py-2 bg-[#b22e2e] text-black"
         >
           Reset Form

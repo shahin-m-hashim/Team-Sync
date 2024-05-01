@@ -10,6 +10,7 @@ import {
 import app from "@/lib/firebase";
 import { toast } from "react-toastify";
 import { createContext, useEffect, useRef, useState } from "react";
+import { updateData } from "@/services/db";
 
 export const TaskUploadsContext = createContext();
 
@@ -55,9 +56,9 @@ const TaskUploadsProvider = ({ children }) => {
 
       removeTaskFromUploads(taskId);
 
-      // await addData(task.secondaryDBPath, {
-      //   submittedTask: uploadedFileURL,
-      // });
+      await updateData(task.secondaryDBPath, {
+        submittedTask: uploadedFileURL,
+      });
 
       toast.success(`Task ${task.taskName} uploaded successfully.`);
     } catch (error) {

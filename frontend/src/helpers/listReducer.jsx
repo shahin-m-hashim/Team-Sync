@@ -43,15 +43,11 @@ export const listReducer = (state, action) => {
       );
     case "DEADLINE_ASC":
       return [...state].sort((a, b) =>
-        moment(a.deadlineDate, "DD/MM/YYYY").diff(
-          moment(b.deadlineDate, "DD/MM/YYYY")
-        )
+        moment(a.deadline, "DD/MM/YYYY").diff(moment(b.deadline, "DD/MM/YYYY"))
       );
     case "DEADLINE_DESC":
       return [...state].sort((a, b) =>
-        moment(b.deadlineDate, "DD/MM/YYYY").diff(
-          moment(a.deadlineDate, "DD/MM/YYYY")
-        )
+        moment(b.deadline, "DD/MM/YYYY").diff(moment(a.deadline, "DD/MM/YYYY"))
       );
     default:
       return state;

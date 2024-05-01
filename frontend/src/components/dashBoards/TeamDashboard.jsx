@@ -136,7 +136,7 @@ export default function TeamDashboard() {
           setShowAddTeamCollaboratorForm={setShowAddTeamCollaboratorForm}
         />
         {initialTasks ? (
-          <StatusCard list={initialTasks} renderList="Team" />
+          <StatusCard list={initialTasks} renderList="Task" />
         ) : (
           <div className="relative bg-[#141414]">
             <Loading />

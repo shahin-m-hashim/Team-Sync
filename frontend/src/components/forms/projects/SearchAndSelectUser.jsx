@@ -22,7 +22,9 @@ function SearchAndSelectUser({
       const results = await axios.get(
         `${baseURL}/search/user?username=${searchTxt}`
       );
-      setSearchedUsers(results?.data);
+      setSearchedUsers(
+        results?.data.filter((user) => user.username !== currentUser.username)
+      );
     } catch (e) {
       console.log(e);
     }
@@ -51,10 +53,7 @@ function SearchAndSelectUser({
       />
       {showSearchResults ? (
         <div className="h-[80%] overflow-auto">
-          {searchedUsers.length > 0 &&
-          searchedUsers.some(
-            (user) => user.username !== currentUser.username
-          ) ? (
+          {searchedUsers.length > 0 ? (
             searchedUsers.map((user) => (
               <button
                 id={user._id}
