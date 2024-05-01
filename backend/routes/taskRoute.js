@@ -1,7 +1,6 @@
 const taskRouter = require("express").Router();
 
 const {
-  isTeamGuide,
   isTeamLeader,
   isTaskAssignee,
   isProjectCollaborator,
@@ -10,28 +9,22 @@ const {
 const {
   submitTask,
   fetchTaskDetails,
+  updateAttachment,
+  updateTaskStatus,
   updateTaskDetails,
-  updateSubmittedTask,
 } = require("../controllers/taskController");
 
 // GET Requests
-taskRouter.get(
-  "/tasks/:taskId/details",
-  isProjectCollaborator,
-  fetchTaskDetails
-);
-
-// POST Requests
-taskRouter.post("/tasks/:taskId/task", isTaskAssignee, submitTask);
+taskRouter.get("/tasks/:taskId", isProjectCollaborator, fetchTaskDetails);
 
 // PATCH Requests
-taskRouter.patch("/tasks/:taskId/taskDetails", isTeamLeader, updateTaskDetails);
+taskRouter.patch("/tasks/:taskId", isTeamLeader, updateTaskDetails);
 
-taskRouter.patch(
-  "/tasks/:taskId/submittedTask",
-  isTaskAssignee,
-  updateSubmittedTask
-);
+taskRouter.patch("/tasks/:taskId/submit", isTaskAssignee, submitTask);
+
+taskRouter.patch("/tasks/:taskId/status", isTeamLeader, updateTaskStatus);
+
+taskRouter.patch("/tasks/:taskId/attachment", isTeamLeader, updateAttachment);
 
 // DELETE Requests
 

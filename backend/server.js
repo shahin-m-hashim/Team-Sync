@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const requestLogger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const { verifyAccessToken } = require("./middlewares/token");
+const monitorTaskDeadline = require("./utils/monitorTaskDeadline");
 const unknownRouteHandler = require("./middlewares/unknownRouteHandler");
 
 const app = express();
@@ -84,6 +85,8 @@ const startApp = async () => {
     httpServer.listen(process.env.PORT, () => {
       console.log("Server is running on port:", process.env.PORT);
     });
+
+    await monitorTaskDeadline(io);
   } catch (error) {
     console.error("Database connection error:", {
       name: error.name,
