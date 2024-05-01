@@ -269,11 +269,14 @@ const assignTask = async (userId, teamId, task) => {
     if (team.unavailableMembers.includes(task.assignee))
       throw new Error("UserAlreadyAssignedToAnotherTask");
 
+    if (new Date(task.deadline) < Date.now()) throw new Error("DeadlineError");
+
     const newTask = await tasks.create(
       [
         {
           ...task,
           parent: teamId,
+          assigner: userId,
           assignee: assignee._id,
           grandParent: team.parent,
         },

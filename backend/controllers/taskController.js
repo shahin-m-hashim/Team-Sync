@@ -1,8 +1,9 @@
 const {
+  setAttachment,
   getTaskDetails,
   setTaskDetails,
-  submitGivenTask,
-  setSubmittedTask,
+  setSubmitTask,
+  setSubmittedTaskStatus,
 } = require("../services/taskService");
 
 // GET Requests
@@ -16,28 +17,21 @@ const fetchTaskDetails = async (req, res, next) => {
   }
 };
 
-// POST REQUESTS
-const submitTask = async (req, res, next) => {
+// PATCH REQUESTS
+const updateAttachment = async (req, res, next) => {
   try {
     const { taskId } = req.params;
-    const { submittedTask } = req.body;
-    await submitGivenTask(taskId, submittedTask);
+    const { attachment } = req.body;
+    await setAttachment(taskId, attachment);
     res.status(200).json({
       success: true,
-      message: `Task submitted successfully`,
+      message: "Attachment updated successfully",
     });
   } catch (e) {
-    if (e.name === "ValidationError") {
-      const customError = new Error("ValidationError");
-      customError.errors = e.errors;
-      next(customError);
-    } else {
-      next(e);
-    }
+    next(e);
   }
 };
 
-// PATCH REQUESTS
 const updateTaskDetails = async (req, res, next) => {
   try {
     const { taskId } = req.params;
@@ -53,20 +47,40 @@ const updateTaskDetails = async (req, res, next) => {
       customError.errors = e.errors;
       next(customError);
     } else if (e.name === "MongoServerError" && e.code === 11000) {
-      next(new Error("TeamAlreadyExists"));
+      next(new Error("TaskAlreadyExists"));
     }
     next(e);
   }
 };
 
-const updateSubmittedTask = async (req, res, next) => {
+const submitTask = async (req, res, next) => {
   try {
     const { taskId } = req.params;
     const { submittedTask } = req.body;
-    await setSubmittedTask(taskId, submittedTask);
+    await setSubmitTask(taskId, submittedTask);
     res.status(200).json({
       success: true,
-      message: "Submitted task updated successfully",
+      message: `Task submitted successfully`,
+    });
+  } catch (e) {
+    if (e.name === "ValidationError") {
+      const customError = new Error("ValidationError");
+      customError.errors = e.errors;
+      next(customError);
+    } else {
+      next(e);
+    }
+  }
+};
+
+const updateTaskStatus = async (req, res, next) => {
+  try {
+    const { taskId } = req.params;
+    const { status } = req.body;
+    await setSubmittedTaskStatus(taskId, status);
+    res.status(200).json({
+      success: true,
+      message: "Task status updated successfully",
     });
   } catch (e) {
     next(e);
@@ -77,7 +91,8 @@ const updateSubmittedTask = async (req, res, next) => {
 
 module.exports = {
   submitTask,
+  updateAttachment,
   fetchTaskDetails,
+  updateTaskStatus,
   updateTaskDetails,
-  updateSubmittedTask,
 };

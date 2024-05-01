@@ -166,6 +166,18 @@ const errorHandler = (error, req, res, next) => {
         error: "User is already assigned to another task.",
       });
 
+    case "TaskStopped":
+      return res.status(400).json({
+        success: false,
+        error: "Deadline has passed.",
+      });
+
+    case "TaskAlreadyHandled":
+      return res.status(400).json({
+        success: false,
+        error: "Task has already been handled.",
+      });
+
     case "ValidationError":
       const validationErrors = {};
       Object.keys(error.errors).forEach(

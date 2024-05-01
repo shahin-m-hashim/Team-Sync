@@ -5,8 +5,8 @@ const { isValidFirebaseUrl } = require("../utils/validator");
 const teamSchema = new mongoose.Schema(
   {
     parent: {
-      ref: "projects",
       type: mongoose.Schema.Types.ObjectId,
+      ref: "projects",
       required: [true, "Parent project is required"],
     },
     name: {
@@ -84,9 +84,9 @@ const teamSchema = new mongoose.Schema(
 teamSchema.index({ name: 1, parent: 1 }, { unique: true });
 
 teamSchema.pre("save", async function (next) {
-  this.NOT = this.tasks?.length;
-  this.NOM = this.members?.length;
-  this.NOA = this.activities?.length;
+  this.NOT = this.tasks?.length || 0;
+  this.NOM = this.members?.length || 0;
+  this.NOA = this.activities?.length || 0;
   next();
 });
 

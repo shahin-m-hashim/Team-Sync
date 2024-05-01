@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const { isValidFirebaseUrl } = require("../utils/validator");
 
 const taskSchema = new mongoose.Schema(
@@ -18,6 +17,11 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: [true, "Task team name is required"],
       maxLength: [50, "Task name cannot exceed 50 characters"],
+    },
+    assigner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: [true, "Assigner is required"],
     },
     assignee: {
       type: mongoose.Schema.Types.ObjectId,
@@ -65,16 +69,5 @@ const taskSchema = new mongoose.Schema(
 );
 
 taskSchema.index({ name: 1, parent: 1, grandParent: 1 }, { unique: true });
-
-taskSchema.pre("save", async function (next) {
-  if (this.deadline < this.createdAt) throw new Error("DeadlineError");
-
-  setTimeout(async () => {
-    if (this.status !== "Done") this.status = "Stopped";
-    await this.save();
-  }, this.deadline - this.createdAt);
-
-  next();
-});
 
 module.exports = mongoose.model("tasks", taskSchema);
