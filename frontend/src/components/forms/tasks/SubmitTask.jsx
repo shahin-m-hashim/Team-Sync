@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 const SubmitTask = ({ team, taskId, project, taskName, submittedTask }) => {
   const inputRef = useRef(null);
-  const { userId, projectId, teamId } = useParams();
+  const { projectId, teamId } = useParams();
   const [disableTaskUpload, setDisableTaskUpload] = useState(false);
   const { taskUploads, addTaskToUploads } = useContext(TaskUploadsContext);
 
@@ -38,7 +38,7 @@ const SubmitTask = ({ team, taskId, project, taskName, submittedTask }) => {
       uploadProgress: 0,
       uploadStatus: "idle",
       firebasePath: `tasks/${taskId}/submittedTask`,
-      secondaryDBPath: `users/${userId}/projects/${projectId}/teams/${teamId}/tasks/${taskId}/submit`,
+      secondaryDBPath: `projects/${projectId}/teams/${teamId}/tasks/${taskId}/submit`,
     };
 
     addTaskToUploads(taskUpload);
