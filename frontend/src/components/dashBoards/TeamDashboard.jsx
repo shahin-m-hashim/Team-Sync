@@ -3,7 +3,9 @@
 
 import { socket } from "@/App";
 import Loading from "../Loading";
+import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
+import { deleteData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
 import TaskForm from "../forms/tasks/TaskForm";
@@ -15,7 +17,9 @@ import ListHeader from "@/components/list/ListHeader";
 import LeaderDemotion from "../popups/LeaderDemotion";
 import { UserContext } from "@/providers/UserProvider";
 import ListSubHeader from "@/components/list/ListSubHeader";
+import EntityDeletedPopUp from "../popups/EntityDeletedPopUp";
 import TeamDetailsCard from "../details cards/TeamDetailsCard";
+import DeleteConfirmation from "../popups/DeletionConfirmation";
 import { useContext, useEffect, useReducer, useState } from "react";
 import AddTeamCollaboratorForm from "../forms/teams/AddTeamCollaboratorForm";
 
@@ -26,11 +30,16 @@ export default function TeamDashboard() {
 
   const [kickedFrom, setKickedFrom] = useState("team");
   const [reFetchTasks, setReFetchTasks] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [deleteTaskLink, setDeleteTaskLink] = useState("");
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [listOnlyYourTasks, setListOnlyYourTasks] = useState(false);
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
-  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showTeamDeletedPopUp, setShowTeamDeletedPopUp] = useState(false);
   const [showKickedFromTeamPopUp, setShowKickedFromTeamPopUp] = useState(false);
+
+  const [showDeleteTaskConfirmation, setShowDeleteTaskConfirmation] =
+    useState(false);
 
   const [
     showTeamLeaderDemotionConfirmation,
@@ -48,6 +57,15 @@ export default function TeamDashboard() {
   );
 
   const yourTasks = tasks?.data?.filter((task) => task.assignee === username);
+
+  const deleteTask = async () => {
+    try {
+      await deleteData(deleteTaskLink);
+      toast.success("Project deleted successfully");
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete project");
+    }
+  };
 
   const resetSubTeamList = () => {
     setTeamNameSearchTxt("");
@@ -80,14 +98,17 @@ export default function TeamDashboard() {
 
   useEffect(() => {
     socket.on("tasks", (task) => setReFetchTasks(task));
-    return () => socket.off("tasks");
-  }, []);
-
-  useEffect(() => {
     socket.on("kickedFromProject", () => {
       setKickedFrom("project");
       setShowKickedFromTeamPopUp(true);
     });
+    socket.on("teamDeleted", () => setShowTeamDeletedPopUp(true));
+
+    return () => {
+      socket.off("tasks");
+      socket.off("teamDeleted");
+      socket.off("kickedFromProject");
+    };
   }, []);
 
   if (tasks?.error === "unauthorized") {
@@ -108,6 +129,19 @@ export default function TeamDashboard() {
           hideAddEntityForm={setShowAddTeamCollaboratorForm}
           username={showTeamLeaderDemotionConfirmation.username || ""}
           setShowEntityLeaderDemotion={setShowTeamLeaderDemotionConfirmation}
+        />
+      )}
+      {showDeleteTaskConfirmation && (
+        <DeleteConfirmation
+          entity="task"
+          deleteEntity={deleteTask}
+          setShowDeleteConfirmation={setShowDeleteTaskConfirmation}
+        />
+      )}
+      {showTeamDeletedPopUp && (
+        <EntityDeletedPopUp
+          entity="team"
+          setShowEntityDeletedPopUp={setShowTeamDeletedPopUp}
         />
       )}
       {showKickedFromTeamPopUp && (
@@ -165,7 +199,9 @@ export default function TeamDashboard() {
           <ListBody
             renderList="Task"
             list={initialTasks || []}
+            setDeleteLink={setDeleteTaskLink}
             listNameSearchTxt={teamNameSearchTxt}
+            showDeleteConfirmation={setShowDeleteTaskConfirmation}
           />
         ) : (
           <div className="relative h-full">

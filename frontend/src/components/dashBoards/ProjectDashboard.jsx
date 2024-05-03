@@ -5,17 +5,19 @@ import { socket } from "@/App";
 import Loading from "../Loading";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
-import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
 import { useParams } from "react-router-dom";
 import KickedPopUp from "../popups/KickedPopUp";
 import { setLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
+import { addData, deleteData } from "@/services/db";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
 import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
 import ListSubHeader from "@/components/list/ListSubHeader";
+import EntityDeletedPopUp from "../popups/EntityDeletedPopUp";
+import DeleteConfirmation from "../popups/DeletionConfirmation";
 import { useContext, useEffect, useReducer, useState } from "react";
 import ProjectDetailsCard from "../details cards/ProjectDetailsCard";
 import SendProjectInviteForm from "../forms/projects/SendProjectInviteForm";
@@ -25,10 +27,12 @@ export default function ProjectDashboard() {
   const { setError } = useContext(UserContext);
 
   const [reFetchTeams, setReFetchTeams] = useState(false);
+  const [deleteTeamLink, setDeleteTeamLink] = useState("");
   const [showAddTeamForm, setShowAddTeamForm] = useState(false);
   const [teamNameSearchTxt, setTeamNameSearchTxt] = useState("");
   const [teamFilterBtnTxt, setTeamFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderTeams, setListOnlyLeaderTeams] = useState(false);
+  const [showProjectDeletedPopUp, setShowProjectDeletedPopUp] = useState(false);
 
   const [disableAddProjectTeamButton, setDisableAddProjectTeamButton] =
     useState(false);
@@ -37,6 +41,9 @@ export default function ProjectDashboard() {
     useState(false);
 
   const [showProjectActivitiesPopUp, setShowProjectActivitiesPopUp] =
+    useState(false);
+
+  const [showDeleteTeamConfirmation, setShowDeleteTeamConfirmation] =
     useState(false);
 
   const [
@@ -77,6 +84,15 @@ export default function ProjectDashboard() {
     }
   };
 
+  const deleteTeam = async () => {
+    try {
+      await deleteData(deleteTeamLink);
+      toast.success("Project deleted successfully");
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete project");
+    }
+  };
+
   const resetTeamList = () => {
     setTeamNameSearchTxt("");
     setListOnlyLeaderTeams(false);
@@ -105,12 +121,15 @@ export default function ProjectDashboard() {
 
   useEffect(() => {
     socket.on("teams", (team) => setReFetchTeams(team));
-    return () => socket.off("teams");
-  }, []);
-
-  useEffect(() => {
+    socket.on("projectDeleted", () => setShowProjectDeletedPopUp(true));
     socket.on("kickedFromProject", () => setShowKickedFromProjectPopUp(true));
-  });
+
+    return () => {
+      socket.off("teams");
+      socket.off("projectDeleted");
+      socket.off("kickedFromProject");
+    };
+  }, []);
 
   if (teams?.error === "unauthorized") {
     setError("unauthorized");
@@ -128,6 +147,19 @@ export default function ProjectDashboard() {
         <KickedPopUp
           entity="project"
           setShowKickedFromEntityPopUp={setShowKickedFromProjectPopUp}
+        />
+      )}
+      {showDeleteTeamConfirmation && (
+        <DeleteConfirmation
+          entity="team"
+          deleteEntity={deleteTeam}
+          setShowDeleteConfirmation={setShowDeleteTeamConfirmation}
+        />
+      )}
+      {showProjectDeletedPopUp && (
+        <EntityDeletedPopUp
+          entity="project"
+          setShowEntityDeletedPopUp={setShowProjectDeletedPopUp}
         />
       )}
       {showAddTeamForm && (
@@ -188,7 +220,9 @@ export default function ProjectDashboard() {
           <ListBody
             renderList="Team"
             list={initialTeams || []}
+            setDeleteLink={setDeleteTeamLink}
             listNameSearchTxt={teamNameSearchTxt}
+            showDeleteConfirmation={setShowDeleteTeamConfirmation}
           />
         ) : (
           <div className="relative h-full">

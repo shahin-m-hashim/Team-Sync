@@ -3,19 +3,24 @@
 import { socket } from "@/App";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
-import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { UserContext } from "@/providers/UserProvider";
 import { deleteData, updateData } from "@/services/db";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { projectValidationSchema } from "@/validations/entityValidations";
+import DeleteConfirmation from "@/components/popups/DeletionConfirmation";
 
 const ProjectSettings = () => {
-  const { projectId } = useParams();
+  const navigate = useNavigate();
+  const { projectId, nav } = useParams();
   const { setError } = useContext(UserContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [reFetchProjectSettings, setReFetchProjectSettings] = useState(false);
+
+  const [showDeleteProjectConfirmation, setShowDeleteProjectConfirmation] =
+    useState(false);
 
   const [showSendProjectInviteForm, setShowSendProjectInviteForm] =
     useState(false);
@@ -90,6 +95,16 @@ const ProjectSettings = () => {
     await deleteData(`projects/${projectId}/icon`);
   };
 
+  const deleteProject = async () => {
+    try {
+      await deleteData(`projects/${projectId}`);
+      toast.success("Project deleted successfully");
+      navigate(-nav, { replace: true });
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete project.");
+    }
+  };
+
   useEffect(() => {
     socket.on("projectDetails", (projectDetails) =>
       setReFetchProjectSettings(projectDetails)
@@ -110,25 +125,35 @@ const ProjectSettings = () => {
 
   return (
     projectSettings && (
-      <EntitySettings
-        entity="project"
-        setIsEditing={setIsEditing}
-        updateEntityIcon={updateProjectIcon}
-        deleteEntityIcon={deleteProjectIcon}
-        entitySettings={projectSettings?.data}
-        validationSchema={projectValidationSchema}
-        kickCollaborator={kickProjectCollaborator}
-        entityIconPath={`projects/${projectId}/icon`}
-        setReFetchEntitySettings={setReFetchProjectSettings}
-        disableEntityUpdateButton={disableProjectUpdateButton}
-        handleUpdateEntityDetails={handleUpdateProjectDetails}
-        showAddEntityCollaboratorForm={showSendProjectInviteForm}
-        showCurrentCollaborators={showCurrentProjectCollaborators}
-        showUpdateEntityDetailsForm={showUpdateProjectDetailsForm}
-        setShowAddEntityCollaboratorForm={setShowSendProjectInviteForm}
-        setShowCurrentCollaborators={setShowCurrentProjectCollaborators}
-        setShowUpdateEntityDetailsForm={setShowUpdateProjectDetailsForm}
-      />
+      <>
+        {showDeleteProjectConfirmation && (
+          <DeleteConfirmation
+            entity="project"
+            deleteEntity={deleteProject}
+            setShowDeleteConfirmation={setShowDeleteProjectConfirmation}
+          />
+        )}
+        <EntitySettings
+          entity="project"
+          setIsEditing={setIsEditing}
+          updateEntityIcon={updateProjectIcon}
+          deleteEntityIcon={deleteProjectIcon}
+          entitySettings={projectSettings?.data}
+          validationSchema={projectValidationSchema}
+          kickCollaborator={kickProjectCollaborator}
+          entityIconPath={`projects/${projectId}/icon`}
+          setReFetchEntitySettings={setReFetchProjectSettings}
+          disableEntityUpdateButton={disableProjectUpdateButton}
+          handleUpdateEntityDetails={handleUpdateProjectDetails}
+          showAddEntityCollaboratorForm={showSendProjectInviteForm}
+          showCurrentCollaborators={showCurrentProjectCollaborators}
+          showUpdateEntityDetailsForm={showUpdateProjectDetailsForm}
+          setShowDeleteConfirmation={setShowDeleteProjectConfirmation}
+          setShowAddEntityCollaboratorForm={setShowSendProjectInviteForm}
+          setShowCurrentCollaborators={setShowCurrentProjectCollaborators}
+          setShowUpdateEntityDetailsForm={setShowUpdateProjectDetailsForm}
+        />
+      </>
     )
   );
 };
