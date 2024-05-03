@@ -1,8 +1,9 @@
 const {
+  removeTask,
   setAttachment,
+  setSubmitTask,
   getTaskDetails,
   setTaskDetails,
-  setSubmitTask,
   setSubmittedTaskStatus,
 } = require("../services/taskService");
 
@@ -88,9 +89,22 @@ const updateTaskStatus = async (req, res, next) => {
 };
 
 // DELETE Requests
+const deleteTask = async (req, res, next) => {
+  try {
+    const { taskId } = req.params;
+    await removeTask(taskId);
+    res.status(200).json({
+      success: true,
+      message: "Task deleted successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
 module.exports = {
   submitTask,
+  deleteTask,
   updateAttachment,
   fetchTaskDetails,
   updateTaskStatus,

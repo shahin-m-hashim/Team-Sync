@@ -1,12 +1,10 @@
 const moment = require("moment");
 const { io } = require("../server");
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 const tasks = require("../models/taskModel");
-const teams = require("../models/teamModel");
-const projects = require("../models/projectModel");
 const activities = require("../models/activityModel");
 const notifications = require("../models/notificationModel");
-const { calculateStatus } = require("../utils/calculateStatus");
 const updateStatusProgress = require("../helpers/updateStatusProgress");
 
 // GET
@@ -165,7 +163,7 @@ const setSubmitTask = async (taskId, updatedSubmittedTask) => {
     io.emit("tasks", task.updatedAt.toString());
     io.emit("notifications", newNotification[0].id);
 
-    updateStatusProgress(task.parent._id, task.grandParent._id);
+    updateStatusProgress(task.parent._id, task.grandParent._id, io);
   } catch (e) {
     if (session) {
       await session.abortTransaction();
@@ -239,7 +237,7 @@ const setSubmittedTaskStatus = async (taskId, status) => {
     io.emit("notifications", newNotification[0].id);
     io.emit("taskDetails", task.updatedAt.toString());
 
-    updateStatusProgress(task.parent._id, task.grandParent._id);
+    updateStatusProgress(task.parent._id, task.grandParent._id, io);
   } catch (e) {
     if (session) {
       await session.abortTransaction();
@@ -250,11 +248,88 @@ const setSubmittedTaskStatus = async (taskId, status) => {
 };
 
 // DELETE
+const removeTask = async (taskId) => {
+  let session = null;
+
+  const deletionId = uuidv4().replace(/-/g, "");
+
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const task = await tasks
+      .findById(taskId)
+      .select("assignee parent grandParent updatedAt")
+      .populate({
+        path: "assignee",
+        select: "username tasks notifications",
+      })
+      .populate({
+        path: "parent",
+        select: "tasks leader unavailableMembers",
+        populate: {
+          path: "leader",
+          select: "username",
+        },
+      })
+      .session(session);
+
+    if (!task) throw new Error("UnknownTask");
+
+    task.assignee.tasks = task.assignee.tasks.filter(
+      (task) => task.toString() !== taskId
+    );
+
+    task.parent.tasks = task.parent.tasks.filter(
+      (task) => task.toString() !== taskId
+    );
+
+    task.parent.unavailableMembers = task.parent.unavailableMembers.filter(
+      (member) => member !== task.assignee.username
+    );
+
+    const newNotification = await notifications.create(
+      [
+        {
+          to: task.assignee,
+          type: "taskDeleted",
+          from: task.parent.leader,
+          message: `The task assigned to you is deleted by team leader ${task.parent.leader.username}.`,
+        },
+      ],
+      { session }
+    );
+
+    task.assignee.notifications.push(newNotification[0].id);
+
+    await Promise.all([
+      task.assignee.save({ session }),
+      task.parent.save({ session }),
+      task.deleteOne({ session }),
+    ]);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    io.emit("tasks", deletionId);
+    io.emit("notifications", newNotification[0].id);
+
+    await updateStatusProgress(task.parent._id, task.grandParent, io);
+  } catch (error) {
+    console.log(error);
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+    throw error;
+  }
+};
 
 module.exports = {
+  removeTask,
   setAttachment,
+  setSubmitTask,
   getTaskDetails,
   setTaskDetails,
-  setSubmitTask,
   setSubmittedTaskStatus,
 };

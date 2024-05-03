@@ -39,40 +39,24 @@ const projectSchema = new mongoose.Schema(
         ref: "users",
       },
     ],
-    NOM: {
-      type: Number,
-      default: 0,
-    },
     invitations: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "invitations",
       },
     ],
-    NOI: {
-      type: Number,
-      default: 0,
-    },
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "activities",
       },
     ],
-    NOA: {
-      type: Number,
-      default: 0,
-    },
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "teams",
       },
     ],
-    NOT: {
-      type: Number,
-      default: 0,
-    },
     progress: {
       type: Number,
       default: 0,
@@ -86,13 +70,5 @@ const projectSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-projectSchema.pre("save", async function (next) {
-  this.NOT = this.teams?.length || 0;
-  this.NOM = this.members?.length || 0;
-  this.NOA = this.activities?.length || 0;
-  this.NOI = this.invitations?.length || 0;
-  next();
-});
 
 module.exports = mongoose.model("projects", projectSchema);

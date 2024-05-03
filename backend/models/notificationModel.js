@@ -15,10 +15,11 @@ const notificationSchema = new mongoose.Schema(
       enum: [
         "",
         "taskUpdated",
-        "taskSubmitted",
+        "taskDeleted",
         "taskApproved",
         "taskRejected",
         "taskAssigned",
+        "taskSubmitted",
         "projectDeleted",
         "kickedFromTeam",
         "teamGuideDemotion",

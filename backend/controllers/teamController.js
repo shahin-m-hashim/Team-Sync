@@ -1,5 +1,6 @@
 const {
   assignTask,
+  removeTeam,
   setTeamIcon,
   setTeamGuide,
   getTeamTasks,
@@ -228,8 +229,22 @@ const kickTeamCollaborator = async (req, res, next) => {
   }
 };
 
+const deleteTeam = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    await removeTeam(teamId);
+    res.status(200).json({
+      success: true,
+      message: "Team deleted successfully",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   addTask,
+  deleteTeam,
   addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
