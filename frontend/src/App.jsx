@@ -90,11 +90,11 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "projects/:projectId/settings",
+        path: "projects/:projectId/settings/nav/:nav",
         element: <ProjectSettings />,
       },
       {
-        path: "projects/:projectId/teams/:teamId/settings",
+        path: "projects/:projectId/teams/:teamId/settings/nav/:nav",
         element: <TeamSettings />,
       },
       {

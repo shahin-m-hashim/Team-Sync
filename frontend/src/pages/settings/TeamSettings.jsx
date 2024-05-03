@@ -1,21 +1,26 @@
 /* eslint-disable react/prop-types */
 
+import { socket } from "@/App";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
-import { useParams } from "react-router-dom";
 import EntitySettings from "./EntitySettings";
 import { deleteData, updateData } from "@/services/db";
-import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/providers/UserProvider";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { teamValidationSchema } from "@/validations/entityValidations";
-import { socket } from "@/App";
+import DeleteConfirmation from "@/components/popups/DeletionConfirmation";
 
 const TeamSettings = () => {
-  const { projectId, teamId } = useParams();
+  const navigate = useNavigate();
   const { setError } = useContext(UserContext);
+  const { nav, projectId, teamId } = useParams();
 
   const [isEditing, setIsEditing] = useState(false);
   const [reFetchTeamSettings, setReFetchTeamSettings] = useState(false);
+
+  const [showDeleteTeamConfirmation, setShowDeleteTeamConfirmation] =
+    useState(false);
 
   const [showAddTeamCollaboratorForm, setShowAddTeamCollaboratorForm] =
     useState(false);
@@ -99,6 +104,16 @@ const TeamSettings = () => {
     }
   };
 
+  const deleteTeam = async () => {
+    try {
+      await deleteData(`projects/${projectId}/teams/${teamId}`);
+      toast.success("Team deleted successfully");
+      navigate(-nav, { replace: true });
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete team");
+    }
+  };
+
   useEffect(() => {
     socket.on("teamDetails", (teamDetails) =>
       setReFetchTeamSettings(teamDetails)
@@ -119,26 +134,36 @@ const TeamSettings = () => {
 
   return (
     teamSettings && (
-      <EntitySettings
-        entity="team"
-        parent="project"
-        setIsEditing={setIsEditing}
-        updateEntityIcon={updateTeamIcon}
-        deleteEntityIcon={deleteTeamIcon}
-        entitySettings={teamSettings?.data}
-        validationSchema={teamValidationSchema}
-        kickCollaborator={kickTeamCollaborator}
-        entityIconPath={`teams/${teamId}/icon`}
-        setReFetchEntitySettings={setReFetchTeamSettings}
-        disableEntityUpdateButton={disableTeamUpdateButton}
-        handleUpdateEntityDetails={handleUpdateTeamDetails}
-        showCurrentCollaborators={showCurrentTeamCollaborators}
-        showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}
-        showAddEntityCollaboratorForm={showAddTeamCollaboratorForm}
-        setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
-        setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}
-        setShowAddEntityCollaboratorForm={setShowAddTeamCollaboratorForm}
-      />
+      <>
+        {showDeleteTeamConfirmation && (
+          <DeleteConfirmation
+            entity="team"
+            deleteEntity={deleteTeam}
+            setShowDeleteConfirmation={setShowDeleteTeamConfirmation}
+          />
+        )}
+        <EntitySettings
+          entity="team"
+          parent="project"
+          setIsEditing={setIsEditing}
+          updateEntityIcon={updateTeamIcon}
+          deleteEntityIcon={deleteTeamIcon}
+          entitySettings={teamSettings?.data}
+          validationSchema={teamValidationSchema}
+          kickCollaborator={kickTeamCollaborator}
+          entityIconPath={`teams/${teamId}/icon`}
+          setReFetchEntitySettings={setReFetchTeamSettings}
+          disableEntityUpdateButton={disableTeamUpdateButton}
+          handleUpdateEntityDetails={handleUpdateTeamDetails}
+          showCurrentCollaborators={showCurrentTeamCollaborators}
+          showUpdateEntityDetailsForm={showUpdateTeamDetailsForm}
+          setShowDeleteConfirmation={setShowDeleteTeamConfirmation}
+          showAddEntityCollaboratorForm={showAddTeamCollaboratorForm}
+          setShowCurrentCollaborators={setShowCurrentTeamCollaborators}
+          setShowUpdateEntityDetailsForm={setShowUpdateTeamDetailsForm}
+          setShowAddEntityCollaboratorForm={setShowAddTeamCollaboratorForm}
+        />
+      </>
     )
   );
 };

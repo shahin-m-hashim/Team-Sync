@@ -33,11 +33,14 @@ function ListItem({
   teamLeader,
   grandParent,
   attachmentURL,
+  attachmentPath,
   submittedTask,
+  setDeleteLink,
+  showDeleteConfirmation,
 }) {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { downloadFile } = useContext(FileContext);
+  const { downloadFile, deleteFile } = useContext(FileContext);
   const { username } = getLocalSecureItem("user", "low");
 
   if (teamLeader === userId) role = "Leader";
@@ -54,6 +57,23 @@ function ListItem({
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const handleDelete = () => {
+    const deleteLink =
+      renderList === "Project"
+        ? `projects/${id}`
+        : renderList === "Team"
+          ? `projects/${parent}/teams/${id}`
+          : `projects/${grandParent}/teams/${parent}/tasks/${id}`;
+
+    if (renderList === "Task") {
+      deleteFile(attachmentPath);
+      deleteFile(`tasks/${id}`);
+    }
+
+    setDeleteLink(deleteLink);
+    showDeleteConfirmation(true);
   };
 
   return (
@@ -208,10 +228,10 @@ function ListItem({
         <Link
           to={
             renderList === "Project"
-              ? `/user/${userId}/projects/${id}/settings`
+              ? `/user/${userId}/projects/${id}/settings/nav/1`
               : renderList === "Team"
-                ? `/user/${userId}/projects/${parent}/teams/${id}/settings`
-                : `/user/${userId}/projects/${grandParent}/teams/${parent}/tasks/${id}/settings`
+                ? `/user/${userId}/projects/${parent}/teams/${id}/settings/nav/1`
+                : `/user/${userId}/projects/${grandParent}/teams/${parent}/tasks/${id}/settings/nav/1`
           }
           className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
         >
@@ -227,6 +247,8 @@ function ListItem({
         />
       )}
       <button
+        disabled={role !== "Leader"}
+        onClick={() => handleDelete()}
         className={cn(
           renderList !== "Task" ? "pl-10" : "pl-8",
           role === "Leader" ? "cursor-pointer" : "cursor-not-allowed"
@@ -238,10 +260,22 @@ function ListItem({
   );
 }
 
-export default function ListBody({ list, renderList, listNameSearchTxt }) {
+export default function ListBody({
+  list,
+  renderList,
+  setDeleteLink,
+  listNameSearchTxt,
+  showDeleteConfirmation,
+}) {
   return list.length > 0 ? (
     list.map((item) => (
-      <ListItem {...item} key={item.id} renderList={renderList} />
+      <ListItem
+        {...item}
+        key={item.id}
+        renderList={renderList}
+        setDeleteLink={setDeleteLink}
+        showDeleteConfirmation={showDeleteConfirmation}
+      />
     ))
   ) : (
     <EmptyListBody

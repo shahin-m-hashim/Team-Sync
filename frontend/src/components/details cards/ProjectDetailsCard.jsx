@@ -65,7 +65,7 @@ export default function ProjectDetailsCard({
       setShowActivitiesPopUp={setShowProjectActivitiesPopUp}
       setDisableSettingsLink={setDisableProjectSettingsLink}
       setShowAddCollaboratorForm={setShowInviteProjectCollaboratorForm}
-      settingsPath={`/user/${userId}/projects/${projectId}/settings`}
+      settingsPath={`/user/${userId}/projects/${projectId}/settings/nav/2`}
     />
   ) : (
     <div className="relative bg-[#141414]">

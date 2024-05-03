@@ -4,27 +4,32 @@ import { socket } from "@/App";
 import Loading from "../Loading";
 import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
-import { addData } from "@/services/db";
 import StatusCard from "../cards/StatusCard";
 import { setLocalSecureItem } from "@/lib/utils";
 import ListBody from "@/components/list/ListBody";
 import ListSubHeader from "../list/ListSubHeader";
+import { addData, deleteData } from "@/services/db";
 import { listReducer } from "@/helpers/listReducer";
 import ListHeader from "@/components/list/ListHeader";
 import InvitationsCard from "../cards/InvitationsCard";
 import { UserContext } from "@/providers/UserProvider";
 import AddListEntityForm from "../forms/AddListEntityForm";
+import DeleteConfirmation from "../popups/DeletionConfirmation";
 import { useContext, useEffect, useReducer, useState } from "react";
 
 export default function UserDashboard() {
   const { setError } = useContext(UserContext);
   const { reFetchProjects, setReFetchProjects } = useContext(UserContext);
 
+  const [deleteProjectLink, setDeleteProjectLink] = useState("");
   const [showAddProjectForm, setShowAddProjectForm] = useState(false);
   const [projectNameSearchTxt, setProjectNameSearchTxt] = useState("");
   const [projectFilterBtnTxt, setProjectFilterBtnTxt] = useState("Filter");
   const [listOnlyLeaderProjects, setListOnlyLeaderProjects] = useState(false);
   const [disableAddProjectButton, setDisableAddProjectButton] = useState(false);
+
+  const [showDeleteProjectConfirmation, setShowDeleteProjectConfirmation] =
+    useState(false);
 
   const projects = useFetch("projects", reFetchProjects);
 
@@ -59,6 +64,16 @@ export default function UserDashboard() {
       );
     } finally {
       setDisableAddProjectButton(false);
+    }
+  };
+
+  const deleteProject = async () => {
+    try {
+      await deleteData(deleteProjectLink);
+      toast.success("Project deleted successfully");
+      setReFetchProjects((prev) => !prev);
+    } catch (e) {
+      toast.error(e.response.data.error || "Failed to delete project");
     }
   };
 
@@ -115,6 +130,13 @@ export default function UserDashboard() {
           description="Your project is where you can create your teams, add members and work with them effortlessly."
         />
       )}
+      {showDeleteProjectConfirmation && (
+        <DeleteConfirmation
+          entity="project"
+          deleteEntity={deleteProject}
+          setShowDeleteConfirmation={setShowDeleteProjectConfirmation}
+        />
+      )}
       <div className="grid grid-cols-2 gap-[2px] text-white border-2 border-t-0 border-white min-h-72">
         <InvitationsCard />
         {initialProjects ? (
@@ -147,7 +169,9 @@ export default function UserDashboard() {
           <ListBody
             renderList="Project"
             list={initialProjects}
+            setDeleteLink={setDeleteProjectLink}
             listNameSearchTxt={projectNameSearchTxt}
+            showDeleteConfirmation={setShowDeleteProjectConfirmation}
           />
         ) : (
           <div className="relative h-full">
