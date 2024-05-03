@@ -170,60 +170,36 @@ const userSchema = new mongoose.Schema(
         ref: "projects",
       },
     ],
-    NOP: {
-      type: Number,
-      default: 0,
-    },
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "teams",
       },
     ],
-    NOTe: {
-      type: Number,
-      default: 0,
-    },
     tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "tasks",
       },
     ],
-    NOTa: {
-      type: Number,
-      default: 0,
-    },
     connections: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
       },
     ],
-    NOC: {
-      type: Number,
-      default: 0,
-    },
     notifications: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "notifications",
       },
     ],
-    NON: {
-      type: Number,
-      default: 0,
-    },
     invitations: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "invitations",
       },
     ],
-    NOI: {
-      type: Number,
-      default: 0,
-    },
     last_seen: {
       type: Date,
       default: null,
@@ -241,16 +217,8 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password"))
     this.password = await bcrypt.hash(this.password, 12);
 
-  this.NOTe = this.teams?.length || 0;
-  this.NOTa = this.tasks?.length || 0;
-  this.NOP = this.projects?.length || 0;
-  this.NOC = this.connections?.length || 0;
-  this.NOI = this.invitations?.length || 0;
-  this.NON = this.notifications?.length || 0;
-
-  this.phone.countryCode = this.phone.countryCode || "+91";
   this.address.country = this.address.country || "IN";
-  this.wasNew = this.isNew;
+  this.phone.countryCode = this.phone.countryCode || "+91";
   next();
 });
 

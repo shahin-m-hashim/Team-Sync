@@ -1,6 +1,6 @@
 function calculateStatus(statuses) {
   if (statuses.every((status) => status === "Not Started")) {
-    return "Pending";
+    return "Not Started";
   }
 
   if (statuses.every((status) => status === "Done")) {

@@ -190,9 +190,8 @@ const kickProjectCollaborator = async (req, res, next) => {
 
 const deleteProject = async (req, res, next) => {
   try {
-    const { userId } = req.user;
     const { projectId } = req.params;
-    await removeProject(userId, projectId);
+    await removeProject(projectId);
     res.status(200).json({
       success: true,
       message: "Project deleted successfully",

@@ -33,6 +33,7 @@ const activitySchema = new mongoose.Schema(
         "teamGuideChanged",
         "teamLeaderChanged",
         "teamAddedToProject",
+        "projectTeamDeleted",
         "teamUpdatedInProject",
         "teamDeletedFromProject",
         "teamCollaboratorRemoved",

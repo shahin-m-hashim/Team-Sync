@@ -1,8 +1,10 @@
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
+const tasks = require("../models/taskModel");
 const projects = require("../models/projectModel");
 const { io, connectedUsers } = require("../server");
 const activities = require("../models/activityModel");
@@ -53,7 +55,7 @@ const getProjectDetails = async (projectId) => {
     icon: project.icon,
     name: project.name,
     description: project.description,
-    NOC: project.NOM + (project.guide ? 1 : 0) + 1,
+    NOC: project.members.length + (project.guide ? 1 : 0) + 1,
   };
 };
 
@@ -501,74 +503,118 @@ const removeProjectCollaborator = async (
   }
 };
 
-const removeProject = async (userId, projectId) => {
+const removeProject = async (projectId) => {
+  const removeEventId = uuidv4().replace(/-/g, "");
+
   let session = null;
   try {
     session = await mongoose.startSession();
     session.startTransaction();
 
-    const user = await users.findById(userId).session(session);
-    if (!user) throw new Error("UnknownUser");
+    const project = await projects
+      .findById(projectId)
+      .select("name leader guide members")
+      .populate({
+        path: "leader guide members",
+        select: "username projects teams tasks notifications",
+        populate: {
+          path: "teams tasks",
+          select: "parent grandParent",
+        },
+      })
+      .session(session);
 
-    const project = await projects.findById(projectId).session(session);
     if (!project) throw new Error("UnknownProject");
 
-    const collaborators = [...project.members, project.guide];
+    project.leader.projects = project.leader.projects.filter(
+      (project) => project.toString() !== projectId
+    );
 
-    for (const collaboratorId of collaborators) {
-      const collaborator = await users
-        .findById(collaboratorId)
-        .session(session);
-      if (collaborator) {
-        const newNotification = new notifications({
-          user: collaboratorId,
-          type: "projectDeleted",
-          message: `We are sorry to inform you that the project ${project.name} you were in was deleted by its leader ${user.username}. You can no longer access this project. All its teams, subteams, and tasks are all gone.`,
-          isRead: false,
-        });
-        await newNotification.save({ session });
+    project.leader.teams = project.leader.teams.filter(
+      (team) => team.parent.toString() !== projectId
+    );
 
-        collaborator.notifications.push(newNotification._id);
-        collaborator.projects = collaborator.projects.filter(
-          (projId) => projId.toString() !== projectId.toString()
+    project.leader.tasks = project.leader.tasks.filter(
+      (task) => task.grandParent.toString() !== projectId
+    );
+
+    if (project.guide) {
+      project.guide.projects.filter(
+        (project) => project.toString() !== projectId
+      );
+      project.guide.teams = project.guide.teams.filter(
+        (team) => team.parent.toString() !== projectId
+      );
+
+      project.guide.tasks = project.guide.tasks.filter(
+        (task) => task.grandParent.toString() !== projectId
+      );
+    }
+
+    project.members.forEach((member) => {
+      member.projects = member.projects.filter(
+        (project) => project.toString() !== projectId
+      );
+
+      member.teams = member.teams.filter(
+        (team) => team.parent.toString() !== projectId
+      );
+
+      member.tasks = member.tasks.filter(
+        (task) => task.grandParent.toString() !== projectId
+      );
+    });
+
+    teams.deleteMany({ parent: projectId }).session(session);
+    tasks.deleteMany({ grandParent: projectId }).session(session);
+
+    const notificationRecipients = [project.guide, ...project.members];
+
+    for (const recipient of notificationRecipients) {
+      if (recipient) {
+        const newNotification = await notifications.create(
+          [
+            {
+              to: recipient.id,
+              type: "projectDeleted",
+              from: project.leader.id,
+              message: `The project ${project.name} is deleted by its leader ${project.leader.username}.`,
+            },
+          ],
+          { session }
         );
-        await collaborator.save({ session });
+
+        recipient.notifications.push(newNotification[0].id);
+        await recipient.save({ session });
       }
     }
 
-    // Find and remove related subteams
-    const subTeamsToDelete = await subteams
-      .find({ grandParent: projectId })
-      .session(session);
-    const subTeamIdsToDelete = subTeamsToDelete.map((subTeam) => subTeam._id);
-    await users
-      .updateMany(
-        { subTeams: { $in: subTeamIdsToDelete } },
-        { $pull: { subTeams: { $in: subTeamIdsToDelete } } }
-      )
-      .session(session);
-    await subteams.deleteMany({ grandParent: projectId }).session(session);
+    await Promise.all([
+      project.leader.save({ session }),
+      project.guide?.save({ session }),
+      project.members.forEach((member) => member.save({ session })),
+      project.deleteOne({ session }),
+    ]);
 
-    // Find and remove related teams
-    const teamsToDelete = await teams
-      .find({ parent: projectId })
-      .session(session);
-    const teamIdsToDelete = teamsToDelete.map((team) => team._id);
-    await users
-      .updateMany(
-        { teams: { $in: teamIdsToDelete } },
-        { $pull: { teams: { $in: teamIdsToDelete } } }
-      )
-      .session(session);
-    await teams.deleteMany({ parent: projectId }).session(session);
-
-    // Delete the project itself
-    await projects.findByIdAndDelete(projectId).session(session);
-
-    // Commit the transaction
     await session.commitTransaction();
     session.endSession();
+
+    const connectedCollaboratorsSocketIds = [
+      connectedUsers[project.leader.id],
+      connectedUsers[project.guide?.id],
+      ...project.members.map((member) => connectedUsers[member.id]),
+    ];
+
+    connectedCollaboratorsSocketIds.forEach((connectedCollaboratorSocketId) => {
+      io.to(connectedCollaboratorSocketId).emit("teamDeleted");
+      io.to(connectedCollaboratorSocketId).emit("projectDeleted");
+    });
+
+    io.emit("projects", removeEventId);
+    io.emit("notifications", removeEventId);
   } catch (error) {
+    console.log(error);
+
     if (session) {
       await session.abortTransaction();
       session.endSession();

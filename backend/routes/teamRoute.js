@@ -6,6 +6,7 @@ const { isTeamLeader, isProjectCollaborator } = require("../middlewares/RBAC");
 
 const {
   addTask,
+  deleteTeam,
   addTeamMember,
   updateTeamIcon,
   deleteTeamIcon,
@@ -68,5 +69,7 @@ teamRouter.delete(
   isTeamLeader,
   kickTeamCollaborator
 );
+
+teamRouter.delete("/teams/:teamId", isTeamLeader, deleteTeam);
 
 module.exports = teamRouter;

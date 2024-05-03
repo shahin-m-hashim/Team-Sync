@@ -1,12 +1,13 @@
 const moment = require("moment");
-const { io } = require("../server");
 const mongoose = require("mongoose");
 const users = require("../models/userModel");
 const teams = require("../models/teamModel");
 const tasks = require("../models/taskModel");
 const projects = require("../models/projectModel");
+const { io, connectedUsers } = require("../server");
 const activities = require("../models/activityModel");
 const notifications = require("../models/notificationModel");
+const updateStatusProgress = require("../helpers/updateStatusProgress");
 
 // GET
 const getTeamDetails = async (teamId) => {
@@ -52,7 +53,7 @@ const getTeamDetails = async (teamId) => {
     icon: team.icon,
     name: team.name,
     description: team.description,
-    NOC: team.NOM + (team.guide ? 1 : 0) + 1,
+    NOC: team.members.length + (team.guide ? 1 : 0) + 1,
   };
 };
 
@@ -324,8 +325,13 @@ const assignTask = async (userId, teamId, task) => {
     io.emit("tasks", newTask[0]._id);
     io.emit("teamActivities", newActivity[0]._id);
     io.emit("notifications", newNotification[0]._id);
+
+    await updateStatusProgress(teamId, team.parent._id, io);
+
     return newTask[0]._id;
   } catch (error) {
+    console.log("Error: ", error);
+
     if (session) {
       await session.abortTransaction();
       session.endSession();
@@ -784,8 +790,123 @@ const removeTeamCollaborator = async (teamId, collaboratorUsername, role) => {
   }
 };
 
+const removeTeam = async (teamId) => {
+  let session = null;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const team = await teams
+      .findById(teamId)
+      .select("name icon parent leader guide members")
+      .populate({
+        path: "leader guide members",
+        select: "username teams tasks",
+        populate: {
+          path: "tasks",
+          select: "parent",
+        },
+      })
+      .populate({
+        path: "parent",
+        select: "teams tasks activities unavailableMembers",
+      })
+      .session(session);
+
+    if (!team) throw new Error("UnknownTeam");
+
+    team.leader.teams = team.leader.teams.filter(
+      (team) => team.toString() !== teamId
+    );
+
+    team.leader.tasks = team.leader.tasks.filter(
+      (task) => task.parent.toString() !== teamId
+    );
+
+    if (team.guide) {
+      team.guide.teams = team.guide.teams.filter(
+        (team) => team.toString() !== teamId
+      );
+
+      team.guide.tasks = team.guide.tasks.filter(
+        (task) => task.parent.toString() !== teamId
+      );
+    }
+
+    team.members.forEach((member) => {
+      member.teams = member.teams.filter((team) => team.toString() !== teamId);
+
+      member.tasks = member.tasks.filter(
+        (task) => task.parent.toString() !== teamId
+      );
+    });
+
+    team.parent.teams = team.parent.teams.filter(
+      (team) => team.toString() !== teamId
+    );
+
+    team.parent.unavailableMembers = team.parent.unavailableMembers.filter(
+      (member) =>
+        !team.members.some((teamMember) => member === teamMember.username)
+    );
+
+    tasks.deleteMany({ parent: teamId }).session(session);
+
+    const newActivity = await activities.create(
+      [
+        {
+          image: team.icon,
+          entity: "project",
+          project: team.parent.id,
+          type: "projectTeamDeleted",
+          message: `The team ${team.name} in this project is deleted.`,
+          read_users: {
+            readBy: team.leader.id,
+            isRead: true,
+          },
+        },
+      ],
+      { session }
+    );
+
+    team.parent.activities.push(newActivity[0].id);
+
+    await Promise.all([
+      team.leader.save({ session }),
+      team.guide?.save({ session }),
+      ...team.members.map((member) => member.save({ session })),
+      team.parent.save({ session }),
+      team.deleteOne({ session }),
+    ]);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    await updateStatusProgress(team.id, team.parent, io);
+
+    const connectedCollaboratorsSocketIds = [
+      connectedUsers[team.guide?.id],
+      ...team.members.map((member) => connectedUsers[member.id]),
+    ];
+    connectedCollaboratorsSocketIds.forEach((connectedCollaboratorSocketId) =>
+      io.to(connectedCollaboratorSocketId).emit("teamDeleted", teamId)
+    );
+
+    io.emit("projectActivities", newActivity[0].id);
+  } catch (error) {
+    console.log("Error: ", error);
+
+    if (session) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+    throw error;
+  }
+};
+
 module.exports = {
   assignTask,
+  removeTeam,
   setTeamIcon,
   setTeamGuide,
   getTeamTasks,
