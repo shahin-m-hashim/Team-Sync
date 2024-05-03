@@ -65,7 +65,7 @@ export default function TeamDetailsCard({
       setShowActivitiesPopUp={setShowTeamActivitiesPopUp}
       setDisableSettingsLink={setDisableProjectSettingsLink}
       setShowAddCollaboratorForm={setShowAddTeamCollaboratorForm}
-      settingsPath={`/user/${userId}/projects/${projectId}/teams/${teamId}/settings`}
+      settingsPath={`/user/${userId}/projects/${projectId}/teams/${teamId}/settings/nav/2`}
     />
   ) : (
     <div className="relative bg-[#141414]">

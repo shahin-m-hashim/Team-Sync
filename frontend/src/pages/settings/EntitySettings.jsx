@@ -23,6 +23,7 @@ const EntitySettings = ({
   validationSchema,
   kickCollaborator,
   showCurrentCollaborators,
+  setShowDeleteConfirmation,
   disableEntityUpdateButton,
   handleUpdateEntityDetails,
   setShowCurrentCollaborators,
@@ -124,7 +125,7 @@ const EntitySettings = ({
                       Update {capitalizeFirstLetterOfEachWord(entity)}
                     </button>
                     <button
-                      onClick={() => setShowUpdateEntityDetailsForm(true)}
+                      onClick={() => setShowDeleteConfirmation(true)}
                       className="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold leading-6 text-black shadow-sm hover:bg-red-500 focus-visible:outline"
                     >
                       Delete {capitalizeFirstLetterOfEachWord(entity)}
