@@ -8,6 +8,7 @@ const {
 
 const {
   submitTask,
+  deleteTask,
   fetchTaskDetails,
   updateAttachment,
   updateTaskStatus,
@@ -27,5 +28,6 @@ taskRouter.patch("/tasks/:taskId/status", isTeamLeader, updateTaskStatus);
 taskRouter.patch("/tasks/:taskId/attachment", isTeamLeader, updateAttachment);
 
 // DELETE Requests
+taskRouter.delete("/tasks/:taskId", isTeamLeader, deleteTask);
 
 module.exports = taskRouter;

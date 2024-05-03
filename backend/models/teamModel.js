@@ -43,30 +43,18 @@ const teamSchema = new mongoose.Schema(
         ref: "users",
       },
     ],
-    NOM: {
-      type: Number,
-      default: 0,
-    },
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "activities",
       },
     ],
-    NOA: {
-      type: Number,
-      default: 0,
-    },
     tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "tasks",
       },
     ],
-    NOT: {
-      type: Number,
-      default: 0,
-    },
     progress: {
       type: Number,
       default: 0,
@@ -82,12 +70,5 @@ const teamSchema = new mongoose.Schema(
 );
 
 teamSchema.index({ name: 1, parent: 1 }, { unique: true });
-
-teamSchema.pre("save", async function (next) {
-  this.NOT = this.tasks?.length || 0;
-  this.NOM = this.members?.length || 0;
-  this.NOA = this.activities?.length || 0;
-  next();
-});
 
 module.exports = mongoose.model("teams", teamSchema);
