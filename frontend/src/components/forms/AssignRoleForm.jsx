@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 
-import { cn } from "@/lib/utils";
 import invite from "../../assets/images/invite.png";
 
 function AssignRoleForm({
@@ -22,48 +21,46 @@ function AssignRoleForm({
         </div>
       </div>
       <label className="block mb-2 font-medium">Project Role</label>
-      <div className="p-4 mb-4 bg-slate-600">
-        <span className="block text-sm">
-          Choose a role for inviting user in your project
-        </span>
-        <div className="flex flex-col gap-5 my-6">
-          <div>Leader: Has full control</div>
-          <div>Guide: Has view permissions</div>
-          <div>Member: Has view and task permissions</div>
-        </div>
-        <div className="flex gap-3">
+      <div className="p-6 mb-4 bg-slate-600">
+        <div>Choose a role for inviting user in your project</div>
+        <div className="flex flex-col gap-5 my-6 text-lg">
           {entity !== "project" && (
-            <button
-              type="button"
-              onClick={() => setSelectedRole("leader")}
-              className={cn(
-                "flex w-full justify-center text-black rounded-md px-3 py-1.5 text-sm font-semibold leading-6",
-                selectedRole === "leader" ? "bg-yellow-500" : "bg-blue-600"
-              )}
-            >
-              <span>Leader</span>
-            </button>
+            <div className="flex gap-3">
+              <input
+                id="leader"
+                name="role"
+                type="radio"
+                value="leader"
+                checked={selectedRole === "leader"}
+                onChange={() => setSelectedRole("leader")}
+              />
+              <label htmlFor="leader">Leader: Has full control</label>
+            </div>
           )}
-          <button
-            type="button"
-            onClick={() => setSelectedRole("guide")}
-            className={cn(
-              selectedRole === "guide" ? "bg-yellow-500" : "bg-blue-600",
-              "flex w-full justify-center text-black rounded-md px-3 py-1.5 text-sm font-semibold leading-6"
-            )}
-          >
-            <span>Guide</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedRole("member")}
-            className={cn(
-              selectedRole === "member" ? "bg-yellow-500" : "bg-blue-600",
-              "flex w-full justify-center text-black rounded-md px-3 py-1.5 text-sm font-semibold leading-6"
-            )}
-          >
-            <span>Member</span>
-          </button>
+          <div className="flex gap-3">
+            <input
+              id="guide"
+              name="role"
+              type="radio"
+              value="guide"
+              checked={selectedRole === "guide"}
+              onChange={() => setSelectedRole("guide")}
+            />
+            <label htmlFor="guide">Guide: Has view permissions</label>
+          </div>
+          <div className="flex gap-3">
+            <input
+              id="member"
+              name="role"
+              type="radio"
+              value="member"
+              checked={selectedRole === "member"}
+              onChange={() => setSelectedRole("member")}
+            />
+            <label htmlFor="member">
+              Member: Has view and task permissions
+            </label>
+          </div>
         </div>
       </div>
       <div className="flex gap-2 px-4">
