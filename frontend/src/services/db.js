@@ -8,7 +8,7 @@ const addData = async (url, newData) => {
   const user = getLocalSecureItem("user", "low");
 
   try {
-    await axios.post(`${baseURL}/user/${user?.id}/${url}`, newData, {
+    await axios.post(`${baseURL}/api/user/${user?.id}/${url}`, newData, {
       withCredentials: true,
     });
   } catch (error) {
@@ -23,7 +23,7 @@ const updateData = async (url, newData) => {
   const user = getLocalSecureItem("user", "low");
 
   try {
-    return await axios.patch(`${baseURL}/user/${user?.id}/${url}`, newData, {
+    return await axios.patch(`${baseURL}/api/user/${user?.id}/${url}`, newData, {
       withCredentials: true,
     });
   } catch (error) {
@@ -41,7 +41,7 @@ const deleteData = async (url) => {
   // console.log("Deleting data...");
   const user = getLocalSecureItem("user", "low");
   try {
-    return await axios.delete(`${baseURL}/user/${user?.id}/${url}`, {
+    return await axios.delete(`${baseURL}/api/user/${user?.id}/${url}`, {
       withCredentials: true,
     });
   } catch (error) {
@@ -55,7 +55,7 @@ const deleteAccount = async (password) => {
   // console.log("Deleting account...");
   const user = getLocalSecureItem("user", "low");
   try {
-    await axios.delete(`${baseURL}/user/${user.id}`, {
+    await axios.delete(`${baseURL}/api/user/${user.id}`, {
       data: { password },
       withCredentials: true,
     });
@@ -70,25 +70,25 @@ const deleteAccount = async (password) => {
 
 const reAuthorizeAdd = async (url, newData) => {
   // console.log("Reauthorizing add...");
-  await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  await axios.get(`${baseURL}/api/auth/refresh`, { withCredentials: true });
   await addData(url, newData);
 };
 
 const reAuthorizeUpdate = async (url, newData) => {
   // console.log("Reauthorizing update...");
-  await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  await axios.get(`${baseURL}/api/auth/refresh`, { withCredentials: true });
   await updateData(url, newData);
 };
 
 const reAuthorizeDelete = async (url) => {
   // console.log("Reauthorizing delete...");
-  await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  await axios.get(`${baseURL}/api/auth/refresh`, { withCredentials: true });
   await deleteData(url);
 };
 
 const reAuthorizeAccountDelete = async (password) => {
   // console.log("Reauthorizing account deletion...");
-  await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+  await axios.get(`${baseURL}/api/auth/refresh`, { withCredentials: true });
   await deleteAccount(password);
 };
 

@@ -3,7 +3,6 @@ import React from "react";
 import App from "./App.jsx";
 import ReactDOM from "react-dom/client";
 import "react-toastify/dist/ReactToastify.css";
-import BreakPoint from "./components/BreakPoint";
 import { Flip, ToastContainer } from "react-toastify";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -21,6 +20,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       }}
       limit={3}
     />
-    <BreakPoint />
   </React.StrictMode>
 );

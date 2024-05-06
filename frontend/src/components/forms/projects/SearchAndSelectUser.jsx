@@ -20,7 +20,7 @@ function SearchAndSelectUser({
     const searchTxt = e.target.value;
     try {
       const results = await axios.get(
-        `${baseURL}/search/user?username=${searchTxt}`
+        `${baseURL}/api/search/user?username=${searchTxt}`
       );
       setSearchedUsers(
         results?.data.filter((user) => user.username !== currentUser.username)
