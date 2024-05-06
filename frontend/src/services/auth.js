@@ -4,10 +4,10 @@ import { getLocalSecureItem, setLocalSecureItem } from "@/lib/utils";
 const base_url = import.meta.env.VITE_APP_BASE_URL;
 
 const signup = async (credentials) =>
-  await axios.post(base_url + "/auth/signup", credentials);
+  await axios.post(base_url + "/api/auth/signup", credentials);
 
 const login = async (credentials) => {
-  const { data } = await axios.post(base_url + "/auth/login", credentials, {
+  const { data } = await axios.post(base_url + "/api/auth/login", credentials, {
     withCredentials: true,
   });
 
@@ -25,7 +25,7 @@ const login = async (credentials) => {
 
 const reqPassResetOTP = async (credentials) => {
   const response = await axios.post(
-    base_url + "/auth/reqPassResetOtp",
+    base_url + "/api/auth/reqPassResetOtp",
     credentials,
     {
       withCredentials: true,
@@ -36,7 +36,7 @@ const reqPassResetOTP = async (credentials) => {
 
 const verifyOTP = async (otp) => {
   const response = await axios.post(
-    base_url + "/auth/verifyPassResetOtp",
+    base_url + "/api/auth/verifyPassResetOtp",
     otp,
     {
       withCredentials: true,
@@ -46,7 +46,7 @@ const verifyOTP = async (otp) => {
 };
 
 const resetPassword = async (credentials) => {
-  const response = await axios.post(base_url + "/auth/resetPass", credentials, {
+  const response = await axios.post(base_url + "/api/auth/resetPass", credentials, {
     withCredentials: true,
   });
   return response;
@@ -56,7 +56,7 @@ const logout = async () => {
   const { id } = getLocalSecureItem("user", "low");
   localStorage.clear();
   await axios.post(
-    base_url + "/auth/logout",
+    base_url + "/api/auth/logout",
     { userId: id },
     { withCredentials: true }
   );

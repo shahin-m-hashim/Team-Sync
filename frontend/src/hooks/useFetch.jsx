@@ -17,7 +17,7 @@ const useFetch = (url, reFetch) => {
     const fetchData = async () => {
       // console.log("Fetching data...", url);
       try {
-        const res = await axios.get(`${baseURL}/user/${user.id}/${url}`, {
+        const res = await axios.get(`${baseURL}/api/user/${user.id}/${url}`, {
           withCredentials: true,
         });
 
@@ -51,7 +51,7 @@ const useFetch = (url, reFetch) => {
 
     const reAuthorize = async () => {
       try {
-        await axios.get(`${baseURL}/auth/refresh`, { withCredentials: true });
+        await axios.get(`${baseURL}/api/auth/refresh`, { withCredentials: true });
         fetchData();
       } catch (error) {
         {
@@ -74,7 +74,7 @@ const useFetch = (url, reFetch) => {
       });
     }
 
-    return () => {};
+    return () => { };
   }, [url, reFetch]);
 
   return response;
