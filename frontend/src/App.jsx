@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import Test from "./pages/Test";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import HomePage from "./pages/HomePage";
@@ -25,7 +24,7 @@ import ProjectDashboard from "./components/dashBoards/ProjectDashboard";
 import SecuritySettingsPage from "./pages/settings/SecuritySettingsPage";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
-const baseURL = import.meta.env.VITE_APP_SOCKET_URL;
+const baseURL = import.meta.env.VITE_APP_BASE_URL;
 export const socket = io(baseURL, { withCredentials: true });
 
 const router = createBrowserRouter([
@@ -120,10 +119,6 @@ const router = createBrowserRouter([
         ],
       },
     ],
-  },
-  {
-    path: "test",
-    element: <Test />,
   },
   {
     path: "resetPass",
