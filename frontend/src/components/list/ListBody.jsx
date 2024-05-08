@@ -231,7 +231,7 @@ function ListItem({
               ? `/user/${userId}/projects/${id}/settings/nav/1`
               : renderList === "Team"
                 ? `/user/${userId}/projects/${parent}/teams/${id}/settings/nav/1`
-                : `/user/${userId}/projects/${grandParent}/teams/${parent}/tasks/${id}/settings/nav/1`
+                : `/user/${userId}/projects/${grandParent}/teams/${parent}/tasks/${id}/settings`
           }
           className={cn(renderList !== "Task" ? "pl-8" : "pl-5")}
         >
