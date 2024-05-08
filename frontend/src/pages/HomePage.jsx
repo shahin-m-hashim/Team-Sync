@@ -29,7 +29,7 @@ export default function HomePage() {
               <span className="underline decoration-yellow-400 underline-offset-4">
                 Effortless
               </span>
-              &nbsp;Team Management
+              &nbsp;Project Management
             </div>
             <div className="flex justify-start mt-10 gap-7">
               <button className="px-4 py-2 text-white rounded-lg bg-slate-900">
@@ -51,7 +51,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <hr className="my-3" />
-                <div>The perfect team management and collaboration.</div>
+                <div>The perfect project management and team collaboration platform.</div>
               </div>
               <div className="flex items-center justify-center p-5 text-white sm:max-w-full max-w-[32rem] rounded-xl bg-slate-900">
                 Revolutionize The Way Your Teams Work Together With Our
