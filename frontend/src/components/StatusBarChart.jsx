@@ -6,7 +6,10 @@ const ProgressBar = ({ percentage, color }) => {
       <div className="w-full h-[90%] bg-inherit relative">
         <div
           className="absolute bottom-0 left-0 w-full h-full ease-in transition-height"
-          style={{ height: `${percentage}%`, backgroundColor: color }}
+          style={{
+            height: `${percentage === 0 ? 1 : percentage}%`,
+            backgroundColor: color,
+          }}
         />
       </div>
       <p className="text-xs font-medium">{Math.round(percentage)}%</p>

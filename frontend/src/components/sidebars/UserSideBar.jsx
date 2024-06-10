@@ -1,21 +1,26 @@
 /* eslint-disable react/prop-types */
 import { useContext } from "react";
-import tasks from "../../assets/images/tasks.png";
-import teams from "../../assets/images/teams.png";
 import { UserContext } from "@/providers/UserProvider";
 import logoutIcon from "../../assets/images/logout.png";
 import projects from "../../assets/images/projects.png";
-import subTeams from "../../assets/images/subTeams.png";
 import defaultDp from "../../assets/images/defaultDp.png";
 import teamSyncLogo from "../../assets/images/Team Sync Logo.png";
 import techSupport from "../../assets/images/Technical Support.png";
+import { Link, useParams } from "react-router-dom";
 
-const MenuItem = ({ icon, text }) => (
-  <div className="inline-flex items-center justify-around gap-5">
-    <img src={icon} alt={text} className="w-10 h-8" />
-    <span>{text}</span>
-  </div>
-);
+const MenuItem = ({ icon, text }) => {
+  const { userId } = useParams();
+
+  return (
+    <Link
+      to={`/user/${userId}/dashboard`}
+      className="inline-flex items-center justify-around gap-5"
+    >
+      <img src={icon} alt={text} className="w-10 h-8" />
+      <span>{text}</span>
+    </Link>
+  );
+};
 
 export default function SideBar() {
   const { user, setUserStatus } = useContext(UserContext);
@@ -33,9 +38,9 @@ export default function SideBar() {
         className="inline-flex flex-col items-start gap-5 justify-evenly"
       >
         <MenuItem icon={projects} text="Projects" />
-        <MenuItem icon={teams} text="Teams" />
+        {/* <MenuItem icon={teams} text="Teams" />
         <MenuItem icon={subTeams} text="Sub Teams" />
-        <MenuItem icon={tasks} text="Tasks" />
+        <MenuItem icon={tasks} text="Tasks" /> */}
       </div>
       <div className="inline-flex flex-col items-start gap-5 justify-evenly">
         <MenuItem icon={techSupport} text="Support" />
